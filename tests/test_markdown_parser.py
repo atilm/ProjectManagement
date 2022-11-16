@@ -1,7 +1,5 @@
 import unittest
-from .test_doubles.mock_file_reader import MockFileReader
 from src.services.markdown_parser import *
-
 
 class the_parser_can_parse_sections(unittest.TestCase):
     def when_the_input_is_parsed(self, input : str) -> MarkdownDocument:
