@@ -33,7 +33,8 @@ class the_parser_can_parse_sections(unittest.TestCase):
         self.then_entry_is_of_type(0, MarkdownSection, result)
 
     def test_parsing_a_file_with_unstructured_text(self):
-        givenInput = "some line\nanother line"
+        givenInput = ( "some line\n"
+        "another line" )
 
         result = self.when_the_input_is_parsed(givenInput)
 
@@ -47,7 +48,13 @@ class the_parser_can_parse_sections(unittest.TestCase):
         self.then_entry_has_title(0, "The only section", result)
 
     def test_parsing_a_file_with_multiple_sections(self):
-        givenInput = "\n## First Section \n\n#Second Section\n### Third Section\n\n"
+        givenInput = ( ""
+        "\n"
+        "## First Section \n"
+        "\n"
+        "#Second Section\n"
+        "### Third Section\n"
+        "\n" )
 
         result = self.when_the_input_is_parsed(givenInput)
 
