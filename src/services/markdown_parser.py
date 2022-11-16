@@ -11,8 +11,8 @@ class Document:
         self.content.append(object)
 
 class Section:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, title : str) -> None:
+        self.title = title
 
 class Table:
     def __init__(self) -> None:
@@ -28,7 +28,14 @@ class MarkdownParser:
 
         lines = self.file_reader.readLines(filePath)
 
-        if (len(lines) != 0):
-            document.append(Section())
+        for line in lines:
+            if self._isSection(line):
+                document.append(self._createSection(line))
 
         return document
+
+    def _isSection(self, line : str):
+        return line.startswith('#')
+
+    def _createSection(self, line :str):
+        return Section(line.strip().strip("#").strip())
