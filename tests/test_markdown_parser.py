@@ -2,63 +2,58 @@ import unittest
 from .test_doubles.mock_file_reader import MockFileReader
 from src.services.markdown_parser import *
 
-def given_a_parser() -> MarkdownParser:
-    return MarkdownParser(MockFileReader())
-
-def given_a_parser_and_a_file_content(fileContent : str) -> MarkdownParser:
-    mockFileReader = MockFileReader()
-    mockFileReader.setup(fileContent)
-    return MarkdownParser(mockFileReader)
 
 class the_parser_can_parse_sections(unittest.TestCase):
+    def when_the_input_is_parsed(self, input : str) -> MarkdownDocument:
+        parser = MarkdownParser()
+        return parser.parse(input)
+
+    def then_the_document_entry_count_is(self, n : int, document : MarkdownDocument):
+        self.assertEqual(len(document.getContent()), n)
+
+    def then_entry_is_of_type(self, entryIndex : int, type, document : MarkdownDocument):
+        self.assertIsInstance(document.getContent()[entryIndex], type)
+
+    def then_entry_has_title(self, entryIndex : int, title : str, document : MarkdownDocument):
+        self.assertEqual(document.getContent()[entryIndex].title, title)
+
     def test_parsing_an_empty_file(self):
-        parser = given_a_parser()
+        givenInput = ""
 
-        result = parser.parse("fileName.md")
+        result = self.when_the_input_is_parsed(givenInput)
 
-        self.assertEqual(result.getContent(), [])
+        self.then_the_document_entry_count_is(0, result)
 
     def test_parsing_a_file_with_one_section(self):
-        parser = given_a_parser_and_a_file_content("# The only section")
+        givenInput = "# The only section"
 
-        result = parser.parse("fileName.md")
+        result = self.when_the_input_is_parsed(givenInput)
 
-        self.assertEqual(len(result.getContent()), 1)
-        self.assertIsInstance(result.getContent()[0], Section)
+        self.then_the_document_entry_count_is(1, result)
+        self.then_entry_is_of_type(0, MarkdownSection, result)
 
     def test_parsing_a_file_with_unstructured_text(self):
-        parser = given_a_parser_and_a_file_content(
-            "some line\n"
-            "another line"
-        )
+        givenInput = "some line\nanother line"
 
-        result = parser.parse("fileName.md")
+        result = self.when_the_input_is_parsed(givenInput)
 
-        self.assertEqual(len(result.getContent()), 0)
+        self.then_the_document_entry_count_is(0, result)
 
     def test_the_section_title_is_parsed(self):
-        parser = given_a_parser_and_a_file_content("# The only section")
+        givenInput = "# The only section"
 
-        result = parser.parse("fileName.md")
+        result = self.when_the_input_is_parsed(givenInput)
 
-        section = result.getContent()[0]
-
-        self.assertEqual(section.title, "The only section")
+        self.then_entry_has_title(0, "The only section", result)
 
     def test_parsing_a_file_with_multiple_sections(self):
-        parser = given_a_parser_and_a_file_content(
-            "\n"
-            "## First Section \n"
-            "\n"
-            "#Second Section\n"
-            "### Third Section\n"
-            "\n")
+        givenInput = "\n## First Section \n\n#Second Section\n### Third Section\n\n"
 
-        result = parser.parse("fileName.md")
+        result = self.when_the_input_is_parsed(givenInput)
 
-        self.assertEqual(len(result.getContent()), 3)
-        self.assertEqual(result.getContent()[0].title, "First Section")
-        self.assertEqual(result.getContent()[1].title, "Second Section")
-        self.assertEqual(result.getContent()[2].title, "Third Section")
+        self.then_the_document_entry_count_is(3, result)
+        self.then_entry_has_title(0, "First Section", result)
+        self.then_entry_has_title(1, "Second Section", result)
+        self.then_entry_has_title(2, "Third Section", result)
 
 

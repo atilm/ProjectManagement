@@ -1,6 +1,4 @@
-from .file_reader import IFileReader
-
-class Document:
+class MarkdownDocument:
     def __init__(self) -> None:
         self.content = []
 
@@ -10,23 +8,23 @@ class Document:
     def append(self, object) -> None:
         self.content.append(object)
 
-class Section:
+class MarkdownSection:
     def __init__(self, title : str) -> None:
         self.title = title
 
-class Table:
+class MarkdownTable:
     def __init__(self) -> None:
         pass
 
 
 class MarkdownParser:
-    def __init__(self, file_reader : IFileReader) -> None:
-        self.file_reader = file_reader
+    def __init__(self) -> None:
+        pass
 
-    def parse(self, filePath : str) -> Document:
-        document = Document()
+    def parse(self, input : str) -> MarkdownDocument:
+        document = MarkdownDocument()
 
-        lines = self.file_reader.readLines(filePath)
+        lines = input.splitlines()
 
         for line in lines:
             if self._isSection(line):
@@ -37,5 +35,5 @@ class MarkdownParser:
     def _isSection(self, line : str):
         return line.startswith('#')
 
-    def _createSection(self, line :str):
-        return Section(line.strip().strip("#").strip())
+    def _createSection(self, line : str):
+        return MarkdownSection(line.strip().strip("#").strip())
