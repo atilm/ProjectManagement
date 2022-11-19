@@ -1,50 +1,10 @@
 import re
+from .markdown_document import *
 
 class TableRowException(Exception):
     def __init__(self, lineNumber : int, *args: object) -> None:
         super().__init__(*args)
         self.message = f"No matching table header in line {lineNumber}"
-
-class MarkdownDocument:
-    def __init__(self) -> None:
-        self.content = []
-
-    def getContent(self) -> list:
-        return self.content
-
-    def append(self, object) -> None:
-        self.content.append(object)
-
-class MarkdownSection:
-    def __init__(self, title : str, lineNumber : int) -> None:
-        self.title = title
-        self.lineNumber = lineNumber
-
-class MarkdownTableRow:
-    def __init__(self, cells : list, lineNumber : int) -> None:
-        self._cells = cells
-        self.lineNumber = lineNumber
-
-    def getColumnCount(self) -> int:
-        return len(self._cells)
-
-    def get(self, columnIdx : int):
-        return self._cells[columnIdx]
-
-class MarkdownTable:
-    def __init__(self, headerRow : MarkdownTableRow) -> None:
-        self._headerRow = headerRow
-        self.rows = []
-
-    def getColumnCount(self) -> int:
-        return self._headerRow.getColumnCount()
-
-    def getColumnHeader(self, columnIndex : int) -> str:
-        return self._headerRow.get(columnIndex)
-    
-    def getRowCount(self) -> int:
-        return len(self.rows)
-
 
 class MarkdownParser:
     def __init__(self) -> None:
@@ -103,4 +63,5 @@ class MarkdownParser:
         return self._tableSeparatorRegex.match(line) != None
 
     def _createSection(self, line : str, lineNumber : int):
-        return MarkdownSection(line.strip().strip("#").strip(), lineNumber)
+        dummyLevel = 0
+        return MarkdownSection(line.strip().strip("#").strip(), dummyLevel, lineNumber)
