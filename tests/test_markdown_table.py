@@ -26,8 +26,17 @@ class the_table_reports_column_widths(unittest.TestCase):
     def test_a_table_with_two_rows(self):
         givenTable = MarkdownTableBuilder()\
             .withHeader("Id", "Description")\
-            .withRow("ANT-1", "A long descritpion")\
+            .withRow("ANT-1", "A long description")\
             .withRow("ANT-12", "short")\
             .build()
 
-        self.then_the_table_has_column_widths(givenTable, [len("ANT-12"), len("A long descritpion")])
+        self.then_the_table_has_column_widths(givenTable, [len("ANT-12"), len("A long description")])
+
+    def test_a_table_with_variing_row_lengths(self):
+        givenTable = MarkdownTableBuilder()\
+            .withHeader("Id", "Description")\
+            .withRow("ANT-1")\
+            .withRow("ANT-12", "short", "third")\
+            .build()
+
+        self.then_the_table_has_column_widths(givenTable, [len("ANT-12"), len("Description"), len("third")])

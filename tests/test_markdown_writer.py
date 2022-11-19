@@ -14,7 +14,19 @@ class MarkdownWriterTest(unittest.TestCase):
 
         self.assertEqual(output, "")
 
-    @unittest.skip
+    def test_writing_a_document_with_one_section(self):
+        givenADocument = MarkdownDocumentBuilder()\
+            .withSection("Section 1", 0)\
+            .build()
+
+        result = self.when_the_document_is_written(givenADocument)
+
+        expectedOutput = (""
+        "# Section 1\n"
+        "\n")
+
+        self.assertEqual(result, expectedOutput)
+
     def test_writing_a_whole_document(self):
         givenADocument = MarkdownDocumentBuilder()\
         .withSection("Section 1", 0)\
@@ -22,7 +34,7 @@ class MarkdownWriterTest(unittest.TestCase):
         .withTable(MarkdownTableBuilder()\
             .withHeader("Id", "Task")\
             .withRow("1", "Wash dishes")\
-            .withHeader("2", "Grocery shopping")\
+            .withRow("2", "Grocery shopping")\
             .build())\
         .withSection("Section 3", 1)\
         .build()

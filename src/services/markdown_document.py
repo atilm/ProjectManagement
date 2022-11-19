@@ -1,3 +1,5 @@
+from . import list_utilities
+
 class MarkdownDocument:
     def __init__(self) -> None:
         self.content = []
@@ -41,6 +43,7 @@ class MarkdownTable:
         
         for row in self.rows:
             rowWidths = self._getColumnWidths(row._cells)
+            (columnWidths, rowWidths) = list_utilities.alignWidths(columnWidths, rowWidths)
             columnWidths = [max(p, c) for p, c in zip(columnWidths, rowWidths)]
         
         return columnWidths
@@ -50,3 +53,5 @@ class MarkdownTable:
 
     def _getColumnWidths(self, rowEntries : list) -> list:
         return [len(s) for s in rowEntries]
+
+        return entries
