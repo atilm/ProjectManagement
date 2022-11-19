@@ -1,6 +1,6 @@
 import unittest
-from src.services.markdown_document import *
-from src.services.markdown_document_builder import *
+from src.services.markdown.markdown_document import *
+from src.services.markdown.markdown_document_builder import *
 
 class the_table_reports_column_widths(unittest.TestCase):
     def then_the_table_has_column_widths(self, table : MarkdownTable, columnWidths : list):

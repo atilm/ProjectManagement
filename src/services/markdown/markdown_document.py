@@ -1,4 +1,4 @@
-from . import list_utilities
+from src.services.utilities import list_utilities
 
 class MarkdownDocument:
     def __init__(self) -> None:
