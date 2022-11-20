@@ -1,5 +1,4 @@
 import unittest
-import datetime
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.domain.task import Task
@@ -15,6 +14,11 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
             .withTable(completed)\
             .withSection("Removed Stories", 1)\
             .withTable(removed)\
+            .build()
+
+    def build_empty_table(self):
+        return MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
             .build()
 
     def when_the_document_is_converted(self, document: MarkdownDocument) -> TaskRepository:
@@ -44,11 +48,23 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
         self.assertTrue(isDateOrNone(lhs.removedDate))
         self.assertEqual(lhs.removedDate, rhs.removedDate)
 
+    def expect_conversion_exception(self, document: MarkdownDocument):
+        try:
+            self.when_the_document_is_converted(document)
+        except Exception as e:
+            return e
+        
+        self.fail("document conversion did not raise an exception")
+
+    def then_the_exception_is(self, e : Exception, expectedType, lineNumber: int):
+        self.assertIsInstance(e, expectedType)
+        self.assertEqual(e.lineNumber, lineNumber)
+
 class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
     def test_the_converter_returns_a_repository(self):
-        todo = MarkdownTableBuilder().build()
-        completed = MarkdownTableBuilder().build()
-        removed = MarkdownTableBuilder().build()
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = self.build_empty_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -58,13 +74,13 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.assertEqual(len(repo.tasks.items()), 0)
 
     def test_can_read_two_tasks_from_completed_table(self):
-        todo = MarkdownTableBuilder().build()
+        todo = self.build_empty_table()
         completed = MarkdownTableBuilder()\
             .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
             .withRow("1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
             .withRow("2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
             .build()
-        removed = MarkdownTableBuilder().build()
+        removed = self.build_empty_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -94,8 +110,8 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
             .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
             .withRow("1", "Description", "5", "", "", "", "29-01-2021", "")\
             .build()
-        completed = MarkdownTableBuilder().build()
-        removed = MarkdownTableBuilder().build()
+        completed = self.build_empty_table()
+        removed = self.build_empty_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -110,3 +126,72 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask.removedDate = None
 
         self.then_the_repo_contains_task(expectedTask, repo)
+
+    def test_can_read_a_task_from_removed_table(self):
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .withRow("3", "Description", "5", "04-05-2022", "", "", "01-05-2022", "05-05-2022")\
+            .build()
+
+        document = self.given_a_document_with_tables(todo, completed, removed)
+
+        repo = self.when_the_document_is_converted(document)
+
+        expectedTask = Task("3", "Description")
+        expectedTask.estimate = 5
+        expectedTask.startedDate = date(2022, 5, 4)
+        expectedTask.completedDate = None
+        expectedTask.actualWorkDays = None
+        expectedTask.createdDate = date(2022, 5, 1)
+        expectedTask.removedDate = date(2022, 5, 5)
+
+        self.then_the_repo_contains_task(expectedTask, repo)
+
+    def test_exception_on_unexpected_table_header(self):
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .build()
+        removed._headerRow.lineNumber = 13
+
+        document = self.given_a_document_with_tables(todo, completed, removed)
+
+        e = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(e, HeaderFormatException, 13)
+
+    def test_exception_on_wrong_number_of_row_entries(self):
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .withRow("3", "Description", "5", "04-05-2022", "", "01-05-2022", "05-05-2022")\
+            .build()
+
+        removed.rows[0].lineNumber = 5
+
+        document = self.given_a_document_with_tables(todo, completed, removed)
+
+        e = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(e, ColumnNumberException, 5)
+
+    def test_exception_on_wrong_date_format(self):
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .withRow("3", "Description", "5", "12-31-2022", "", "", "01-05-2022", "05-05-2022")\
+            .build()
+        
+        removed.rows[0].lineNumber = 5
+
+        document = self.given_a_document_with_tables(todo, completed, removed)
+
+        e = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(e, ValueConversionException, 5)
+        e.inputString = "12-31-2022"

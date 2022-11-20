@@ -17,7 +17,7 @@ class MarkdownDocumentBuilder:
 
 class MarkdownTableBuilder:
     def __init__(self) -> None:
-        self.table = MarkdownTable([])
+        self.table = MarkdownTable(MarkdownTableRow([], -1))
 
     def build(self):
         return self.table
