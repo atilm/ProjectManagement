@@ -24,7 +24,7 @@ class MarkdownTableRow:
     def getColumnCount(self) -> int:
         return len(self._cells)
 
-    def get(self, columnIdx : int):
+    def get(self, columnIdx : int) -> str:
         return self._cells[columnIdx]
 
 class MarkdownTable:
