@@ -6,7 +6,7 @@ from src.domain.task import Task
 from tests.domain.domain_utilities.task_utilities import *
 
 class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
-    def given_a_document_with_table(self, todo: MarkdownTable, completed: MarkdownTable, removed: MarkdownTable) -> MarkdownDocument:
+    def given_a_document_with_tables(self, todo: MarkdownTable, completed: MarkdownTable, removed: MarkdownTable) -> MarkdownDocument:
         return MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
             .withSection("Stories To Do", 1)\
@@ -20,6 +20,10 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def when_the_document_is_converted(self, document: MarkdownDocument) -> TaskRepository:
         converter = MarkdownPlanningDocumentToModelConverter()
         return converter.convert(document)
+
+    def then_the_repo_contains_id(self, taskId: str, repo: TaskRepository):
+        task = repo.get(taskId)
+        self.assertEqual(task.id, taskId)
 
     def then_the_repo_contains_task(self, task: Task, repo: TaskRepository):
         actualTask = repo.get(task.id)
@@ -46,7 +50,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         completed = MarkdownTableBuilder().build()
         removed = MarkdownTableBuilder().build()
 
-        document = self.given_a_document_with_table(todo, completed, removed)
+        document = self.given_a_document_with_tables(todo, completed, removed)
 
         repo = self.when_the_document_is_converted(document)
 
@@ -57,12 +61,12 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         todo = MarkdownTableBuilder().build()
         completed = MarkdownTableBuilder()\
             .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
-            .withRow("1", "Description 1", 3, "01-02-2020", "03-02-2020", 2, "29-01-2020", "")\
-            .withRow("2", "Description 2", 5, "01-02-2021", "04-02-2021", 3.5, "29-01-2021", "")\
+            .withRow("1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
+            .withRow("2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
             .build()
         removed = MarkdownTableBuilder().build()
 
-        document = self.given_a_document_with_table(todo, completed, removed)
+        document = self.given_a_document_with_tables(todo, completed, removed)
 
         repo = self.when_the_document_is_converted(document)
 
@@ -84,3 +88,25 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
         self.then_the_repo_contains_task(expectedTask1, repo)
         self.then_the_repo_contains_task(expectedTask2, repo)
+
+    def test_can_read_a_task_from_to_do_table(self):
+        todo = MarkdownTableBuilder()\
+            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .withRow("1", "Description", "5", "", "", "", "29-01-2021", "")\
+            .build()
+        completed = MarkdownTableBuilder().build()
+        removed = MarkdownTableBuilder().build()
+
+        document = self.given_a_document_with_tables(todo, completed, removed)
+
+        repo = self.when_the_document_is_converted(document)
+
+        expectedTask = Task("1", "Description")
+        expectedTask.estimate = 5
+        expectedTask.startedDate = None
+        expectedTask.completedDate = None
+        expectedTask.actualWorkDays = None
+        expectedTask.createdDate = date(2021, 1, 29)
+        expectedTask.removedDate = None
+
+        self.then_the_repo_contains_task(expectedTask, repo)
