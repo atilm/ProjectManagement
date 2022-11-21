@@ -4,7 +4,7 @@ from src.services.markdown.markdown_document_builder import *
 from src.domain.task import Task
 from tests.domain.domain_utilities.task_utilities import *
 
-correctTableHeader = ["Id", "Project Id" "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]
+correctTableHeader = ["Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]
 
 class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def given_a_document_with_tables(self, todo: MarkdownTable, completed: MarkdownTable, removed: MarkdownTable) -> MarkdownDocument:
