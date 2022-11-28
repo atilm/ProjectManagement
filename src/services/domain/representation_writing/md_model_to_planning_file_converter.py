@@ -18,16 +18,19 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
 
     def _build_todo_table(self, repo: TaskRepository) -> MarkdownTable:
         isTodoTask = lambda t: t.startedDate == None and t.removedDate == None
-        todoTasks = filter(isTodoTask, list(repo.tasks.values()))
-        return self._build_table(todoTasks)
+        return self._build_table(repo, isTodoTask)
 
     def _build_completedTable(self, repo: TaskRepository) -> MarkdownTable:
-        return self._build_table([])
+        isCompletedTask = lambda t: t.completedDate != None
+        return self._build_table(repo, isCompletedTask)
 
     def _build_removed_table(self, repo: TaskRepository) -> MarkdownTable:
-        return self._build_table([])
+        isRemovedTask = lambda t: t.removedDate != None
+        return self._build_table(repo, isRemovedTask)
 
-    def _build_table(self, tasks: list) -> MarkdownTable:
+    def _build_table(self, repo: TaskRepository, filterPredicate) -> MarkdownTable:
+        tasks = filter(filterPredicate, list(repo.tasks.values()))
+
         tableBuilder = MarkdownTableBuilder()\
             .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")
 

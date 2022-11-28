@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, datetime
+from datetime import date
 
 from src.domain.tasks_repository import *
 from src.services.markdown.markdown_document import *
@@ -13,6 +13,23 @@ class ConverterTestCase(unittest.TestCase):
         task = Task(id, description)
         task.estimate = 3
         task.createdDate = date(2022, 3, 1)
+        repo.add(task)
+
+    def add_completed_task(self, repo: TaskRepository, id: str, description: str):
+        task = Task(id, description)
+        task.estimate = 4
+        task.startedDate = date(2022, 3, 2)
+        task.completedDate = date(2022, 3, 4)
+        task.actualWorkDays = 2
+        task.createdDate = date(2022, 3, 1)
+        repo.add(task)
+
+    def add_removed_task(self, repo: TaskRepository, id: str, description: str):
+        task = Task(id, description)
+        task.estimate = 5
+        task.startedDate = date(2022, 3, 2)
+        task.createdDate = date(2022, 3, 1)
+        task.removedDate = date(2022, 3, 3)
         repo.add(task)
 
     def when_the_repo_is_converted(self, repo: TaskRepository) -> MarkdownDocument:
@@ -66,5 +83,20 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
         self.assertEqual(table.rows[0]._cells, ["1", "Todo task 1", "3", "", "", "", "01-03-2022", ""])
         self.assertEqual(table.rows[1]._cells, ["2", "Todo task 2", "3", "", "", "", "01-03-2022", ""])
 
+    def test_a_repository_with_all_task_kinds(self):
+        repo = self.given_a_repository()
+        self.add_todo_task(repo, "1", "Todo task")
+        self.add_completed_task(repo, "2", "Completed task")
+        self.add_removed_task(repo, "3", "Removed task")
+
+        document = self.when_the_repo_is_converted(repo)
+
+        todoTable = self._assertTable(2, 8, 1, document)
+        completedTable = self._assertTable(4, 8, 1, document)
+        removedTable = self._assertTable(6, 8, 1, document)
+
+        self.assertEqual(todoTable.rows[0]._cells, ["1", "Todo task", "3", "", "", "", "01-03-2022", ""])
+        self.assertEqual(completedTable.rows[0]._cells, ["2", "Completed task", "4", "02-03-2022", "04-03-2022", "2", "01-03-2022", ""])
+        self.assertEqual(removedTable.rows[0]._cells, ["3", "Removed task", "5", "02-03-2022", "", "", "01-03-2022", "03-03-2022"])
 
         
