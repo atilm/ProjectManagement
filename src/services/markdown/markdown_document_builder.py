@@ -23,9 +23,9 @@ class MarkdownTableBuilder:
         return self.table
 
     def withHeader(self, *args):
-        self.table._headerRow = MarkdownTableRow(args, -1)
+        self.table._headerRow = MarkdownTableRow(list(args), -1)
         return self
 
     def withRow(self, *args):
-        self.table.rows.append(MarkdownTableRow(args, -1))
+        self.table.rows.append(MarkdownTableRow(list(args), -1))
         return self

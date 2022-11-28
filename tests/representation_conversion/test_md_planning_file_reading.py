@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.domain.task import Task

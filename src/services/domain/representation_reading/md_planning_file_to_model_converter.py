@@ -1,6 +1,6 @@
 from .representation_to_model_converter import *
 from src.services.markdown.markdown_document import *
-from datetime import date, datetime
+from src.services.domain.task_to_string_converter import *
 
 class MarkdownConverterException(Exception):
     def __init__(self, lineNumber: int, *args: object) -> None:
@@ -44,31 +44,16 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         return row.getColumnCount() == table._headerRow.getColumnCount()
 
     def _toTask(self, row: MarkdownTableRow) -> Task:
-        task = Task(row.get(0), row.get(1))
-        task.estimate = self._convert(row, 2, self._toFloatOrNone)
-        task.startedDate = self._convert(row, 3, self._toDateOrNone)
-        task.completedDate = self._convert(row, 4, self._toDateOrNone)
-        task.actualWorkDays = self._convert(row, 5, self._toFloatOrNone)
-        task.createdDate = self._convert(row, 6, self._toDateOrNone)
-        task.removedDate = self._convert(row, 7, self._toDateOrNone)
-        return task
-
-    def _convert(self, row: MarkdownTableRow, columnIndex: int, convert):
-        s = row.get(columnIndex)
         try:
-            return convert(s)
-        except:
-            raise ValueConversionException(s, row.lineNumber)
-
-    def _toFloatOrNone(self, s: str) -> float:
-        if s.strip() == "":
-            return None
-
-        return float(s)
-
-    def _toDateOrNone(self, s: str) -> date:
-        if s.strip() == "":
-            return None
-
-        return datetime.strptime(s, r"%d-%m-%Y").date()
-
+            return TaskToStringConverter()\
+                .withId(row.get(0))\
+                .withDescription(row.get(1))\
+                .withEstimate(row.get(2))\
+                .withStartedDate(row.get(3))\
+                .withCompletedDate(row.get(4))\
+                .withActualWorkDays(row.get(5))\
+                .withCreatedDate(row.get(6))\
+                .withRemovedDate(row.get(7))\
+                .toTask()
+        except ConversionException as e:
+            raise ValueConversionException(e.inputString, row.lineNumber)
