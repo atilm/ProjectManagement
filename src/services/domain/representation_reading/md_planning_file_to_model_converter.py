@@ -1,22 +1,7 @@
 from .representation_to_model_converter import *
+from .md_converter_exceptions import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
-
-class MarkdownConverterException(Exception):
-    def __init__(self, lineNumber: int, *args: object) -> None:
-        super().__init__(*args)
-        self.lineNumber = lineNumber
-
-class HeaderFormatException(MarkdownConverterException):
-    pass
-
-class ColumnNumberException(MarkdownConverterException):
-    pass
-
-class ValueConversionException(MarkdownConverterException):
-    def __init__(self, inputString: str, lineNumber: int, *args: object) -> None:
-        super().__init__(lineNumber, *args)
-        self.inputString = inputString
 
 class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
     def convert(self, document : MarkdownDocument) -> TaskRepository:

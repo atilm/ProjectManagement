@@ -51,7 +51,7 @@ class TaskToStringConverter:
         s = {}
         s["id"] = self._toStr(task.id, lambda s: s)
         s["description"] = self._toStr(task.description, lambda s: s)
-        s["estimate"] = self._toStr(task.estimate, str)
+        s["estimate"] = self._toStr(task.estimate, lambda f: f"{f:g}")
         s["createdDate"] = self._toStr(task.createdDate, self._toDateStr)
         s["startedDate"] = self._toStr(task.startedDate, self._toDateStr)
         s["completedDate"] = self._toStr(task.completedDate, self._toDateStr)
