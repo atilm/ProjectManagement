@@ -1,11 +1,31 @@
 import argparse
 
+from src.services.domain.representation_reading.md_representation_reader import *
+from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
+from src.services.domain.representation_writing.md_representation_writer import MarkdownRepresentationWriter
+from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
+
+def read_from_file(filePath: str) -> str:
+    file = open(filePath ,mode='r')
+    content = file.read()
+    file.close()
+    return content
+
+def write_to_file(filePath: str, content: str) -> str:
+    file = open(filePath, mode='w')
+    file.write(content)
+    file.close()
+
 def generateEstimationFile(args):
     print(f"generating {args.o} from {args.planningPath}")
-    # read content from planning file path
-    # create repo from planning file content
-    # generate estimation file content from repo
-    # write estimation file content to estimation file path
+    
+    reader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+    writer = MarkdownRepresentationWriter(ModelToMarkdownEstimationDocumentConverter())
+
+    planningFileContent = read_from_file(args.planningPath)
+    repo = reader.read(planningFileContent)
+    estimationFileContent = writer.write(repo)
+    write_to_file(args.o, estimationFileContent)
 
 def applyEstimationFile(args):
     print(f"applying {args.estimationPath} to {args.planningPath}")
