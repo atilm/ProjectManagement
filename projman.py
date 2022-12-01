@@ -4,6 +4,7 @@ from src.services.domain.representation_reading.md_representation_reader import 
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
 from src.services.domain.representation_writing.md_representation_writer import MarkdownRepresentationWriter
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
+from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
 
 def read_from_file(filePath: str) -> str:
     file = open(filePath ,mode='r')
@@ -15,6 +16,13 @@ def write_to_file(filePath: str, content: str) -> str:
     file = open(filePath, mode='w')
     file.write(content)
     file.close()
+
+def initPlanningFile(args):
+    print(f"initialize planning file: {args.planningPath}")
+    repo = TaskRepository()
+    writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
+    planningFileContent = writer.write(repo)
+    write_to_file(args.planningPath, planningFileContent)
 
 def generateEstimationFile(args):
     print(f"generating {args.o} from {args.planningPath}")
@@ -44,6 +52,10 @@ argumentParser = argparse.ArgumentParser(prog="projman",
     description="Cli project management tools")
 
 subparsers = argumentParser.add_subparsers(help="The action to perform")
+
+initParser = subparsers.add_parser("init", help="Generate a planning file with the initial structure.")
+initParser.add_argument("planningPath", help="Path to the planning file.")
+initParser.set_defaults(func=initPlanningFile)
 
 createEstimationFileParser = subparsers.add_parser("estimation", help="Generate an estimation file from the planning file.")
 createEstimationFileParser.add_argument("planningPath", help="Path to the planning file.")
