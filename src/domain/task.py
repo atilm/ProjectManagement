@@ -9,3 +9,19 @@ class Task:
         self.completedDate = None
         self.actualWorkDays = None
         self.removedDate = None
+
+class VelocityCalculationException(Exception):
+    def __init__(self, task_id: str, *args: object) -> None:
+        super().__init__(*args)
+        self.task_id = task_id
+
+def calc_velocity(task: Task) -> float:
+    if task.actualWorkDays <= 0:
+        raise VelocityCalculationException(task.id)
+
+    return task.estimate / task.actualWorkDays
+
+def has_velocity(task: Task) -> float:
+    return task.estimate is not None and\
+        task.actualWorkDays is not None and\
+        task.removedDate is None

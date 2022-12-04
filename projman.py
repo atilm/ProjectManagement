@@ -6,6 +6,7 @@ from src.services.domain.representation_reading.md_estimation_file_to_model_conv
 from src.services.domain.representation_writing.md_representation_writer import *
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
+from src.domain.report_generator import *
 
 def read_from_file(filePath: str) -> str:
     file = open(filePath ,mode='r')
@@ -52,9 +53,19 @@ def applyEstimationFile(args):
     planningOutput = planningWriter.write(planningRepo)
     write_to_file(args.planningPath, planningOutput)
 
+def generateReport(args):
+    print(f"Report on {args.planningPath}:\n")
 
-argumentParser = argparse.ArgumentParser(prog="projman",
-    description="Cli project management tools")
+    planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+    planningInput = read_from_file(args.planningPath)
+    planningRepo = planningReader.read(planningInput)
+
+    reportGenerator = ReportGenerator()
+    report = reportGenerator.generate(planningRepo)
+
+    print(f"Velocity: {report.velocity} story points / day")
+
+argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 
 subparsers = argumentParser.add_subparsers(help="The action to perform")
 
@@ -71,6 +82,10 @@ applyEstimationParser = subparsers.add_parser("applyestimation", help="Update th
 applyEstimationParser.add_argument("planningPath", help="Path to the planning file.")
 applyEstimationParser.add_argument("estimationPath", help="Path to the estimation file.")
 applyEstimationParser.set_defaults(func=applyEstimationFile)
+
+reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
+reportParser.add_argument("planningPath", help="Path to the planning file.")
+reportParser.set_defaults(func=generateReport)
 
 args = argumentParser.parse_args()
 args.func(args)
