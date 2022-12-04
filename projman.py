@@ -2,7 +2,8 @@ import argparse
 
 from src.services.domain.representation_reading.md_representation_reader import *
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
-from src.services.domain.representation_writing.md_representation_writer import MarkdownRepresentationWriter
+from src.services.domain.representation_reading.md_estimation_file_to_model_converter import *
+from src.services.domain.representation_writing.md_representation_writer import *
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
 
@@ -37,15 +38,19 @@ def generateEstimationFile(args):
 
 def applyEstimationFile(args):
     print(f"applying {args.estimationPath} to {args.planningPath}")
-    # read content from planning file path
-    # create planningRepo from file content
+    planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+    estimationReader = MarkdownRepresentationReader(MarkdownEstimationFileToModelConverter())
+    planningWriter = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
 
-    # read content from estimation file path
-    # create estimationRepo from file content
+    planningInput = read_from_file(args.planningPath)
+    planningRepo = planningReader.read(planningInput)
 
-    # udate estimates in planningRepo with content from estimationRepo
-    # generate planning file content from planningRepo
-    # write planning file content to planning file path
+    estimationInput = read_from_file(args.estimationPath)
+    estimationRepo = estimationReader.read(estimationInput)
+
+    planningRepo.updateEstimates(list(estimationRepo.tasks.values()))
+    planningOutput = planningWriter.write(planningRepo)
+    write_to_file(args.planningPath, planningOutput)
 
 
 argumentParser = argparse.ArgumentParser(prog="projman",
