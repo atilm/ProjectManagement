@@ -64,6 +64,16 @@ def generateReport(args):
     report = reportGenerator.generate(planningRepo)
 
     print(f"Velocity: {report.velocity} story points / day")
+    print(f"Remaining work days: {report.remaining_work_days}")
+    
+    if (report.warnings):
+        print("\nWarnings:\n")
+    
+    for warning in report.warnings:
+        print(warning)
+
+    print("\n")
+
 
 argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 

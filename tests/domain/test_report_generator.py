@@ -16,17 +16,8 @@ class the_user_can_generate_a_report_from_a_task_repository(DomainTestCase):
         self.assertIsNone(report.velocity)
 
 class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestCase):
-    def create_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float) -> Task:
-        task = Task(self._id_generator.next(), "")
-        task.estimate = estimate
-        task.actualWorkDays = actualWorkDays
-        task.completedDate = completedDate
-        task.startedDate = completedDate - datetime.timedelta(actualWorkDays) if actualWorkDays is not None else completedDate
-        task.createdDate = task.startedDate
-        return task
-
     def test_calculate_velocity_from_a_single_task(self):
-        task = self.create_task(datetime.date(2022, 12, 4), 3, 5.5)
+        task = self.completed_task(datetime.date(2022, 12, 4), 3, 5.5)
         repo = self.given_a_repository_with_tasks([task])
 
         report = self.when_a_report_is_generated(repo)
@@ -36,8 +27,8 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
     def test_calculate_velocity_from_two_tasks(self):
         repo = self.given_a_repository_with_tasks([
-            self.create_task(datetime.date(2022, 12, 4), 3, 5.5),
-            self.create_task(datetime.date(2022, 12, 4), 5, 8.0)
+            self.completed_task(datetime.date(2022, 12, 4), 3, 5.5),
+            self.completed_task(datetime.date(2022, 12, 4), 5, 8.0)
         ])
 
         report = self.when_a_report_is_generated(repo)
@@ -46,7 +37,7 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         self.assertAlmostEqual(report.velocity, 0.59, places=2)
 
     def test_duration_of_zero(self):
-        task = self.create_task(datetime.date(2022, 12, 4), 3, 0.0)
+        task = self.completed_task(datetime.date(2022, 12, 4), 3, 0.0)
         repo = self.given_a_repository_with_tasks([task])
 
         exception = self.then_report_generation_raises(repo)
@@ -56,7 +47,7 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
     def test_tasks_without_estimate_are_ignored(self):
         repo = self.given_a_repository_with_tasks([
-            self.create_task(datetime.date(2022, 12, 4), None, 1.0)
+            self.completed_task(datetime.date(2022, 12, 4), None, 1.0)
         ])
 
         report = self.when_a_report_is_generated(repo)
@@ -66,7 +57,7 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
     def test_tasks_without_actual_work_days_are_ignored(self):
         repo = self.given_a_repository_with_tasks([
-            self.create_task(datetime.date(2022, 12, 4), 3, None)
+            self.completed_task(datetime.date(2022, 12, 4), 3, None)
         ])
 
         report = self.when_a_report_is_generated(repo)
@@ -75,7 +66,7 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         self.assertIsNone(report.velocity)
 
     def test_removed_tasks_are_ignored(self):
-        task = self.create_task(datetime.date(2022, 12, 4), 3, 1)
+        task = self.completed_task(datetime.date(2022, 12, 4), 3, 1)
         task.removedDate = datetime.date(2022, 12, 4)
         repo = self.given_a_repository_with_tasks([
             task
@@ -88,9 +79,9 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
     def test_only_the_30_most_recent_tasks_are_used(self):
         startDate = datetime.date(2022, 2, 1)
-        tasks = [self.create_task(startDate + datetime.timedelta(i), 1, 1) for i in range(29)]
-        tasks.append(self.create_task(startDate + datetime.timedelta(30), 1, 0.01))
-        tasks.append(self.create_task(startDate - datetime.timedelta(1), 1, 0.001))
+        tasks = [self.completed_task(startDate + datetime.timedelta(i), 1, 1) for i in range(29)]
+        tasks.append(self.completed_task(startDate + datetime.timedelta(30), 1, 0.01))
+        tasks.append(self.completed_task(startDate - datetime.timedelta(1), 1, 0.001))
 
         repo = self.given_a_repository_with_tasks(tasks)
 
@@ -98,3 +89,61 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
         # then the velocity is (29 * 1 + 100) / 30
         self.assertAlmostEqual(report.velocity, 4.3, places=2)
+
+class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTestCase):
+    def test_when_no_tasks_are_given_None_is_returned(self):
+        repo = self.given_an_empty_repository()
+
+        report = self.when_a_report_is_generated(repo)
+
+        # then the remaining workdays are None
+        self.assertIsNone(report.remaining_work_days)
+
+    def test_when_only_a_completed_task_is_given_0_is_returned(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 3, 3), 1, 1)
+        ])
+
+        report = self.when_a_report_is_generated(repo)
+
+        # then the remaining workdays are 0
+        self.assertEqual(report.remaining_work_days, 0)
+
+    def test_when_a_completed_and_an_estimated_todo_task_are_given(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 1, 1), 3, 6),
+            self.todo_task(5)
+        ])
+
+        report = self.when_a_report_is_generated(repo)
+
+        # then the remaining days are calculated
+        self.assertAlmostEqual(report.remaining_work_days, 10, places=2)
+
+    def test_when_a_completed_and_two_estimated_tasks_are_given(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 1, 1), 3, 6),
+            self.todo_task(5),
+            self.todo_task(3)
+        ])
+
+        report = self.when_a_report_is_generated(repo)
+
+        # then the sum of the durations is returned
+        self.assertAlmostEqual(report.remaining_work_days, 16, places=2)
+
+    def test_when_a_completed_and_some_estimated_and_some_unestimated_tasks_are_given(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 1, 1), 3, 6),
+            self.todo_task(5),
+            self.todo_task(8),
+            self.todo_task(None)
+        ])
+
+        report = self.when_a_report_is_generated(repo)
+
+        # then the sum of the durations is returned
+        self.assertAlmostEqual(report.remaining_work_days, 26, places=2)
+
+        # then the report contains a warning about unestimated tasks
+        self.assertEqual(report.warnings, {"Unestimated stories have been ignored."})

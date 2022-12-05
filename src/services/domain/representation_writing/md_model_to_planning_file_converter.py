@@ -1,6 +1,7 @@
 from .model_to_representation_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.services.domain.task_to_string_converter import *
+from src.domain import task
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def convert(self, source : TaskRepository) -> object:
@@ -17,16 +18,13 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
         return document
 
     def _build_todo_table(self, repo: TaskRepository) -> MarkdownTable:
-        isTodoTask = lambda t: t.completedDate == None and t.removedDate == None
-        return self._build_table(repo, isTodoTask)
+        return self._build_table(repo, task.is_todo_task)
 
     def _build_completedTable(self, repo: TaskRepository) -> MarkdownTable:
-        isCompletedTask = lambda t: t.completedDate != None
-        return self._build_table(repo, isCompletedTask)
+        return self._build_table(repo, task.is_completed_task)
 
     def _build_removed_table(self, repo: TaskRepository) -> MarkdownTable:
-        isRemovedTask = lambda t: t.removedDate != None
-        return self._build_table(repo, isRemovedTask)
+        return self._build_table(repo, task.is_removed_task)
 
     def _build_table(self, repo: TaskRepository, filterPredicate) -> MarkdownTable:
         tasks = filter(filterPredicate, list(repo.tasks.values()))

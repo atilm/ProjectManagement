@@ -25,3 +25,12 @@ def has_velocity(task: Task) -> float:
     return task.estimate is not None and\
         task.actualWorkDays is not None and\
         task.removedDate is None
+
+def is_todo_task(task: Task) -> bool:
+    return task.completedDate == None and task.removedDate == None
+
+def is_completed_task(task: Task) -> bool:
+    return task.completedDate != None
+
+def is_removed_task(task: Task) -> bool:
+    return task.removedDate != None

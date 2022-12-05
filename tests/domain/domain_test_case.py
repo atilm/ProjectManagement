@@ -1,4 +1,5 @@
 import unittest
+import datetime
 from src.domain.tasks_repository import *
 from src.domain.report_generator import *
 from tests.domain.domain_utilities.id_generator import IdGenerator
@@ -16,6 +17,21 @@ class DomainTestCase(unittest.TestCase):
         for t in taskList:
             repo.add(t)
         return repo
+
+    def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float) -> Task:
+        task = Task(self._id_generator.next(), "")
+        task.estimate = estimate
+        task.actualWorkDays = actualWorkDays
+        task.completedDate = completedDate
+        task.startedDate = completedDate - datetime.timedelta(actualWorkDays) if actualWorkDays is not None else completedDate
+        task.createdDate = task.startedDate
+        return task
+
+    def todo_task(self, estimate: float) -> Task:
+        task = Task(self._id_generator.next(), "")
+        task.estimate = estimate
+        task.createdDate = datetime.date(2000, 1, 1)
+        return task
 
     def when_the_user_retrieves_a_task_id(self, taskId : str, repo : TaskRepository) -> Task:
         return repo.get(taskId)
