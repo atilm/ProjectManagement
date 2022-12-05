@@ -18,7 +18,7 @@ class ConverterTestCase(unittest.TestCase):
     def add_completed_task(self, repo: TaskRepository, id: str, description: str):
         task = Task(id, description)
         task.estimate = 4
-        task.startedDate = date(2022, 3, 2)
+        task.startedDate = None
         task.completedDate = date(2022, 3, 4)
         task.actualWorkDays = 2
         task.createdDate = date(2022, 3, 1)
@@ -96,7 +96,7 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
         removedTable = self._assertTable(6, 8, 1, document)
 
         self.assertEqual(todoTable.rows[0]._cells, ["1", "Todo task", "3", "", "", "", "01-03-2022", ""])
-        self.assertEqual(completedTable.rows[0]._cells, ["2", "Completed task", "4", "02-03-2022", "04-03-2022", "2", "01-03-2022", ""])
+        self.assertEqual(completedTable.rows[0]._cells, ["2", "Completed task", "4", "", "04-03-2022", "2", "01-03-2022", ""])
         self.assertEqual(removedTable.rows[0]._cells, ["3", "Removed task", "5", "02-03-2022", "", "", "01-03-2022", "03-03-2022"])
 
         

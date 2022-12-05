@@ -17,7 +17,7 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
         return document
 
     def _build_todo_table(self, repo: TaskRepository) -> MarkdownTable:
-        isTodoTask = lambda t: t.startedDate == None and t.removedDate == None
+        isTodoTask = lambda t: t.completedDate == None and t.removedDate == None
         return self._build_table(repo, isTodoTask)
 
     def _build_completedTable(self, repo: TaskRepository) -> MarkdownTable:
