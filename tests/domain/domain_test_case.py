@@ -3,6 +3,7 @@ import datetime
 from src.domain.tasks_repository import *
 from src.domain.report_generator import *
 from tests.domain.domain_utilities.id_generator import IdGenerator
+from src.domain.working_day_repository import WorkingDayRepository
 
 class DomainTestCase(unittest.TestCase):
     def __init__(self, methodName: str = ...) -> None:
@@ -39,9 +40,9 @@ class DomainTestCase(unittest.TestCase):
     def when_a_task_is_added(self, task : Task, repo : TaskRepository) -> Task:
         repo.add(task)
 
-    def when_a_report_is_generated(self, repo: TaskRepository) -> Report:
+    def when_a_report_is_generated(self, repo: TaskRepository, startDate = datetime.date(2022, 1, 1), workdays = WorkingDayRepository()) -> Report:
         generator = ReportGenerator()
-        return generator.generate(repo)
+        return generator.generate(repo, startDate, workdays)
 
     def then_report_generation_raises(self, repo: TaskRepository) -> Exception:
         try:
