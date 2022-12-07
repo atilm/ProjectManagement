@@ -52,10 +52,12 @@ class MarkdownParser:
         return self._tableRowRegex.match(line) != None
 
     def _parseTableRow(self, line : str, lineNumber : int) -> list:
-        if not self._isTableRow(line):
+        strippedLine = line.strip()
+
+        if not self._isTableRow(strippedLine):
             raise TableRowException(lineNumber)
 
-        rawEntries = line.strip().strip("|").split("|")
+        rawEntries = strippedLine.strip("|").split("|")
         strippedEntries = [e.strip() for e in rawEntries]
         return MarkdownTableRow(strippedEntries, lineNumber)
 

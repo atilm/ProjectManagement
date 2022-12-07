@@ -150,7 +150,7 @@ class the_parser_can_parse_tables(ParserTestCase):
         "| Header 1 | Header 2 |\n"
         "| -------- | -------- |\n"
         "| 1.1 | 1.2 |\n"
-        "| 2.1 | 2.2 |\n"
+        " | 2.1 | 2.2 |\n"
         "\n")
 
         result = self.when_the_input_is_parsed(givenInput)
