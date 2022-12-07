@@ -7,6 +7,23 @@ from src.services.domain.representation_writing.md_representation_writer import 
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
 from src.domain.report_generator import *
+from src.domain.task import VelocityCalculationException
+
+def catch_all(action, args):
+    try:
+        action(args)
+    except TableRowException as e:
+        print(e.message)
+    except ConversionException as e:
+        print(f"Could not  convert {e.inputString}.")
+    except ValueConversionException as e:
+        print(f"Could not convert {e.inputString} in line {e.lineNumber}.")
+    except MarkdownConverterException as e:
+        print(f"Markdown parsing error in line {e.lineNumber}.")
+    except TaskIdConflictException as e:
+        print("Found duplicate task id.")
+    except VelocityCalculationException as e:
+        print(f"Could not calculate velocity for story {e.task_id}.")
 
 def read_from_file(filePath: str) -> str:
     file = open(filePath, mode='r', encoding="utf-8")
@@ -81,21 +98,21 @@ subparsers = argumentParser.add_subparsers(help="The action to perform")
 
 initParser = subparsers.add_parser("init", help="Generate a planning file with the initial structure.")
 initParser.add_argument("planningPath", help="Path to the planning file.")
-initParser.set_defaults(func=initPlanningFile)
+initParser.set_defaults(func=lambda args: catch_all(initPlanningFile, args))
 
 createEstimationFileParser = subparsers.add_parser("estimation", help="Generate an estimation file from the planning file.")
 createEstimationFileParser.add_argument("planningPath", help="Path to the planning file.")
 createEstimationFileParser.add_argument("-o", help="Specify the output path for the estimation file.")
-createEstimationFileParser.set_defaults(func=generateEstimationFile)
+createEstimationFileParser.set_defaults(func=lambda args: catch_all(generateEstimationFile, args))
 
 applyEstimationParser = subparsers.add_parser("applyestimation", help="Update the planning file from the estimation file.")
 applyEstimationParser.add_argument("planningPath", help="Path to the planning file.")
 applyEstimationParser.add_argument("estimationPath", help="Path to the estimation file.")
-applyEstimationParser.set_defaults(func=applyEstimationFile)
+applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFile, args))
 
 reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
-reportParser.set_defaults(func=generateReport)
+reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
 
 args = argumentParser.parse_args()
 args.func(args)

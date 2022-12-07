@@ -17,3 +17,4 @@
     * at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
 - [ ] As a developer I want to see a chart of the time evolution of the confidence band for the predicted completion date.
 - [ ] As a developer I want to automatically reformat the planning and estimation files
+- [ ] TaskIdConflictException should contain the conflicting task id and show it to the user
