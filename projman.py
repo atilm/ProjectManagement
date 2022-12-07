@@ -9,13 +9,13 @@ from src.services.domain.representation_writing.md_model_to_planning_file_conver
 from src.domain.report_generator import *
 
 def read_from_file(filePath: str) -> str:
-    file = open(filePath ,mode='r')
+    file = open(filePath, mode='r', encoding="utf-8")
     content = file.read()
     file.close()
     return content
 
 def write_to_file(filePath: str, content: str) -> str:
-    file = open(filePath, mode='w')
+    file = open(filePath, mode='w', encoding="utf-8")
     file.write(content)
     file.close()
 

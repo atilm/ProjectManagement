@@ -1,8 +1,12 @@
 
 - [x] Bug: when completed stories are updated from estimation file, they are copied to the to do stories
+- [x] Bug: when special characters are used they are counted as 2 characters when filling table cells to their width
+- [ ] Bug: A table line may not start with white space
+- [ ] Catch exceptions in main
 - [x] As a developer I want to use relative comparison of my tasks to estimate them on a floating point scale.
 - [x] As a developer I want to know how many workdays I need for the remaining tasks based on my recent velocity.
 - [ ] As a developer I want to know a predicted completed date of my project. (official and personal holidays, days spend on other activities, free weekdays)
+- [ ] As a developer I want a list of completed dates (date ranges) per item (in the given orders)
 - [ ] As a developer I want to know a (kind of) confidence interval for the remaining workdays. (monte carlo simulation or some formula -> measurement of the probability distribution estimation error?)
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
 - [ ] As a developer I want to know a confidence interval for the completed date of my project. (official and personal holidays, days spend on other activities)
