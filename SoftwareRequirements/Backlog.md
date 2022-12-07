@@ -2,7 +2,7 @@
 - [x] Bug: when completed stories are updated from estimation file, they are copied to the to do stories
 - [x] Bug: when special characters are used they are counted as 2 characters when filling table cells to their width
 - [x] Bug: A table line may not start with white space
-- [ ] Catch exceptions in main
+- [x] Catch exceptions in main
 - [x] As a developer I want to use relative comparison of my tasks to estimate them on a floating point scale.
 - [x] As a developer I want to know how many workdays I need for the remaining tasks based on my recent velocity.
 - [ ] As a developer I want to know a predicted completed date of my project. (official and personal holidays, days spend on other activities, free weekdays)
