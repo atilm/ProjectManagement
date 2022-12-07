@@ -44,7 +44,7 @@ def initPlanningFile(args):
     write_to_file(args.planningPath, planningFileContent)
 
 def generateEstimationFile(args):
-    print(f"generating {args.o} from {args.planningPath}")
+    print(f"generating {args.estimationPath} from {args.planningPath}")
     
     reader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
     writer = MarkdownRepresentationWriter(ModelToMarkdownEstimationDocumentConverter())
@@ -52,7 +52,7 @@ def generateEstimationFile(args):
     planningFileContent = read_from_file(args.planningPath)
     repo = reader.read(planningFileContent)
     estimationFileContent = writer.write(repo)
-    write_to_file(args.o, estimationFileContent)
+    write_to_file(args.estimationPath, estimationFileContent)
 
 def applyEstimationFile(args):
     print(f"applying {args.estimationPath} to {args.planningPath}")
@@ -100,9 +100,9 @@ initParser = subparsers.add_parser("init", help="Generate a planning file with t
 initParser.add_argument("planningPath", help="Path to the planning file.")
 initParser.set_defaults(func=lambda args: catch_all(initPlanningFile, args))
 
-createEstimationFileParser = subparsers.add_parser("estimation", help="Generate an estimation file from the planning file.")
+createEstimationFileParser = subparsers.add_parser("estimate", help="Generate an estimation file from the planning file.")
 createEstimationFileParser.add_argument("planningPath", help="Path to the planning file.")
-createEstimationFileParser.add_argument("-o", help="Specify the output path for the estimation file.")
+createEstimationFileParser.add_argument("estimationPath", help="Specify the output path for the estimation file.")
 createEstimationFileParser.set_defaults(func=lambda args: catch_all(generateEstimationFile, args))
 
 applyEstimationParser = subparsers.add_parser("applyestimation", help="Update the planning file from the estimation file.")
