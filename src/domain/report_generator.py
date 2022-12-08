@@ -27,16 +27,7 @@ class ReportGenerator:
         report.remaining_work_days = workdays
         report.add_warning(warning)
 
-        if workdays is not None:
-            currentDate = startDate
-            while workdays > 0:
-                currentDate += datetime.timedelta(1)
-                if workingDayRepo.is_working_day(currentDate):
-                    workdays -= 1
-                else: # skip this day
-                    pass
-
-            report.predicted_completion_date = currentDate
+        report.predicted_completion_date = self._calculate_completion_date(workingDayRepo, workdays, startDate)
 
         return report
 
@@ -59,3 +50,16 @@ class ReportGenerator:
                 warning = "Unestimated stories have been ignored."
 
         return (workdays_sum, warning)
+
+    def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
+        if days_of_work is None:
+            return None
+        
+        currentDate = start_date
+        while days_of_work >= 1:
+            if working_day_repo.is_working_day(currentDate):
+                days_of_work -= 1
+                
+            currentDate += datetime.timedelta(1)
+
+        return currentDate

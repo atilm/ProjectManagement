@@ -38,10 +38,48 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         # then the completion date is 4 days + 2 weekend days in the future
         self.assertEqual(report.predicted_completion_date, datetime.date(2022, 12, 14))
 
-    def test_more_work_to_do(self):
-        self.fail("more work to do")
-    # specifying free ranges (holidays)
-    # specifying free single days (holidays)
-    # leap years ?
-    # fractional workdays
-    # today is not a working day
+    def test_skipping_free_ranges(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 3, 6), #velocity of 0.5
+            self.todo_task(2),
+            self.todo_task(2)
+        ])
+
+        workdays = WorkingDayRepository()
+        workdays.set_free_weekdays(weekdays.SATURDAY, weekdays.SUNDAY)
+        workdays.add_free_range(datetime.date(2022, 12, 12), datetime.date(2022, 12, 18)) # Mo to Su
+        workdays.add_free_range(datetime.date(2022, 12, 26), datetime.date(2022, 12, 26)) # single free day: Mo
+
+        thursday = datetime.date(2022, 12, 8)
+        report = self.when_a_report_is_generated(repo, thursday, workdays)
+
+        # then the completion date is after weekend and holidays
+        self.assertEqual(report.predicted_completion_date, datetime.date(2022, 12, 28))
+
+    def test_start_date_is_not_a_working_day(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 3, 6), #velocity of 0.5
+            self.todo_task(1)
+        ])
+
+        freeDay = datetime.date(2022, 12, 26)
+        workdays = WorkingDayRepository()
+        workdays.add_free_range(freeDay, freeDay) # single free day: Mo
+
+        report = self.when_a_report_is_generated(repo, freeDay, workdays)
+
+        self.assertEqual(report.predicted_completion_date, datetime.date(2022, 12, 29))
+    
+    def test_work_amounts_to_a_fraction_of_a_day(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 8, 4), #velocity of 2
+            self.todo_task(1) # -> half a day of work
+        ])
+
+        startDate = datetime.date(2022, 12, 8)
+        report = self.when_a_report_is_generated(repo, startDate, WorkingDayRepository())
+
+        # then the work is completed on the same day
+        self.assertEqual(report.predicted_completion_date, startDate)
+
+
