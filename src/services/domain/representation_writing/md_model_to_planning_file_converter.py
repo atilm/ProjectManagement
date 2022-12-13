@@ -2,15 +2,16 @@ from .model_to_representation_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.services.domain.task_to_string_converter import *
 from src.domain import task
+from src.domain import weekdays
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
-    def convert(self, source : TaskRepository) -> object:
+    def convert(self, source : TaskRepository, workingDaysRepo: WorkingDayRepository) -> object:
         document = MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
             .withSection("Working Days", 1)\
-            .withTable(self._build_working_days_table(source))\
+            .withTable(self._build_working_days_table(workingDaysRepo))\
             .withSection("Holidays", 1)\
-            .withTable(self._build_holidays_table(source))\
+            .withTable(self._build_holidays_table(workingDaysRepo))\
             .withSection("Stories To Do", 1)\
             .withTable(self._build_todo_table(source))\
             .withSection("Completed Stories", 1)\
@@ -21,12 +22,19 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
         
         return document
 
-    def _build_working_days_table(self, repo: TaskRepository) -> MarkdownTable:
+    def _build_working_days_table(self, repo: WorkingDayRepository) -> MarkdownTable:
+        theWeekdays = [weekdays.MONDAY, weekdays.TUESDAY, weekdays.WEDNESDAY,\
+                       weekdays.THURSDAY, weekdays.FRIDAY, weekdays.SATURDAY, weekdays.SUNDAY]
+        weekdayHeaders = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+
+        markers = ["" if wd in repo.free_weekdays else "x" for wd in theWeekdays]
+
         return MarkdownTableBuilder()\
-            .withHeader("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")\
+            .withHeader(*weekdayHeaders)\
+            .withRow(*markers)\
             .build()
 
-    def _build_holidays_table(self, repo: TaskRepository) -> MarkdownTable:
+    def _build_holidays_table(self, repo: WorkingDayRepository) -> MarkdownTable:
         return MarkdownTableBuilder()\
             .withHeader("Dates", "Description")\
             .build()
