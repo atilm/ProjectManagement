@@ -2,8 +2,13 @@ import unittest
 from datetime import date
 
 from src.domain.tasks_repository import *
+from src.domain.working_day_repository import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
+
+todoTableIndex = 6
+completedTableIndex = 8
+removedTableIndex = 10
 
 class ConverterTestCase(unittest.TestCase):
     def given_a_repository(self) -> TaskRepository:
@@ -37,14 +42,18 @@ class ConverterTestCase(unittest.TestCase):
         return converter.convert(repo)
 
     def then_the_document_has_the_expected_structure(self, doc: MarkdownDocument):
-        self.assertEqual(len(doc.getContent()), 7, doc)
+        self.assertEqual(len(doc.getContent()), 11, doc)
         self._assertSection(0, "Planning", 0, doc)
-        self._assertSection(1, "Stories To Do", 1, doc)
-        self._assertTableColumns(2, 8, doc)
-        self._assertSection(3, "Completed Stories", 1, doc)
-        self._assertTableColumns(4, 8, doc)
-        self._assertSection(5, "Removed Stories", 1, doc)
+        self._assertSection(1, "Working Days", 1, doc)
+        self._assertTableColumns(2, 7, doc)
+        self._assertSection(3, "Holidays", 1, doc)
+        self._assertTableColumns(4, 2, doc)
+        self._assertSection(5, "Stories To Do", 1, doc)
         self._assertTableColumns(6, 8, doc)
+        self._assertSection(7, "Completed Stories", 1, doc)
+        self._assertTableColumns(8, 8, doc)
+        self._assertSection(9, "Removed Stories", 1, doc)
+        self._assertTableColumns(10, 8, doc)
 
     def _assertSection(self, entryIndex : int, title: str, level: int, document : MarkdownDocument):
         entry = document.getContent()[entryIndex]
@@ -79,7 +88,7 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         document = self.when_the_repo_is_converted(repo)
 
-        table = self._assertTable(2, 8, 2, document)
+        table = self._assertTable(todoTableIndex, 8, 2, document)
         self.assertEqual(table.rows[0]._cells, ["1", "Todo task 1", "3", "", "", "", "01-03-2022", ""])
         self.assertEqual(table.rows[1]._cells, ["2", "Todo task 2", "3", "", "", "", "01-03-2022", ""])
 
@@ -91,12 +100,15 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         document = self.when_the_repo_is_converted(repo)
 
-        todoTable = self._assertTable(2, 8, 1, document)
-        completedTable = self._assertTable(4, 8, 1, document)
-        removedTable = self._assertTable(6, 8, 1, document)
+        todoTable = self._assertTable(todoTableIndex, 8, 1, document)
+        completedTable = self._assertTable(completedTableIndex, 8, 1, document)
+        removedTable = self._assertTable(removedTableIndex, 8, 1, document)
 
         self.assertEqual(todoTable.rows[0]._cells, ["1", "Todo task", "3", "", "", "", "01-03-2022", ""])
         self.assertEqual(completedTable.rows[0]._cells, ["2", "Completed task", "4", "", "04-03-2022", "2", "01-03-2022", ""])
         self.assertEqual(removedTable.rows[0]._cells, ["3", "Removed task", "5", "02-03-2022", "", "", "01-03-2022", "03-03-2022"])
 
-        
+    def test_a_repository_with_all_working_days(self):
+        taskRepo = self.given_a_repository()
+        daysRepo = WorkingDayRepository()
+        self.fail("this repository must be used")

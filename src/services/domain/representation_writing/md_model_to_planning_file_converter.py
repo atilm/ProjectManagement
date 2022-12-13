@@ -7,6 +7,10 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def convert(self, source : TaskRepository) -> object:
         document = MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
+            .withSection("Working Days", 1)\
+            .withTable(self._build_working_days_table(source))\
+            .withSection("Holidays", 1)\
+            .withTable(self._build_holidays_table(source))\
             .withSection("Stories To Do", 1)\
             .withTable(self._build_todo_table(source))\
             .withSection("Completed Stories", 1)\
@@ -16,6 +20,16 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
             .build()
         
         return document
+
+    def _build_working_days_table(self, repo: TaskRepository) -> MarkdownTable:
+        return MarkdownTableBuilder()\
+            .withHeader("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")\
+            .build()
+
+    def _build_holidays_table(self, repo: TaskRepository) -> MarkdownTable:
+        return MarkdownTableBuilder()\
+            .withHeader("Dates", "Description")\
+            .build()
 
     def _build_todo_table(self, repo: TaskRepository) -> MarkdownTable:
         return self._build_table(repo, task.is_todo_task)
