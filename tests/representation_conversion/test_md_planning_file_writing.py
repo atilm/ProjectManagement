@@ -140,3 +140,15 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         workingDaysTable = self._assertTable(workingDaysTableIndex, 7, 1, document)
         self._assertRow(workingDaysTable, 0, ["", "x", "", "x", "", "x", ""])
+
+    def test_a_repository_with_holidays(self):
+        taskRepo = self.given_a_task_repository()
+        daysRepo = self.given_a_days_repository()
+        daysRepo.add_free_range(date(2022, 12, 21), date(2022, 12, 31), "Christmas holidays")
+        daysRepo.add_free_range(date(2023, 1, 6), date(2023, 1, 6), "Holy Three Kings")
+
+        document = self.when_the_repos_are_converted(taskRepo, daysRepo)
+
+        holidaysTable = self._assertTable(holidaysTableIndex, 2, 2, document)
+        self._assertRow(holidaysTable, 0, ["21-12-2022 -- 31-12-2022", "Christmas holidays"])
+        self._assertRow(holidaysTable, 1, ["06-01-2023", "Holy Three Kings"])

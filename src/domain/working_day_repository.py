@@ -1,9 +1,10 @@
 import datetime
 
 class FreeRange:
-    def __init__(self, firstFreeDay: datetime.date, lastFreeDay: datetime.date) -> None:
+    def __init__(self, firstFreeDay: datetime.date, lastFreeDay: datetime.date, description: str) -> None:
         self.firstFreeDay = firstFreeDay
         self.lastFreeDay = lastFreeDay
+        self.description = description
 
     def contains(self, day: datetime.date) -> bool:
         return self.firstFreeDay <= day and day <= self.lastFreeDay
@@ -18,8 +19,8 @@ class WorkingDayRepository:
         for weekday in args:
             self.free_weekdays.add(weekday)
 
-    def add_free_range(self, firstFreeDay: datetime.date, lastFreeDay: datetime.date) -> None:
-        self.free_ranges.append(FreeRange(firstFreeDay, lastFreeDay))
+    def add_free_range(self, firstFreeDay: datetime.date, lastFreeDay: datetime.date, description: str = "") -> None:
+        self.free_ranges.append(FreeRange(firstFreeDay, lastFreeDay, description))
 
     def is_working_day(self, day: datetime.date) -> bool:
         is_free_weekday = day.weekday() in self.free_weekdays

@@ -3,6 +3,7 @@ from src.services.markdown.markdown_document_builder import *
 from src.services.domain.task_to_string_converter import *
 from src.domain import task
 from src.domain import weekdays
+from src.services.utilities import string_utilities
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def convert(self, source : TaskRepository, workingDaysRepo: WorkingDayRepository) -> object:
@@ -35,9 +36,15 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
             .build()
 
     def _build_holidays_table(self, repo: WorkingDayRepository) -> MarkdownTable:
-        return MarkdownTableBuilder()\
-            .withHeader("Dates", "Description")\
-            .build()
+        tableBuilder =  MarkdownTableBuilder().withHeader("Dates", "Description")
+
+        for freeRange in repo.free_ranges:
+            beginStr = string_utilities.to_date_str(freeRange.firstFreeDay)
+            endStr = string_utilities.to_date_str(freeRange.lastFreeDay)
+            dateStr = f"{beginStr}" if beginStr == endStr else f"{beginStr} -- {endStr}"
+            tableBuilder.withRow(dateStr, freeRange.description)
+
+        return tableBuilder.build()
 
     def _build_todo_table(self, repo: TaskRepository) -> MarkdownTable:
         return self._build_table(repo, task.is_todo_task)

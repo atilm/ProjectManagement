@@ -1,6 +1,8 @@
 
 from datetime import datetime
 from src.domain.task import Task
+from src.services.utilities import string_utilities
+from src.global_settings import GlobalSettings
 
 class ConversionException(Exception):
     def __init__(self, s: str, *args: object) -> None:
@@ -10,7 +12,6 @@ class ConversionException(Exception):
 class TaskToStringConverter:
     def __init__(self) -> None:
         self.task = Task("", "")
-        self.dateFormat = r"%d-%m-%Y"
 
     def withId(self, id: str):
         self.task.id = id
@@ -52,11 +53,11 @@ class TaskToStringConverter:
         s["id"] = self._toStr(task.id, lambda s: s)
         s["description"] = self._toStr(task.description, lambda s: s)
         s["estimate"] = self._toStr(task.estimate, lambda f: f"{f:g}")
-        s["createdDate"] = self._toStr(task.createdDate, self._toDateStr)
-        s["startedDate"] = self._toStr(task.startedDate, self._toDateStr)
-        s["completedDate"] = self._toStr(task.completedDate, self._toDateStr)
+        s["createdDate"] = self._toStr(task.createdDate, string_utilities.to_date_str)
+        s["startedDate"] = self._toStr(task.startedDate, string_utilities.to_date_str)
+        s["completedDate"] = self._toStr(task.completedDate, string_utilities.to_date_str)
         s["actualWorkDays"] = self._toStr(task.actualWorkDays, str)
-        s["removedDate"] = self._toStr(task.removedDate, self._toDateStr)
+        s["removedDate"] = self._toStr(task.removedDate, string_utilities.to_date_str)
         return s
 
     def _toFloatOrNone(self, s: str) -> float:
@@ -69,7 +70,7 @@ class TaskToStringConverter:
         if s.strip() == "":
             return None
 
-        return datetime.strptime(s, self.dateFormat).date()
+        return string_utilities.parse_to_date(s)
 
     def _convert(self, s: str, convert):
         try:
@@ -82,7 +83,3 @@ class TaskToStringConverter:
             return ""
 
         return convert(obj)
-
-    def _toDateStr(self, date: datetime.date) -> str:
-        dt = datetime.combine(date, datetime.min.time())
-        return dt.strftime(self.dateFormat)
