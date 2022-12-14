@@ -1,10 +1,11 @@
 from .representation_to_model_converter import *
+from src.domain.tasks_repository import *
 from .md_converter_exceptions import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
 
 class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
-    def convert(self, document : MarkdownDocument) -> TaskRepository:
+    def convert(self, document : MarkdownDocument) -> RepositoryCollection:
         repo = TaskRepository()
         
         for item in document.getContent():
@@ -17,7 +18,7 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
                         raise ColumnNumberException(row.lineNumber)
                     repo.add(self._toTask(row))
 
-        return repo
+        return RepositoryCollection(repo, None)
 
     def _hasRequiredHeader(self, table: MarkdownTable):
         expectedHeaders = ["Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]

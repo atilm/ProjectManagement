@@ -1,9 +1,10 @@
 from .md_converter_exceptions import *
 from .representation_to_model_converter import *
 from src.services.markdown.markdown_document import *
+from src.domain.tasks_repository import *
 
 class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):
-    def convert(self, document: MarkdownDocument) -> TaskRepository:
+    def convert(self, document: MarkdownDocument) -> RepositoryCollection:
         repo = TaskRepository()
         currentEstimate = None
 
@@ -14,7 +15,7 @@ class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):
                 for task in self._convert_table_to_tasks(item, currentEstimate):
                     repo.add(task)
 
-        return repo
+        return RepositoryCollection(repo, None)
 
     def _convert_to_estimate(self, section: MarkdownSection) -> float:
         if self._is_title_section(section):

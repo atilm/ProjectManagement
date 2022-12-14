@@ -26,7 +26,8 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
 
     def when_the_document_is_converted(self, document: MarkdownDocument) -> TaskRepository:
         converter = MarkdownPlanningDocumentToModelConverter()
-        return converter.convert(document)
+        repoCollection = converter.convert(document)
+        return repoCollection.task_repository
 
     def then_the_repo_contains_id(self, taskId: str, repo: TaskRepository):
         task = repo.get(taskId)

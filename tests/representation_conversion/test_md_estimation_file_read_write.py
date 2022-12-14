@@ -30,7 +30,8 @@ class MarkdownEstimationFileTest(unittest.TestCase):
         document = parser.parse(input)
 
         converter = MarkdownEstimationFileToModelConverter()
-        return converter.convert(document)
+        repoCollection = converter.convert(document)
+        return repoCollection.task_repository
 
     def then_the_exception_is(self, e : Exception, expectedType, lineNumber: int):
         self.assertIsInstance(e, expectedType)
