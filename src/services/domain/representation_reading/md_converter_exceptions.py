@@ -12,6 +12,9 @@ class ColumnNumberException(MarkdownConverterException):
 class UnexpectedSectionException(MarkdownConverterException):
     pass
 
+class MissingTableRowException(MarkdownConverterException):
+    pass
+
 class ValueConversionException(MarkdownConverterException):
     def __init__(self, inputString: str, lineNumber: int, *args: object) -> None:
         super().__init__(lineNumber, *args)

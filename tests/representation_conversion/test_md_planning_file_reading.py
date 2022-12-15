@@ -1,16 +1,30 @@
 import unittest
-from datetime import date
+from datetime import date, timedelta
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.domain.task import Task
 from tests.domain.domain_utilities.task_utilities import *
+from src.domain.working_day_repository import WorkingDayRepository
 
 correctTableHeader = ["Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]
 
 class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def given_a_document_with_tables(self, todo: MarkdownTable, completed: MarkdownTable, removed: MarkdownTable) -> MarkdownDocument:
+        return self.build_table(self.build_default_working_days_table(), self.build_empty_holidays_table(), todo, completed, removed)
+
+    def given_a_document_with_holidays(self, workingDays, holidays) -> MarkdownDocument:
+        todo = self.build_empty_table()
+        completed = self.build_empty_table()
+        removed = self.build_empty_table()
+        return self.build_table(workingDays, holidays, todo, completed, removed)
+
+    def build_table(self, workingDays, holidays, todo, completed, removed) -> MarkdownDocument:
         return MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
+            .withSection("Working Days", 1)\
+            .withTable(workingDays)\
+            .withSection("Holidays", 1)\
+            .withTable(holidays)\
             .withSection("Stories To Do", 1)\
             .withTable(todo)\
             .withSection("Completed Stories", 1)\
@@ -24,10 +38,29 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
             .withHeader(*correctTableHeader)\
             .build()
 
+    def build_default_working_days_table(self):
+        return self.build_working_days_table(["x"] * 7)
+
+    def build_working_days_table(self, row: list):
+        return MarkdownTableBuilder()\
+            .withHeader("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")\
+            .withRow(*row)\
+            .build()
+
+    def build_empty_holidays_table(self):
+        return MarkdownTableBuilder()\
+            .withHeader("Dates", "Description")\
+            .build()
+
     def when_the_document_is_converted(self, document: MarkdownDocument) -> TaskRepository:
         converter = MarkdownPlanningDocumentToModelConverter()
         repoCollection = converter.convert(document)
         return repoCollection.task_repository
+
+    def when_the_document_is_converted_to_a_working_days_repo(self, document: MarkdownDocument) -> WorkingDayRepository:
+        converter = MarkdownPlanningDocumentToModelConverter()
+        repoCollection = converter.convert(document)
+        return repoCollection.working_days_repository
 
     def then_the_repo_contains_id(self, taskId: str, repo: TaskRepository):
         task = repo.get(taskId)
@@ -199,3 +232,43 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
         self.then_the_exception_is(e, ValueConversionException, 5)
         e.inputString = "12-31-2022"
+
+    def test_weekly_working_days_are_parsed(self):
+        workingDays = self.build_working_days_table(["", "a", "", "n", "", "y", ""])
+        holidays = self.build_empty_holidays_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        repo = self.when_the_document_is_converted_to_a_working_days_repo(document)
+
+        monday = date(2022, 12, 12)
+        aWeek = [monday + timedelta(d) for d in range(7)]
+
+        self.assertFalse(repo.is_working_day(aWeek[MONDAY]))
+        self.assertTrue(repo.is_working_day(aWeek[TUESDAY]))
+        self.assertFalse(repo.is_working_day(aWeek[WEDNESDAY]))
+        self.assertTrue(repo.is_working_day(aWeek[THURSDAY]))
+        self.assertFalse(repo.is_working_day(aWeek[FRIDAY]))
+        self.assertTrue(repo.is_working_day(aWeek[SATURDAY]))
+        self.assertFalse(repo.is_working_day(aWeek[SUNDAY]))
+
+    def test_exception_on_wrong_working_days_row_format(self):
+        workingDays = self.build_working_days_table(["x", "x", "x"]) # too few columns
+        workingDays.rows[0].lineNumber = 7
+        holidays = self.build_empty_holidays_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        e = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(e, ColumnNumberException, 7)
+
+    def test_exception_on_missing_working_days_row(self):
+        workingDays = self.build_working_days_table([])
+        workingDays._headerRow.lineNumber = 4
+        workingDays.rows = []
+
+        holidays = self.build_empty_holidays_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        e = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(e, MissingTableRowException, 6)
