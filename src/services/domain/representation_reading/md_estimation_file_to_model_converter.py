@@ -2,6 +2,7 @@ from .md_converter_exceptions import *
 from .representation_to_model_converter import *
 from src.services.markdown.markdown_document import *
 from src.domain.tasks_repository import *
+from src.services.domain import markdown_configuration
 
 class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):
     def convert(self, document: MarkdownDocument) -> RepositoryCollection:
@@ -59,4 +60,4 @@ class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):
             yield task
 
     def _has_expected_header(self, table: MarkdownTable) -> bool:
-        return table._headerRow._cells == ["Id", "Desc"]
+        return table._headerRow._cells == markdown_configuration.estimation_task_header

@@ -6,6 +6,7 @@ from .md_converter_exceptions import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
 from src.services.utilities import string_utilities
+from src.services.domain import markdown_configuration
 
 def parse_date_range(dateString: str, lineNumber: int) -> tuple:
     rangeMatch = GlobalSettings.date_range_regex.match(dateString)
@@ -51,16 +52,13 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         return RepositoryCollection(repo, workingDaysRepo)
 
     def _has_working_days_header(self, table: MarkdownTable):
-        workingDaysHeaders = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-        return self._has_header(table, workingDaysHeaders)
+        return self._has_header(table, markdown_configuration.planning_working_days_header)
 
     def _has_holidays_header(self, table: MarkdownTable):
-        holidaysHeaders = ["Dates", "Description"]
-        return self._has_header(table, holidaysHeaders)
+        return self._has_header(table, markdown_configuration.planning_holidays_header)
 
     def _has_tasks_header(self, table: MarkdownTable):
-        expectedHeaders = ["Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]
-        return self._has_header(table, expectedHeaders)
+        return self._has_header(table, markdown_configuration.planning_task_header)
 
     def _has_header(self, table: MarkdownTable, header: list) -> bool:
         actualHeaders = self._extract_headers(table)

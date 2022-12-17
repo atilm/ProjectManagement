@@ -4,6 +4,7 @@ from src.services.domain.task_to_string_converter import *
 from src.domain import task
 from src.domain import weekdays
 from src.services.utilities import string_utilities
+from src.services.domain import markdown_configuration
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def convert(self, source : TaskRepository, workingDaysRepo: WorkingDayRepository) -> object:
@@ -26,17 +27,16 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def _build_working_days_table(self, repo: WorkingDayRepository) -> MarkdownTable:
         theWeekdays = [weekdays.MONDAY, weekdays.TUESDAY, weekdays.WEDNESDAY,\
                        weekdays.THURSDAY, weekdays.FRIDAY, weekdays.SATURDAY, weekdays.SUNDAY]
-        weekdayHeaders = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 
         markers = ["" if wd in repo.free_weekdays else "x" for wd in theWeekdays]
 
         return MarkdownTableBuilder()\
-            .withHeader(*weekdayHeaders)\
+            .withHeader(*markdown_configuration.planning_working_days_header)\
             .withRow(*markers)\
             .build()
 
     def _build_holidays_table(self, repo: WorkingDayRepository) -> MarkdownTable:
-        tableBuilder =  MarkdownTableBuilder().withHeader("Dates", "Description")
+        tableBuilder =  MarkdownTableBuilder().withHeader(*markdown_configuration.planning_holidays_header)
 
         for freeRange in repo.free_ranges:
             beginStr = string_utilities.to_date_str(freeRange.firstFreeDay)
@@ -59,7 +59,7 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
         tasks = filter(filterPredicate, list(repo.tasks.values()))
 
         tableBuilder = MarkdownTableBuilder()\
-            .withHeader("Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed")
+            .withHeader(*markdown_configuration.planning_task_header)
 
         converter = TaskToStringConverter()
 

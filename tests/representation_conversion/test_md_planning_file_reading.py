@@ -5,20 +5,19 @@ from src.services.markdown.markdown_document_builder import *
 from src.domain.task import Task
 from tests.domain.domain_utilities.task_utilities import *
 from src.domain.working_day_repository import WorkingDayRepository
-
-correctTableHeader = ["Id", "Description", "Estimate", "Started", "Completed", "Workdays", "Created", "Removed"]
+from src.services.domain import markdown_configuration
 
 class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def given_a_document_with_tables(self, todo: MarkdownTable, completed: MarkdownTable, removed: MarkdownTable) -> MarkdownDocument:
-        return self.build_table(self.build_default_working_days_table(), self.build_empty_holidays_table(), todo, completed, removed)
+        return self.build_document(self.build_default_working_days_table(), self.build_empty_holidays_table(), todo, completed, removed)
 
     def given_a_document_with_holidays(self, workingDays, holidays) -> MarkdownDocument:
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
-        removed = self.build_empty_table()
-        return self.build_table(workingDays, holidays, todo, completed, removed)
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
+        removed = self.build_empty_task_table()
+        return self.build_document(workingDays, holidays, todo, completed, removed)
 
-    def build_table(self, workingDays, holidays, todo, completed, removed) -> MarkdownDocument:
+    def build_document(self, workingDays, holidays, todo, completed, removed) -> MarkdownDocument:
         return MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
             .withSection("Working Days", 1)\
@@ -33,9 +32,9 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
             .withTable(removed)\
             .build()
 
-    def build_empty_table(self):
+    def build_empty_task_table(self):
         return MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .build()
 
     def build_default_working_days_table(self) -> MarkdownTable:
@@ -43,7 +42,7 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
 
     def build_working_days_table(self, row: list) -> MarkdownTable:
         return MarkdownTableBuilder()\
-            .withHeader("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")\
+            .withHeader(*markdown_configuration.planning_working_days_header)\
             .withRow(*row)\
             .build()
 
@@ -51,7 +50,7 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
         return self.build_holidays_table([])
 
     def build_holidays_table(self, holidayRows: list) -> MarkdownTable:
-        builder = MarkdownTableBuilder().withHeader("Dates", "Description")
+        builder = MarkdownTableBuilder().withHeader(*markdown_configuration.planning_holidays_header)
 
         for fields in holidayRows:
             builder.withRow(*fields)
@@ -109,9 +108,9 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
 
 class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
     def test_the_converter_returns_a_repository(self):
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
-        removed = self.build_empty_table()
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
+        removed = self.build_empty_task_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -121,13 +120,13 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.assertEqual(len(repo.tasks.items()), 0)
 
     def test_can_read_two_tasks_from_completed_table(self):
-        todo = self.build_empty_table()
+        todo = self.build_empty_task_table()
         completed = MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .withRow("1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
             .withRow("2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
             .build()
-        removed = self.build_empty_table()
+        removed = self.build_empty_task_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -154,11 +153,11 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
     def test_can_read_a_task_from_to_do_table(self):
         todo = MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .withRow("1", "Description", "5", "", "", "", "29-01-2021", "")\
             .build()
-        completed = self.build_empty_table()
-        removed = self.build_empty_table()
+        completed = self.build_empty_task_table()
+        removed = self.build_empty_task_table()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
 
@@ -175,10 +174,10 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.then_the_repo_contains_task(expectedTask, repo)
 
     def test_can_read_a_task_from_removed_table(self):
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .withRow("3", "Description", "5", "04-05-2022", "", "", "01-05-2022", "05-05-2022")\
             .build()
 
@@ -197,8 +196,8 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.then_the_repo_contains_task(expectedTask, repo)
 
     def test_exception_on_unexpected_table_header(self):
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
             .withHeader("Id", "Description", "Started", "Completed", "Workdays", "Created", "Removed")\
             .build()
@@ -211,10 +210,10 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.then_the_exception_is(e, HeaderFormatException, 13)
 
     def test_exception_on_wrong_number_of_row_entries(self):
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .withRow("3", "Description", "5", "04-05-2022", "", "01-05-2022", "05-05-2022")\
             .build()
 
@@ -227,10 +226,10 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.then_the_exception_is(e, ColumnNumberException, 5)
 
     def test_exception_on_wrong_date_format(self):
-        todo = self.build_empty_table()
-        completed = self.build_empty_table()
+        todo = self.build_empty_task_table()
+        completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
-            .withHeader(*correctTableHeader)\
+            .withHeader(*markdown_configuration.planning_task_header)\
             .withRow("3", "Description", "5", "12-31-2022", "", "", "01-05-2022", "05-05-2022")\
             .build()
         

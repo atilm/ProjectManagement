@@ -10,7 +10,7 @@
 [x] error with line number if holidays table not formatted correctly
 [x] error with line number if a date (range) cannot be parsed
 [ ] use RepositoryCollection as input to writers
-[ ] extract table headers to common location for readers and writers
+[x] extract table headers to common location for readers and writers
 [later?] parse reordered working days table
 [no] error when working days table is missing -> then all days are working days
 [no] error when holidays table is missing

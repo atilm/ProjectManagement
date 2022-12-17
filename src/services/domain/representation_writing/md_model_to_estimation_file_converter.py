@@ -3,6 +3,7 @@ from collections import defaultdict
 from .model_to_representation_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.services.markdown.markdown_document import *
+from src.services.domain import markdown_configuration
 
 class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter):
     def convert(self, repo : TaskRepository) -> MarkdownDocument:
@@ -25,7 +26,7 @@ class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter
 
     def _tasks_to_table(self, tasks: list):
         builder = MarkdownTableBuilder()\
-            .withHeader("Id", "Desc")
+            .withHeader(*markdown_configuration.estimation_task_header)
 
         for t in tasks:
             task: Task = t
