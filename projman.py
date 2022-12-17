@@ -8,6 +8,7 @@ from src.services.domain.representation_writing.md_model_to_estimation_file_conv
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
 from src.domain.report_generator import *
 from src.domain.task import VelocityCalculationException
+from src.services.utilities import string_utilities
 
 def catch_all(action, args):
     try:
@@ -38,9 +39,10 @@ def write_to_file(filePath: str, content: str) -> str:
 
 def initPlanningFile(args):
     print(f"initialize planning file: {args.planningPath}")
-    repo = TaskRepository()
+    task_repo = TaskRepository()
+    working_days_repo = WorkingDayRepository()
     writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
-    planningFileContent = writer.write(repo)
+    planningFileContent = writer.write(RepositoryCollection(task_repo, working_days_repo))
     write_to_file(args.planningPath, planningFileContent)
 
 def generateEstimationFile(args):
@@ -50,8 +52,8 @@ def generateEstimationFile(args):
     writer = MarkdownRepresentationWriter(ModelToMarkdownEstimationDocumentConverter())
 
     planningFileContent = read_from_file(args.planningPath)
-    repo = reader.read(planningFileContent)
-    estimationFileContent = writer.write(repo)
+    repos = reader.read(planningFileContent)
+    estimationFileContent = writer.write(repos)
     write_to_file(args.estimationPath, estimationFileContent)
 
 def applyEstimationFile(args):
@@ -61,13 +63,13 @@ def applyEstimationFile(args):
     planningWriter = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
 
     planningInput = read_from_file(args.planningPath)
-    planningRepo = planningReader.read(planningInput)
+    planningRepos = planningReader.read(planningInput)
 
     estimationInput = read_from_file(args.estimationPath)
-    estimationRepo = estimationReader.read(estimationInput)
+    estimationRepo = estimationReader.read(estimationInput).task_repository
 
-    planningRepo.updateEstimates(list(estimationRepo.tasks.values()))
-    planningOutput = planningWriter.write(planningRepo)
+    planningRepos.task_repository.updateEstimates(list(estimationRepo.tasks.values()))
+    planningOutput = planningWriter.write(planningRepos)
     write_to_file(args.planningPath, planningOutput)
 
 def generateReport(args):
@@ -75,13 +77,14 @@ def generateReport(args):
 
     planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
     planningInput = read_from_file(args.planningPath)
-    planningRepo = planningReader.read(planningInput)
+    planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
-    report = reportGenerator.generate(planningRepo)
+    report = reportGenerator.generate(planningRepos.task_repository, datetime.date.today(), planningRepos.working_days_repository)
 
     print(f"Velocity: {report.velocity} story points / day")
     print(f"Remaining work days: {report.remaining_work_days}")
+    print(f"Predicted completion date: {string_utilities.to_date_str(report.predicted_completion_date)}")
     
     if (report.warnings):
         print("\nWarnings:\n")
