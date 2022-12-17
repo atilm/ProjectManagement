@@ -94,6 +94,16 @@ def generateReport(args):
 
     print("\n")
 
+def formatFile(args):
+    print(f"Reformat file {args.filePath}:\n")
+    parser = MarkdownParser()
+    writer = MarkdownWriter()
+
+    input = read_from_file(args.filePath)
+    document = parser.parse(input)
+    output = writer.write(document)
+    write_to_file(args.filePath, output)
+
 
 argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 
@@ -116,6 +126,10 @@ applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFi
 reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
+
+formatParser = subparsers.add_parser("format", help="Clean up the format of a markdown file (e.g. alignment in tables).")
+formatParser.add_argument("filePath", help="The file to reformat.")
+formatParser.set_defaults(func=lambda args: catch_all(formatFile, args))
 
 args = argumentParser.parse_args()
 args.func(args)
