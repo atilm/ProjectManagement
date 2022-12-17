@@ -80,7 +80,7 @@ def generateReport(args):
     planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
-    report = reportGenerator.generate(planningRepos.task_repository, datetime.date.today(), planningRepos.working_days_repository)
+    report = reportGenerator.generate(planningRepos, datetime.date.today())
 
     print(f"Velocity: {report.velocity} story points / day")
     print(f"Remaining work days: {report.remaining_work_days}")

@@ -1,8 +1,9 @@
-from .tasks_repository import TaskRepository
 from src.domain import task
 from src.services.utilities import calculations
 import datetime
+from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
+from src.domain.repository_collection import RepositoryCollection
 
 class Report:
     def __init__(self) -> None:
@@ -16,18 +17,20 @@ class Report:
             self.warnings.add(warning)
 
 class ReportGenerator:
-    def generate(self, repo: TaskRepository, startDate: datetime.date, workingDayRepo: WorkingDayRepository) -> Report:
+    def generate(self, repos: RepositoryCollection, startDate: datetime.date) -> Report:
         report = Report()
 
-        velocity = self._calculate_recent_velocity(repo)
+        task_repo = repos.task_repository
+
+        velocity = self._calculate_recent_velocity(task_repo)
         report.velocity = velocity
 
-        todo_tasks = list(filter(task.is_todo_task, repo.tasks.values()))
+        todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
         workdays, warning = self._calculate_workdays(todo_tasks, velocity)
         report.remaining_work_days = workdays
         report.add_warning(warning)
 
-        report.predicted_completion_date = self._calculate_completion_date(workingDayRepo, workdays, startDate)
+        report.predicted_completion_date = self._calculate_completion_date(repos.working_days_repository, workdays, startDate)
 
         return report
 

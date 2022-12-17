@@ -40,9 +40,10 @@ class DomainTestCase(unittest.TestCase):
     def when_a_task_is_added(self, task : Task, repo : TaskRepository) -> Task:
         repo.add(task)
 
-    def when_a_report_is_generated(self, repo: TaskRepository, startDate = datetime.date(2022, 1, 1), workdays = WorkingDayRepository()) -> Report:
+    def when_a_report_is_generated(self, task_repo: TaskRepository, startDate = datetime.date(2022, 1, 1), workdays_repo = WorkingDayRepository()) -> Report:
         generator = ReportGenerator()
-        return generator.generate(repo, startDate, workdays)
+        repos = RepositoryCollection(task_repo, workdays_repo)
+        return generator.generate(repos, startDate)
 
     def then_report_generation_raises(self, repo: TaskRepository) -> Exception:
         try:
