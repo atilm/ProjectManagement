@@ -5,10 +5,9 @@ from src.domain.weekdays import *
 from .md_converter_exceptions import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
-import datetime
 from src.services.utilities import string_utilities
 
-def parse_date_range(dateString: str) -> tuple:
+def parse_date_range(dateString: str, lineNumber: int) -> tuple:
     rangeMatch = GlobalSettings.date_range_regex.match(dateString)
     dateMatch = GlobalSettings.date_regex.match(dateString)
 
@@ -20,12 +19,15 @@ def parse_date_range(dateString: str) -> tuple:
         d = string_utilities.parse_to_date(dateString)
         return (d, d)
     else:
-        raise Exception()
+        raise ValueConversionException(dateString, lineNumber)
 
 def parse_to_free_range(tableRow: MarkdownTableRow) -> FreeRange:
+        if tableRow.getColumnCount() != 2:
+            raise ColumnNumberException(tableRow.lineNumber)
+
         dateString = tableRow.get(0).strip()
         description = tableRow.get(1).strip()
-        firstDate, lastDate = parse_date_range(dateString)
+        firstDate, lastDate = parse_date_range(dateString, tableRow.lineNumber)
         return FreeRange(firstDate, lastDate, description)
 
 class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):

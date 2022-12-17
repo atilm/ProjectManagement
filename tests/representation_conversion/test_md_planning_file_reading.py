@@ -50,11 +50,11 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def build_empty_holidays_table(self) -> MarkdownTable:
         return self.build_holidays_table([])
 
-    def build_holidays_table(self, holidays: list) -> MarkdownTable:
+    def build_holidays_table(self, holidayRows: list) -> MarkdownTable:
         builder = MarkdownTableBuilder().withHeader("Dates", "Description")
 
-        for date, description in holidays:
-            builder.withRow(date, description)
+        for fields in holidayRows:
+            builder.withRow(*fields)
 
         return builder.build()
 
@@ -307,6 +307,25 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         self.then_the_repo_contains_holidays(repo, date(2022, 12, 24), date(2022, 12, 24))
 
     def test_holiday_row_with_wrong_format(self):
-        self.fail()
+        holidays = self.build_holidays_table([
+            (" 24-12-2022 ")])
+        holidays.rows[0].lineNumber = 7
+        workingDays = self.build_default_working_days_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
 
+        exception = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(exception, ColumnNumberException, 7)
+
+    def test_holiday_row_with_wrong_formatted_date(self):
+        holidays = self.build_holidays_table([
+            ("02.01.2023 -- 06.01.2023 ", " Skiing ")])
+        holidays.rows[0].lineNumber = 8
+        workingDays = self.build_default_working_days_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        exception = self.expect_conversion_exception(document)
+
+        self.then_the_exception_is(exception, ValueConversionException, 8)
+        self.assertEqual(exception.inputString, "02.01.2023 -- 06.01.2023")
     
