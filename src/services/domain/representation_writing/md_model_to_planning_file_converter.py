@@ -1,25 +1,26 @@
 from .model_to_representation_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.services.domain.task_to_string_converter import *
+from src.domain.repository_collection import RepositoryCollection
 from src.domain import task
 from src.domain import weekdays
 from src.services.utilities import string_utilities
 from src.services.domain import markdown_configuration
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
-    def convert(self, source : TaskRepository, workingDaysRepo: WorkingDayRepository) -> object:
+    def convert(self, repos : RepositoryCollection) -> object:
         document = MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
             .withSection("Working Days", 1)\
-            .withTable(self._build_working_days_table(workingDaysRepo))\
+            .withTable(self._build_working_days_table(repos.working_days_repository))\
             .withSection("Holidays", 1)\
-            .withTable(self._build_holidays_table(workingDaysRepo))\
+            .withTable(self._build_holidays_table(repos.working_days_repository))\
             .withSection("Stories To Do", 1)\
-            .withTable(self._build_todo_table(source))\
+            .withTable(self._build_todo_table(repos.task_repository))\
             .withSection("Completed Stories", 1)\
-            .withTable(self._build_completedTable(source))\
+            .withTable(self._build_completedTable(repos.task_repository))\
             .withSection("Removed Stories", 1)\
-            .withTable(self._build_removed_table(source))\
+            .withTable(self._build_removed_table(repos.task_repository))\
             .build()
         
         return document

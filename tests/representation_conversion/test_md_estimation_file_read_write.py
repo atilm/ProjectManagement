@@ -7,10 +7,10 @@ from src.services.domain.representation_writing.md_model_to_estimation_file_conv
 class MarkdownEstimationFileTest(unittest.TestCase):
     
     def when_the_file_is_read_and_written_again(self, input: str) -> str:
-        repo = self._parse_to_repo(input)
+        repos = self._parse_to_repo(input)
 
         backConverter = ModelToMarkdownEstimationDocumentConverter()
-        outputDocument = backConverter.convert(repo)
+        outputDocument = backConverter.convert(repos)
 
         writer = MarkdownWriter()
         output = writer.write(outputDocument)
@@ -25,13 +25,13 @@ class MarkdownEstimationFileTest(unittest.TestCase):
 
         self.fail("Conversion did not raise an exception")
 
-    def _parse_to_repo(self, input: str) -> TaskRepository:
+    def _parse_to_repo(self, input: str) -> RepositoryCollection:
         parser = MarkdownParser()
         document = parser.parse(input)
 
         converter = MarkdownEstimationFileToModelConverter()
         repoCollection = converter.convert(document)
-        return repoCollection.task_repository
+        return repoCollection
 
     def then_the_exception_is(self, e : Exception, expectedType, lineNumber: int):
         self.assertIsInstance(e, expectedType)

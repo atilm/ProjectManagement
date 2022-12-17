@@ -4,13 +4,14 @@ from .model_to_representation_converter import *
 from src.services.markdown.markdown_document_builder import *
 from src.services.markdown.markdown_document import *
 from src.services.domain import markdown_configuration
+from src.domain.repository_collection import RepositoryCollection
 
 class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter):
-    def convert(self, repo : TaskRepository) -> MarkdownDocument:
+    def convert(self, repos : RepositoryCollection) -> MarkdownDocument:
         builder = MarkdownDocumentBuilder()\
             .withSection("Estimation", 0)
 
-        tasksGroupedByEstimate = self._group_by_estimate((repo.tasks.values()))
+        tasksGroupedByEstimate = self._group_by_estimate((repos.task_repository.tasks.values()))
         keyGenerator = lambda f: -1 if f is None else f
         sortedEstimates = sorted(list(tasksGroupedByEstimate.keys()), reverse = True, key = keyGenerator)
 

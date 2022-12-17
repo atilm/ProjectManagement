@@ -9,10 +9,12 @@
 [x] parse several holidays from holidays table
 [x] error with line number if holidays table not formatted correctly
 [x] error with line number if a date (range) cannot be parsed
-[ ] use RepositoryCollection as input to writers
+[x] use RepositoryCollection as input to writers
+[ ] use RepostiroyColleciton as input to report generator
 [x] extract table headers to common location for readers and writers
 [later?] parse reordered working days table
 [no] error when working days table is missing -> then all days are working days
 [no] error when holidays table is missing
 [no] error when working days section is missing
 [no] error when holidays section is missing
+[ ] format cleanup feature for markdown files

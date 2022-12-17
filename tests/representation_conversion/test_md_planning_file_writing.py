@@ -43,13 +43,14 @@ class ConverterTestCase(unittest.TestCase):
         task.removedDate = date(2022, 3, 3)
         repo.add(task)
 
-    def when_the_repo_is_converted(self, repo: TaskRepository) -> MarkdownDocument:
+    def when_the_repo_is_converted(self, taskRepo: TaskRepository) -> MarkdownDocument:
         converter = ModelToMarkdownPlanningDocumentConverter()
-        return converter.convert(repo, WorkingDayRepository())
+        repos = RepositoryCollection(taskRepo, WorkingDayRepository())
+        return converter.convert(repos)
 
     def when_the_repos_are_converted(self, taskRepo: TaskRepository, daysRepo: WorkingDayRepository) -> MarkdownDocument:
         converter = ModelToMarkdownPlanningDocumentConverter()
-        return converter.convert(taskRepo, daysRepo)
+        return converter.convert(RepositoryCollection(taskRepo, daysRepo))
 
     def then_the_document_has_the_expected_structure(self, doc: MarkdownDocument):
         self.assertEqual(len(doc.getContent()), 11, doc)

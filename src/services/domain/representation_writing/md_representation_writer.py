@@ -1,6 +1,6 @@
 from .representation_writer import IRepresentationWriter
 from .model_to_representation_converter import IModelToRepresentationConverter
-from src.domain.tasks_repository import TaskRepository
+from src.domain.repository_collection import RepositoryCollection
 from src.services.markdown.markdown_writer import MarkdownWriter
 
 class MarkdownRepresentationWriter(IRepresentationWriter):
@@ -8,7 +8,7 @@ class MarkdownRepresentationWriter(IRepresentationWriter):
         super().__init__()
         self.converter = converter
 
-    def write(self, repo: TaskRepository) -> str:
-        document = self.converter.convert(repo)
+    def write(self, repos: RepositoryCollection) -> str:
+        document = self.converter.convert(repos)
         writer = MarkdownWriter()
         return writer.write(document)
