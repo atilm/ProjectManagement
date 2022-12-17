@@ -2,10 +2,11 @@
 [x] accept any marker in weekly working days table
 [x] error with line number when working days row missing
 [x] error with line number when working days table not formatted correctly
-[ ] parse extended holidays from holidays table
-[ ] accept any separator for extended holidays
-[ ] parse single holiday form holidays table
-[ ] parse empty holidays table
+[x] parse single holiday form holidays table
+[x] parse empty holidays table
+[x] parse extended holidays from holidays table
+[x] accept any separator for extended holidays
+[x] parse several holidays from holidays table
 [ ] error with line number if holidays table not formatted correctly
 [ ] error with line number if a date (range) cannot be parsed
 [ ] use RepositoryCollection as input to writers

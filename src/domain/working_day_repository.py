@@ -22,6 +22,9 @@ class WorkingDayRepository:
     def add_free_range(self, firstFreeDay: datetime.date, lastFreeDay: datetime.date, description: str = "") -> None:
         self.free_ranges.append(FreeRange(firstFreeDay, lastFreeDay, description))
 
+    def add_free_ranges(self, free_ranges: list):
+        self.free_ranges += free_ranges
+
     def is_working_day(self, day: datetime.date) -> bool:
         is_free_weekday = day.weekday() in self.free_weekdays
         is_holiday = any(free_range.contains(day) for free_range in self.free_ranges)

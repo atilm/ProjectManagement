@@ -38,19 +38,25 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
             .withHeader(*correctTableHeader)\
             .build()
 
-    def build_default_working_days_table(self):
+    def build_default_working_days_table(self) -> MarkdownTable:
         return self.build_working_days_table(["x"] * 7)
 
-    def build_working_days_table(self, row: list):
+    def build_working_days_table(self, row: list) -> MarkdownTable:
         return MarkdownTableBuilder()\
             .withHeader("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")\
             .withRow(*row)\
             .build()
 
-    def build_empty_holidays_table(self):
-        return MarkdownTableBuilder()\
-            .withHeader("Dates", "Description")\
-            .build()
+    def build_empty_holidays_table(self) -> MarkdownTable:
+        return self.build_holidays_table([])
+
+    def build_holidays_table(self, holidays: list) -> MarkdownTable:
+        builder = MarkdownTableBuilder().withHeader("Dates", "Description")
+
+        for date, description in holidays:
+            builder.withRow(date, description)
+
+        return builder.build()
 
     def when_the_document_is_converted(self, document: MarkdownDocument) -> TaskRepository:
         converter = MarkdownPlanningDocumentToModelConverter()
@@ -84,6 +90,10 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
         self.assertEqual(lhs.createdDate, rhs.createdDate)
         self.assertTrue(isDateOrNone(lhs.removedDate))
         self.assertEqual(lhs.removedDate, rhs.removedDate)
+
+    def then_the_repo_contains_holidays(self, repo: WorkingDayRepository, firstFreeDay: date, lastFreeDay: date) -> None:
+        self.assertFalse(repo.is_working_day(firstFreeDay))
+        self.assertFalse(repo.is_working_day(lastFreeDay))
 
     def expect_conversion_exception(self, document: MarkdownDocument):
         try:
@@ -272,3 +282,31 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         e = self.expect_conversion_exception(document)
 
         self.then_the_exception_is(e, MissingTableRowException, 6)
+
+    def test_parse_a_single_holiday(self):
+        holidays = self.build_holidays_table([(" 24-12-2022 ", " Christmas ")])
+        workingDays = self.build_default_working_days_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        repo = self.when_the_document_is_converted_to_a_working_days_repo(document)
+
+        holidays: FreeRange = repo.free_ranges[0]
+        self.assertFalse(repo.is_working_day(date(2022, 12, 24)))
+        self.assertEqual(holidays.description, "Christmas")
+
+    def test_parse_holidays(self):
+        holidays = self.build_holidays_table([
+            ("02-01-2023 -- 06-01-2023 ", " Skiing "),
+            (" 24-12-2022 ", " Christmas ")])
+        workingDays = self.build_default_working_days_table()
+        document = self.given_a_document_with_holidays(workingDays, holidays)
+
+        repo = self.when_the_document_is_converted_to_a_working_days_repo(document)
+        
+        self.then_the_repo_contains_holidays(repo, date(2023, 1, 2), date(2023, 1, 6))
+        self.then_the_repo_contains_holidays(repo, date(2022, 12, 24), date(2022, 12, 24))
+
+    def test_holiday_row_with_wrong_format(self):
+        self.fail()
+
+    

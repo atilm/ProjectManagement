@@ -5,6 +5,28 @@ from src.domain.weekdays import *
 from .md_converter_exceptions import *
 from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
+import datetime
+from src.services.utilities import string_utilities
+
+def parse_date_range(dateString: str) -> tuple:
+    rangeMatch = GlobalSettings.date_range_regex.match(dateString)
+    dateMatch = GlobalSettings.date_regex.match(dateString)
+
+    if rangeMatch:
+        firstDate = string_utilities.parse_to_date(rangeMatch.group('first'))
+        lastDate = string_utilities.parse_to_date(rangeMatch.group('last'))
+        return (firstDate, lastDate)
+    elif dateMatch:
+        d = string_utilities.parse_to_date(dateString)
+        return (d, d)
+    else:
+        raise Exception()
+
+def parse_to_free_range(tableRow: MarkdownTableRow) -> FreeRange:
+        dateString = tableRow.get(0).strip()
+        description = tableRow.get(1).strip()
+        firstDate, lastDate = parse_date_range(dateString)
+        return FreeRange(firstDate, lastDate, description)
 
 class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
     def convert(self, document : MarkdownDocument) -> RepositoryCollection:
@@ -14,19 +36,15 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         for item in document.getContent():
             if isinstance(item, MarkdownTable):
                 if self._has_holidays_header(item):
-                    continue
-
-                if self._has_working_days_header(item):
+                    free_ranges = [parse_to_free_range(r) for r in item.rows]
+                    workingDaysRepo.add_free_ranges(free_ranges)
+                elif self._has_working_days_header(item):
                     workingDaysRepo.set_free_weekdays(*self._to_free_days(item))
-                    continue
-
-                if not self._has_tasks_header(item):
+                elif self._has_tasks_header(item):
+                    for row in item.rows:
+                        repo.add(self._toTask(row))
+                else:
                     raise HeaderFormatException(item._headerRow.lineNumber)
-
-                for row in item.rows:
-                    if not self._hasRequiredColumnCount(row, item):
-                        raise ColumnNumberException(row.lineNumber)
-                    repo.add(self._toTask(row))
 
         return RepositoryCollection(repo, workingDaysRepo)
 
@@ -72,6 +90,9 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         return result
 
     def _toTask(self, row: MarkdownTableRow) -> Task:
+        if row.getColumnCount() != 8:
+            raise ColumnNumberException(row.lineNumber)
+
         try:
             return TaskToStringConverter()\
                 .withId(row.get(0))\
