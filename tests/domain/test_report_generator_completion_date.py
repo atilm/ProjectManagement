@@ -81,5 +81,3 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
         # then the work is completed on the same day
         self.assertEqual(report.predicted_completion_date, startDate)
-
-

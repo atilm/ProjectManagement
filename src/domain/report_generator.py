@@ -7,10 +7,11 @@ from src.domain.repository_collection import RepositoryCollection
 
 class Report:
     def __init__(self) -> None:
-        self.velocity = None
-        self.remaining_work_days = None
-        self.predicted_completion_date = None
+        self.velocity: float = None
+        self.remaining_work_days: float = None
+        self.predicted_completion_date: datetime.date = None
         self.warnings = set()
+        self.task_completion_dates = []
 
     def add_warning(self, warning: str):
         if warning is not None:
@@ -22,7 +23,8 @@ class ReportGenerator:
 
         task_repo = repos.task_repository
 
-        velocity = self._calculate_recent_velocity(task_repo)
+        velocity, warning = self._calculate_recent_velocity(task_repo)
+        report.add_warning(warning)
         report.velocity = velocity
 
         todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
@@ -32,12 +34,18 @@ class ReportGenerator:
 
         report.predicted_completion_date = self._calculate_completion_date(repos.working_days_repository, workdays, startDate)
 
+        report.task_completion_dates, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity)
+
         return report
 
-    def _calculate_recent_velocity(self, repo: TaskRepository) -> float:
+    def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, str]:
         tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
-        return calculations.calc_average(sorted_tasks[-30:], task.calc_velocity)
+        velocity =  calculations.calc_average(sorted_tasks[-30:], task.calc_velocity)
+
+        warning = None if velocity else "No velocity could be calculated."
+
+        return (velocity, warning)
 
     def _calculate_workdays(self, tasks: list, velocity: float) -> tuple[float, str]:
         if velocity is None:
@@ -66,3 +74,21 @@ class ReportGenerator:
             currentDate += datetime.timedelta(1)
 
         return currentDate
+
+    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float) -> tuple[list, str]:
+        result = []
+
+        workdaysSum = 0
+
+        for tdt in todoTasks:
+            todoTask: task.Task = tdt
+            t = task.Task(0, "")
+            
+            if todoTask.estimate:
+                taskDuration = todoTask.estimate / velocity
+                workdaysSum += taskDuration
+                t.completedDate = startDate + datetime.timedelta(workdaysSum)
+
+                result.append(t)
+
+        return (result, None)
