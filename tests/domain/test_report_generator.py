@@ -91,13 +91,13 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         self.assertAlmostEqual(report.velocity, 4.3, places=2)
 
 class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTestCase):
-    def test_when_no_tasks_are_given_None_is_returned(self):
+    def test_when_no_tasks_are_given_0_is_returned(self):
         repo = self.given_an_empty_repository()
 
         report = self.when_a_report_is_generated(repo)
 
-        # then the remaining workdays are None
-        self.assertIsNone(report.remaining_work_days)
+        # then the remaining workdays are 0
+        self.assertEqual(report.remaining_work_days, 0)
 
     def test_when_only_a_completed_task_is_given_0_is_returned(self):
         repo = self.given_a_repository_with_tasks([
