@@ -11,3 +11,5 @@
 [x] replace previous completion date calculation
 [x] output contains (at least) completed date, id, description, estimated effort in days
 [ ] integration test for planning file content -> report file content
+[ ] do not generate report twice when an output file is requested
+[ ] rename task_completion_dates to task_reports

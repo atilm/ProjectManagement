@@ -10,7 +10,6 @@ class TaskReport:
         self.taskId = sourceTask.id
         self.description = sourceTask.description
         self.completion_date = completion_date
-        self.completedDate = completion_date
         self.estimated_days = estimated_days
 
 class Report:
@@ -41,7 +40,7 @@ class ReportGenerator:
         report.add_warning(warning)
         report.remaining_work_days = workdays
         if report.task_completion_dates:
-            report.predicted_completion_date = report.task_completion_dates[-1].completedDate
+            report.predicted_completion_date = report.task_completion_dates[-1].completion_date
 
         return report
 

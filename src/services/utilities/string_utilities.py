@@ -7,3 +7,6 @@ def to_date_str(date: datetime.date) -> str:
 
 def parse_to_date(dateStr: str) -> datetime.date:
     return datetime.datetime.strptime(dateStr, GlobalSettings.date_format).date()
+
+def to_days_str(days: float) -> str:
+    return f"{days:.1f}"

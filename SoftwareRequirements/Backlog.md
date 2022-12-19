@@ -7,7 +7,7 @@
 - [x] As a developer I want to know how many workdays I need for the remaining tasks based on my recent velocity.
 - [x] As a developer I want to know a predicted completed date of my project. (official and personal holidays, days spend on other activities, free weekdays)
 - [x] As a developer I want to automatically reformat the planning and estimation files
-- [ ] As a developer I want a list of completed dates (date ranges) per item (in the given orders)
+- [ ] As a developer I want a list of completed dates per item (in the given orders)
 - [ ] As a developer I want to know a (kind of) confidence interval for the remaining workdays. (monte carlo simulation or some formula -> measurement of the probability distribution estimation error?)
 - [ ] As a developer I want to know a confidence interval for the completed date of my project. (official and personal holidays, days spend on other activities)
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)

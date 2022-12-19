@@ -9,6 +9,7 @@ from src.services.domain.representation_writing.md_model_to_planning_file_conver
 from src.domain.report_generator import *
 from src.domain.task import VelocityCalculationException
 from src.services.utilities import string_utilities
+from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
 
 def catch_all(action, args):
     try:
@@ -80,11 +81,18 @@ def generateReport(args):
     planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
-    report = reportGenerator.generate(planningRepos, datetime.date.today())
+    startDate = datetime.date.today()
+    report = reportGenerator.generate(planningRepos, startDate)
 
     print(f"Velocity: {report.velocity} story points / day")
     print(f"Remaining work days: {report.remaining_work_days}")
     print(f"Predicted completion date: {string_utilities.to_date_str(report.predicted_completion_date)}")
+
+    if args.file:
+        print(f"Write to report file: {args.file}")
+        report_file_generator = ReportFileGenerator()
+        report_file_content = report_file_generator.generate(planningInput, startDate)
+        write_to_file(args.file, report_file_content)
     
     if (report.warnings):
         print("\nWarnings:\n")
@@ -125,6 +133,7 @@ applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFi
 
 reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
+reportParser.add_argument("-f", "--file", help="Path to report file.")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
 
 formatParser = subparsers.add_parser("format", help="Clean up the format of a markdown file (e.g. alignment in tables).")
