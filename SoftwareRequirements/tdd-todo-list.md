@@ -5,8 +5,8 @@
 [x] completion date for two tasks with even number of days effort
 [x] completion date for one task with fractional effort
 [x] completion date for two tasks with fractional effort
-[ ] weekend
-[ ] holidays
+[x] weekend
+[x] holidays
 [ ] unestimated tasks present -> warning
 [ ] output contains (at least) completed date, id, description, estimated effort in days
 [ ] replace previous completion date calculation

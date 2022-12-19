@@ -34,7 +34,7 @@ class ReportGenerator:
 
         report.predicted_completion_date = self._calculate_completion_date(repos.working_days_repository, workdays, startDate)
 
-        report.task_completion_dates, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity)
+        report.task_completion_dates, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository)
 
         return report
 
@@ -67,15 +67,19 @@ class ReportGenerator:
             return None
         
         currentDate = start_date
-        while days_of_work >= 1:
-            if working_day_repo.is_working_day(currentDate):
-                days_of_work -= 1
-                
-            currentDate += datetime.timedelta(1)
+        while days_of_work > 0:
+            if not working_day_repo.is_working_day(currentDate):
+                currentDate += datetime.timedelta(1)
+            else:
+                if days_of_work >= 1:
+                    days_of_work -= 1
+                    currentDate += datetime.timedelta(1)
+                else:
+                    days_of_work = 0
 
         return currentDate
 
-    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float) -> tuple[list, str]:
+    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepo: WorkingDayRepository) -> tuple[list, str]:
         result = []
 
         workdaysSum = 0
@@ -87,7 +91,8 @@ class ReportGenerator:
             if todoTask.estimate:
                 taskDuration = todoTask.estimate / velocity
                 workdaysSum += taskDuration
-                t.completedDate = startDate + datetime.timedelta(workdaysSum)
+                t.completedDate = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
+                # t.completedDate = startDate + datetime.timedelta(workdaysSum)
 
                 result.append(t)
 

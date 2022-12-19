@@ -81,3 +81,18 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
         # then the work is completed on the same day
         self.assertEqual(report.predicted_completion_date, startDate)
+
+    def test_fraction_of_day_must_be_completed_after_weekend(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 8, 4), #velocity of 2
+            self.todo_task(3) # effort = 1.5 days
+        ])
+
+        freeWeekendsRepo = WorkingDayRepository()
+        freeWeekendsRepo.set_free_weekdays(weekdays.SATURDAY, weekdays.SUNDAY)
+
+        startDate = datetime.date(2023, 1, 13) # friday
+        report = self.when_a_report_is_generated(repo, startDate, freeWeekendsRepo)
+
+        # then the work is completed on the same day
+        self.assertEqual(report.predicted_completion_date, datetime.date(2023, 1, 16))

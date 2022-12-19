@@ -1,6 +1,7 @@
 from .domain_test_case import DomainTestCase
 from datetime import date
 from src.domain.report_generator import *
+from src.domain import weekdays
 
 class the_report_predicts_completion_dates_per_story(DomainTestCase):
     def test_no_todo_tasks(self):
@@ -86,4 +87,23 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
            ])
 
     def test_date_calculations_between_weekends_and_holidays(self):
-        self.fail("to be implemented")
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(date(2022,12,18), 2, 1), # velocity = 2
+            self.todo_task(3), # 1.5 days duration
+            self.todo_task(3),
+            self.todo_task(3),
+        ])
+
+        workingDaysRepo = WorkingDayRepository()
+        workingDaysRepo.set_free_weekdays(weekdays.SATURDAY, weekdays.SUNDAY)
+        workingDaysRepo.add_free_range(date(2022, 12, 26), date(2022, 12, 26))
+        workingDaysRepo.add_free_range(date(2022, 12, 28), date(2022, 12, 29))
+
+        startDate = date(2022, 12, 22)
+        report = self.when_a_report_is_generated(repo, startDate, workingDaysRepo)
+
+        self.then_the_completion_dates_are(report.task_completion_dates, [
+           date(2022, 12, 23),
+           date(2022, 12, 28),
+           date(2023, 1, 2),
+           ])
