@@ -9,4 +9,5 @@
 [x] holidays
 [x] unestimated tasks present -> warning
 [x] replace previous completion date calculation
-[ ] output contains (at least) completed date, id, description, estimated effort in days
+[x] output contains (at least) completed date, id, description, estimated effort in days
+[ ] integration test for planning file content -> report file content

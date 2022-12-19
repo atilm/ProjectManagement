@@ -4,6 +4,10 @@ from src.domain.report_generator import *
 from src.domain import weekdays
 
 class the_report_predicts_completion_dates_per_story(DomainTestCase):
+    def then_the_completion_dates_are(self, task_reports: list, expectedDates: list):
+        actualDates = [r.completion_date for r in task_reports]
+        self.assertEqual(actualDates, expectedDates)
+
     def test_no_todo_tasks(self):
         repo = self.given_a_repository_with_tasks([
             self.completed_task(date(2022,12,18), 1, 2) # velocity = 0.5
@@ -20,19 +24,23 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
 
         self.assertEqual(report.warnings, {"No velocity could be calculated."})
 
-    def then_the_completion_dates_are(self, actualTasks: list, expectedDates: list):
-        actualDates = [t.completedDate for t in actualTasks]
-        self.assertEqual(actualDates, expectedDates)
-
     def test_one_todo_task(self):
+        todoTask = self.todo_task(2)
+        todoTask.description = "task description"
+
         repo = self.given_a_repository_with_tasks([
             self.completed_task(date(2022,12,18), 1, 2), # velocity = 0.5
-            self.todo_task(2)
+            todoTask
         ])
 
         report = self.when_a_report_is_generated(repo, date(2023, 1, 1))
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [date(2023,1,5)])
+        self.assertEqual(1, len(report.task_completion_dates))
+        taskReport = report.task_completion_dates[0]
+        self.assertEqual(todoTask.id, taskReport.taskId)
+        self.assertEqual(todoTask.description, taskReport.description)
+        self.assertEqual(date(2023,1,5), taskReport.completion_date)
+        self.assertEqual(4.0, taskReport.estimated_days)
 
     def test_one_todo_task_taking_a_fractional_day(self):
         repo = self.given_a_repository_with_tasks([

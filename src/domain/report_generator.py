@@ -5,6 +5,14 @@ from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
 
+class TaskReport:
+    def __init__(self, sourceTask: task.Task, estimated_days: float, completion_date: datetime.date) -> None:
+        self.taskId = sourceTask.id
+        self.description = sourceTask.description
+        self.completion_date = completion_date
+        self.completedDate = completion_date
+        self.estimated_days = estimated_days
+
 class Report:
     def __init__(self) -> None:
         self.velocity: float = None
@@ -71,15 +79,14 @@ class ReportGenerator:
 
         for tdt in todoTasks:
             todoTask: task.Task = tdt
-            t = task.Task(0, "")
             
             if todoTask.estimate:
                 taskDuration = todoTask.estimate / velocity
                 workdaysSum += taskDuration
                 # could this algorithm be optimized to use only one loop? 
-                t.completedDate = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
+                completion_date = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
 
-                result.append(t)
+                result.append(TaskReport(todoTask, taskDuration, completion_date))
             else:
                 warning = "Unestimated stories have been ignored."
 
