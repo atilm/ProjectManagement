@@ -1,4 +1,5 @@
 from src.domain import task
+from src.domain.fibonacci_sequence import FibonacciSequence
 from src.services.utilities import calculations
 import datetime
 from src.domain.tasks_repository import TaskRepository
@@ -6,8 +7,28 @@ from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
 
 class ConfidenceInterval:
-    def __init__(self, expected_value) -> None:
+    def __init__(self, lower_limit, expected_value, upper_limit) -> None:
+        self.lower_limit = lower_limit
         self.expected_value = expected_value
+        self.upper_limit = upper_limit
+
+    def convert(self, conversion): # -> ConfidenceInterval
+        return ConfidenceInterval(
+            conversion(self.lower_limit),
+            conversion(self.expected_value),
+            conversion(self.upper_limit)
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, ConfidenceInterval):
+            return other.lower_limit == self.lower_limit and\
+                other.expected_value == self.expected_value and\
+                other.upper_limit == self.upper_limit
+        else:
+            return False
+
+    def __str__(self) -> str:
+        return f"({self.lower_limit}, {self.expected_value}, {self.upper_limit})"
 
 class TaskReport:
     def __init__(self, sourceTask: task.Task, estimated_days: float, completion_date: datetime.date) -> None:
@@ -57,6 +78,32 @@ class ReportGenerator:
 
         return (velocity, warning)
 
+    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepo: WorkingDayRepository) -> tuple[float, list, str]:
+        result = []
+
+        warning = None
+        workdaysSum = 0
+
+        for tdt in todoTasks:
+            todoTask: task.Task = tdt
+            
+            if todoTask.estimate:
+                estimateInterval = ConfidenceInterval(
+                    FibonacciSequence.predecessor(todoTask.estimate),
+                    todoTask.estimate,
+                    FibonacciSequence.successor(todoTask.estimate))
+                taskDurationInterval: ConfidenceInterval = estimateInterval.convert(lambda estimate: estimate / velocity)
+                workdaysSum += taskDurationInterval.expected_value
+                # could this algorithm be optimized to use only one loop? 
+                completion_date = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
+
+                completionDateInterval = ConfidenceInterval(None, completion_date, None)
+                result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
+            else:
+                warning = "Unestimated stories have been ignored."
+
+        return (workdaysSum, result, warning)
+
     def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
         if days_of_work is None:
             return None
@@ -73,26 +120,3 @@ class ReportGenerator:
                     days_of_work = 0
 
         return currentDate
-
-    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepo: WorkingDayRepository) -> tuple[float, list, str]:
-        result = []
-
-        warning = None
-        workdaysSum = 0
-
-        for tdt in todoTasks:
-            todoTask: task.Task = tdt
-            
-            if todoTask.estimate:
-                taskDuration = todoTask.estimate / velocity
-                workdaysSum += taskDuration
-                # could this algorithm be optimized to use only one loop? 
-                completion_date = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
-
-                taskDurationInterval = ConfidenceInterval(taskDuration)
-                completionDateInterval = ConfidenceInterval(completion_date)
-                result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
-            else:
-                warning = "Unestimated stories have been ignored."
-
-        return (workdaysSum, result, warning)
