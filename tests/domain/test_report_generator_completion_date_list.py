@@ -15,7 +15,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
 
         report = self.when_a_report_is_generated(repo)
 
-        self.assertEqual(report.task_completion_dates, [])
+        self.assertEqual(report.task_reports, [])
 
     def test_no_completed_tasks(self):
         repo = self.given_an_empty_repository()
@@ -35,8 +35,8 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
 
         report = self.when_a_report_is_generated(repo, date(2023, 1, 1))
 
-        self.assertEqual(1, len(report.task_completion_dates))
-        taskReport = report.task_completion_dates[0]
+        self.assertEqual(1, len(report.task_reports))
+        taskReport = report.task_reports[0]
         self.assertEqual(todoTask.id, taskReport.taskId)
         self.assertEqual(todoTask.description, taskReport.description)
         self.assertEqual(date(2023,1,5), taskReport.completion_date)
@@ -51,7 +51,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         startDate = date(2023, 1, 1)
         report = self.when_a_report_is_generated(repo, startDate)
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [startDate])
+        self.then_the_completion_dates_are(report.task_reports, [startDate])
 
     def test_one_todo_task_taking_fractional_days_greater_than_1(self):
         repo = self.given_a_repository_with_tasks([
@@ -62,7 +62,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         startDate = date(2023, 1, 1)
         report = self.when_a_report_is_generated(repo, startDate)
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [startDate + datetime.timedelta(1)])
+        self.then_the_completion_dates_are(report.task_reports, [startDate + datetime.timedelta(1)])
 
     def test_two_todo_tasks_taking_integral_days(self):
         repo = self.given_a_repository_with_tasks([
@@ -74,7 +74,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         startDate = date(2023, 1, 1)
         report = self.when_a_report_is_generated(repo, startDate)
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [
+        self.then_the_completion_dates_are(report.task_reports, [
            date(2023, 1, 2),
            date(2023, 1, 4)
            ])
@@ -89,7 +89,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         startDate = date(2023, 1, 1)
         report = self.when_a_report_is_generated(repo, startDate)
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [
+        self.then_the_completion_dates_are(report.task_reports, [
            date(2023, 1, 2),
            date(2023, 1, 4)
            ])
@@ -110,7 +110,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         startDate = date(2022, 12, 22)
         report = self.when_a_report_is_generated(repo, startDate, workingDaysRepo)
 
-        self.then_the_completion_dates_are(report.task_completion_dates, [
+        self.then_the_completion_dates_are(report.task_reports, [
            date(2022, 12, 23),
            date(2022, 12, 28),
            date(2023, 1, 2),

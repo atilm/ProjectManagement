@@ -18,7 +18,7 @@ class Report:
         self.remaining_work_days: float = None
         self.predicted_completion_date: datetime.date = None
         self.warnings = set()
-        self.task_completion_dates = []
+        self.task_reports = []
 
     def add_warning(self, warning: str):
         if warning is not None:
@@ -36,11 +36,11 @@ class ReportGenerator:
 
         todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
 
-        workdays, report.task_completion_dates, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository)
+        workdays, report.task_reports, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository)
         report.add_warning(warning)
         report.remaining_work_days = workdays
-        if report.task_completion_dates:
-            report.predicted_completion_date = report.task_completion_dates[-1].completion_date
+        if report.task_reports:
+            report.predicted_completion_date = report.task_reports[-1].completion_date
 
         return report
 

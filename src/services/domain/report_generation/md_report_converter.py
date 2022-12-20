@@ -10,7 +10,7 @@ class ReportToMarkdownConverter:
     def convert(self, report: Report) -> MarkdownDocument:
         return MarkdownDocumentBuilder()\
             .withSection("Planning Report", 0)\
-            .withTable(self._build_task_report_table(report.task_completion_dates))\
+            .withTable(self._build_task_report_table(report.task_reports))\
             .build()
 
     def _build_task_report_table(self, taskReports: list) -> MarkdownTable:
