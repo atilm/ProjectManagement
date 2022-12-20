@@ -5,7 +5,7 @@ from src.domain import weekdays
 
 class the_report_predicts_completion_dates_per_story(DomainTestCase):
     def then_the_completion_dates_are(self, task_reports: list, expectedDates: list):
-        actualDates = [r.completion_date for r in task_reports]
+        actualDates = [r.completion_date.expected_value for r in task_reports]
         self.assertEqual(actualDates, expectedDates)
 
     def test_no_todo_tasks(self):
@@ -39,8 +39,8 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
         taskReport = report.task_reports[0]
         self.assertEqual(todoTask.id, taskReport.taskId)
         self.assertEqual(todoTask.description, taskReport.description)
-        self.assertEqual(date(2023,1,5), taskReport.completion_date)
-        self.assertEqual(4.0, taskReport.estimated_days)
+        self.assertEqual(date(2023,1,5), taskReport.completion_date.expected_value)
+        self.assertEqual(4.0, taskReport.estimated_days.expected_value)
 
     def test_one_todo_task_taking_a_fractional_day(self):
         repo = self.given_a_repository_with_tasks([

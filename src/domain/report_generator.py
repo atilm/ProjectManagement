@@ -5,6 +5,10 @@ from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
 
+class ConfidenceInterval:
+    def __init__(self, expected_value) -> None:
+        self.expected_value = expected_value
+
 class TaskReport:
     def __init__(self, sourceTask: task.Task, estimated_days: float, completion_date: datetime.date) -> None:
         self.taskId = sourceTask.id
@@ -16,7 +20,7 @@ class Report:
     def __init__(self) -> None:
         self.velocity: float = None
         self.remaining_work_days: float = None
-        self.predicted_completion_date: datetime.date = None
+        self.predicted_completion_date: ConfidenceInterval = None
         self.warnings = set()
         self.task_reports = []
 
@@ -85,7 +89,9 @@ class ReportGenerator:
                 # could this algorithm be optimized to use only one loop? 
                 completion_date = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
 
-                result.append(TaskReport(todoTask, taskDuration, completion_date))
+                taskDurationInterval = ConfidenceInterval(taskDuration)
+                completionDateInterval = ConfidenceInterval(completion_date)
+                result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
             else:
                 warning = "Unestimated stories have been ignored."
 

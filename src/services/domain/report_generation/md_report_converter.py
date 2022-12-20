@@ -22,7 +22,7 @@ class ReportToMarkdownConverter:
             tableBuilder.withRow(
                 taskReport.taskId,
                 taskReport.description,
-                string_utilities.to_days_str(taskReport.estimated_days),
-                string_utilities.to_date_str(taskReport.completion_date))
+                string_utilities.to_days_str(taskReport.estimated_days.expected_value),
+                string_utilities.to_date_str(taskReport.completion_date.expected_value))
 
         return tableBuilder.build()
