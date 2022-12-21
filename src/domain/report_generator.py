@@ -7,6 +7,11 @@ from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
 
+class NotAFibonacciEstimateException(Exception):
+    def __init__(self, task_id: str, *args: object) -> None:
+        super().__init__(*args)
+        self.task_id = task_id
+
 class ConfidenceInterval:
     def __init__(self, lower_limit, expected_value, upper_limit) -> None:
         self.lower_limit = lower_limit
@@ -38,11 +43,11 @@ class ConfidenceInterval:
         return f"({self.lower_limit}, {self.expected_value}, {self.upper_limit})"
 
 class TaskReport:
-    def __init__(self, sourceTask: task.Task, estimated_days: float, completion_date: datetime.date) -> None:
-        self.taskId = sourceTask.id
-        self.description = sourceTask.description
-        self.completion_date = completion_date
-        self.estimated_days = estimated_days
+    def __init__(self, sourceTask: task.Task, estimated_days: ConfidenceInterval, completion_date: ConfidenceInterval) -> None:
+        self.taskId: str = sourceTask.id
+        self.description: str = sourceTask.description
+        self.completion_date: ConfidenceInterval = completion_date
+        self.estimated_days: ConfidenceInterval = estimated_days
 
 class Report:
     def __init__(self) -> None:
@@ -95,6 +100,9 @@ class ReportGenerator:
             todoTask: task.Task = tdt
             
             if todoTask.estimate:
+                if (not FibonacciSequence.is_in_sequence(todoTask.estimate)):
+                    raise NotAFibonacciEstimateException(todoTask.id)
+
                 estimateInterval = ConfidenceInterval(
                     FibonacciSequence.predecessor(todoTask.estimate),
                     todoTask.estimate,

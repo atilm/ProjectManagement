@@ -40,4 +40,34 @@ class the_report_generator_calculates_completion_date_ranges(DomainTestCase):
 
         actual_intervals = [tr.completion_date for tr in report.task_reports]
         self.assertEqual(actual_intervals, [first_expected_interval, second_expected_interval])
+
+    
+
+    def test_exception_when_estimate_is_not_a_fibonacci_number(self):
+        self._assert_exception_on_estimate(4)
+        self._assert_exception_on_estimate(55)
+
+    def _assert_exception_on_estimate(self, estimate):
+        todo_task = self.todo_task(estimate)
+
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(date(2022,12,18), 1, 2),
+            todo_task,
+        ])
+
+        error = self.then_report_generation_raises(repo)
+
+        self.assertIsInstance(error, NotAFibonacciEstimateException, f"Estimate: {estimate}")
+        self.assertEqual(error.task_id, todo_task.id)
         
+    def test_stories_with_estimate_0_are_filtered_out(self):
+        todo_task = self.todo_task(0)
+
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(date(2022,12,18), 1, 2),
+            todo_task,
+        ])
+
+        report = self.when_a_report_is_generated(repo)
+
+        self.assertEqual(len(report.task_reports), 0)
