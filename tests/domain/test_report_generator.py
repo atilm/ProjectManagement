@@ -97,7 +97,7 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
         report = self.when_a_report_is_generated(repo)
 
         # then the remaining workdays are 0
-        self.assertEqual(report.remaining_work_days, 0)
+        self.assertEqual(report.remaining_work_days.expected_value, 0)
 
     def test_when_only_a_completed_task_is_given_0_is_returned(self):
         repo = self.given_a_repository_with_tasks([
@@ -107,7 +107,7 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
         report = self.when_a_report_is_generated(repo)
 
         # then the remaining workdays are 0
-        self.assertEqual(report.remaining_work_days, 0)
+        self.assertEqual(report.remaining_work_days.expected_value, 0)
 
     def test_when_a_completed_and_an_estimated_todo_task_are_given(self):
         repo = self.given_a_repository_with_tasks([
@@ -118,7 +118,7 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
         report = self.when_a_report_is_generated(repo)
 
         # then the remaining days are calculated
-        self.assertAlmostEqual(report.remaining_work_days, 10, places=2)
+        self.assertAlmostEqual(report.remaining_work_days.expected_value, 10, places=2)
 
     def test_when_a_completed_and_two_estimated_tasks_are_given(self):
         repo = self.given_a_repository_with_tasks([
@@ -130,7 +130,7 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
         report = self.when_a_report_is_generated(repo)
 
         # then the sum of the durations is returned
-        self.assertAlmostEqual(report.remaining_work_days, 16, places=2)
+        self.assertAlmostEqual(report.remaining_work_days.expected_value, 16, places=2)
 
     def test_when_a_completed_and_some_estimated_and_some_unestimated_tasks_are_given(self):
         repo = self.given_a_repository_with_tasks([
@@ -143,7 +143,7 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
         report = self.when_a_report_is_generated(repo)
 
         # then the sum of the durations is returned
-        self.assertAlmostEqual(report.remaining_work_days, 26, places=2)
+        self.assertAlmostEqual(report.remaining_work_days.expected_value, 26, places=2)
 
         # then the report contains a warning about unestimated tasks
         self.assertEqual(report.warnings, {"Unestimated stories have been ignored."})

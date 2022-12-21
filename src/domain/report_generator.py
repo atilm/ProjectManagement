@@ -55,7 +55,7 @@ class TaskReport:
 class Report:
     def __init__(self) -> None:
         self.velocity: float = None
-        self.remaining_work_days: float = None
+        self.remaining_work_days: ConfidenceInterval = None
         self.predicted_completion_date: ConfidenceInterval = None
         self.warnings = set()
         self.task_reports = []
@@ -126,7 +126,7 @@ class ReportGenerator:
             else:
                 warning = "Unestimated stories have been ignored."
 
-        return (workdaysSumInterval.expected_value, result, warning)
+        return (workdaysSumInterval, result, warning)
 
     def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
         if days_of_work is None:

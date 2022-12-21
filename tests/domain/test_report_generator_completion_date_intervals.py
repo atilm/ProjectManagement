@@ -16,6 +16,7 @@ class the_report_generator_calculates_completion_date_ranges(DomainTestCase):
         expected_completion_date_interval = ConfidenceInterval(date(2023, 1, 3), date(2023, 1, 5), date(2023, 1, 7))
         self.assertEqual(taskReport.estimated_days, ConfidenceInterval(2, 4, 6))
         self.assertEqual(taskReport.completion_date, expected_completion_date_interval)
+        self.assertEqual(report.remaining_work_days, ConfidenceInterval(2, 4, 6))
         self.assertEqual(report.predicted_completion_date, expected_completion_date_interval)
 
 
