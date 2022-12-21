@@ -1,7 +1,8 @@
+import math
+import datetime
 from src.domain import task
 from src.domain.fibonacci_sequence import FibonacciSequence
 from src.services.utilities import calculations
-import datetime
 from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
@@ -18,6 +19,12 @@ class ConfidenceInterval:
             conversion(self.expected_value),
             conversion(self.upper_limit)
         )
+
+    def lower_error(self):
+        return self.expected_value - self.lower_limit
+
+    def upper_error(self):
+        return self.upper_limit - self.expected_value
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, ConfidenceInterval):
@@ -94,9 +101,12 @@ class ReportGenerator:
                     FibonacciSequence.successor(todoTask.estimate))
                 taskDurationInterval: ConfidenceInterval = estimateInterval.convert(lambda estimate: estimate / velocity)
                 
-                workdaysSumInterval.lower_limit += taskDurationInterval.lower_limit
-                workdaysSumInterval.expected_value += taskDurationInterval.expected_value
-                workdaysSumInterval.upper_limit += taskDurationInterval.upper_limit
+                # accumulate errors according to sum-of-squares-summation
+                expected_value = workdaysSumInterval.expected_value + taskDurationInterval.expected_value
+                lower_limit = expected_value - math.sqrt(workdaysSumInterval.lower_error()**2 + taskDurationInterval.lower_error()**2)
+                upper_limit = expected_value + math.sqrt(workdaysSumInterval.upper_error()**2 + taskDurationInterval.upper_error()**2)
+
+                workdaysSumInterval = ConfidenceInterval(lower_limit, expected_value, upper_limit)
 
                 # could this algorithm be optimized to use only one loop? 
                 completionDateInterval = workdaysSumInterval.convert(lambda days: self._calculate_completion_date(workingDaysRepo, days, startDate))
@@ -106,11 +116,6 @@ class ReportGenerator:
                 warning = "Unestimated stories have been ignored."
 
         return (workdaysSumInterval.expected_value, result, warning)
-
-    # def _calculate_completion_date_interval(self, working_day_repo: WorkingDayRepository, days_of_work_interval: ConfidenceInterval, start_date: datetime.date) -> ConfidenceInterval:
-    #     return ConfidenceInterval(
-            
-    #     )
 
     def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
         if days_of_work is None:
