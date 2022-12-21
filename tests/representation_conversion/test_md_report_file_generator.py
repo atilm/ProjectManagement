@@ -38,10 +38,10 @@ planningFileContent = """
 
 expectedReport = """# Planning Report
 
-| Id | Description | Days | Completion date |
-| -- | ----------- | ---- | --------------- |
-| 1  | Task 1      | 2.0  | 22-12-2022      |
-| 2  | Task 2      | 4.0  | 28-12-2022      |
+| Id | Description | Days | Completion date                      |
+| -- | ----------- | ---- | ------------------------------------ |
+| 1  | Task 1      | 2.0  | (20-12-2022, 22-12-2022, 24-12-2022) |
+| 2  | Task 2      | 4.0  | (23-12-2022, 28-12-2022, 30-12-2022) |
 
 """
 

@@ -86,7 +86,7 @@ def generateReport(args):
 
     print(f"Velocity: {report.velocity} story points / day")
     print(f"Remaining work days: {report.remaining_work_days}")
-    print(f"Predicted completion date: {string_utilities.to_date_str(report.predicted_completion_date)}")
+    print(f"Predicted completion date range: {report.predicted_completion_date.to_string(string_utilities.to_date_str)}")
 
     if args.file:
         print(f"Write to report file: {args.file}")

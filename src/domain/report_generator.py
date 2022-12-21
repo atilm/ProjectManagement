@@ -40,7 +40,10 @@ class ConfidenceInterval:
             return False
 
     def __str__(self) -> str:
-        return f"({self.lower_limit}, {self.expected_value}, {self.upper_limit})"
+        return self.to_string(lambda x: x)
+
+    def to_string(self, converter) -> str:
+        return f"({converter(self.lower_limit)}, {converter(self.expected_value)}, {converter(self.upper_limit)})"
 
 class TaskReport:
     def __init__(self, sourceTask: task.Task, estimated_days: ConfidenceInterval, completion_date: ConfidenceInterval) -> None:
