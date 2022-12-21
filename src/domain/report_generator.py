@@ -82,7 +82,7 @@ class ReportGenerator:
         result = []
 
         warning = None
-        workdaysSum = 0
+        workdaysSumInterval = ConfidenceInterval(0.0, 0.0, 0.0)
 
         for tdt in todoTasks:
             todoTask: task.Task = tdt
@@ -93,16 +93,24 @@ class ReportGenerator:
                     todoTask.estimate,
                     FibonacciSequence.successor(todoTask.estimate))
                 taskDurationInterval: ConfidenceInterval = estimateInterval.convert(lambda estimate: estimate / velocity)
-                workdaysSum += taskDurationInterval.expected_value
-                # could this algorithm be optimized to use only one loop? 
-                completion_date = self._calculate_completion_date(workingDaysRepo, workdaysSum, startDate)
+                
+                workdaysSumInterval.lower_limit += taskDurationInterval.lower_limit
+                workdaysSumInterval.expected_value += taskDurationInterval.expected_value
+                workdaysSumInterval.upper_limit += taskDurationInterval.upper_limit
 
-                completionDateInterval = ConfidenceInterval(None, completion_date, None)
+                # could this algorithm be optimized to use only one loop? 
+                completionDateInterval = workdaysSumInterval.convert(lambda days: self._calculate_completion_date(workingDaysRepo, days, startDate))
+
                 result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
             else:
                 warning = "Unestimated stories have been ignored."
 
-        return (workdaysSum, result, warning)
+        return (workdaysSumInterval.expected_value, result, warning)
+
+    # def _calculate_completion_date_interval(self, working_day_repo: WorkingDayRepository, days_of_work_interval: ConfidenceInterval, start_date: datetime.date) -> ConfidenceInterval:
+    #     return ConfidenceInterval(
+            
+    #     )
 
     def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
         if days_of_work is None:
