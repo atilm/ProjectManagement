@@ -9,6 +9,14 @@ class FreeRange:
     def contains(self, day: datetime.date) -> bool:
         return self.firstFreeDay <= day and day <= self.lastFreeDay
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, FreeRange):
+            return other.firstFreeDay == self.firstFreeDay and\
+                other.lastFreeDay == self.lastFreeDay and\
+                other.description == self.description
+        else:
+            return False
+
 class WorkingDayRepository:
     def __init__(self) -> None:
         self.free_weekdays = set()

@@ -19,6 +19,12 @@ class DomainTestCase(unittest.TestCase):
             repo.add(t)
         return repo
 
+    def given_a_working_days_repository(self, free_weekdays: list, holidays: list) -> TaskRepository:
+        repo = WorkingDayRepository()
+        repo.set_free_weekdays(*free_weekdays)
+        repo.add_free_ranges(holidays)
+        return repo
+
     def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float) -> Task:
         task = Task(self._id_generator.next(), "")
         task.estimate = estimate

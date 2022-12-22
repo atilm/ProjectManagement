@@ -1,3 +1,2 @@
-[ ] repair main application verbs -> write tests for all functionality?
+[ ] extract FreeDays into own module as it is used by WorkingDaysRepository and GraphData
 [ ] do not generate report twice when an output file is requested
-[ ] range for remaining work days
