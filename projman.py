@@ -94,6 +94,11 @@ def generateReport(args):
         report_file_generator = ReportFileGenerator()
         report_file_content = report_file_generator.generate(planningInput, startDate)
         write_to_file(args.file, report_file_content)
+
+    if args.graph:
+        print("Show a graph")
+        # graphData = graph_generator.generate(report, planningRepos)
+        # graph_engine.show(graph_data)
     
     if (report.warnings):
         print("\nWarnings:\n")
@@ -135,6 +140,7 @@ applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFi
 reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
 reportParser.add_argument("-f", "--file", help="Path to report file.")
+reportParser.add_argument("-g", "--graph", action='store_true', help="Show a burn down chart of all past and future stories")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
 
 formatParser = subparsers.add_parser("format", help="Clean up the format of a markdown file (e.g. alignment in tables).")
