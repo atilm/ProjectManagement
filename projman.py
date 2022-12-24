@@ -10,6 +10,8 @@ from src.domain.report_generator import *
 from src.domain.task import VelocityCalculationException
 from src.services.utilities import string_utilities
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
+from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
+from src.services.domain.graph_generation.graph_engine import GraphEngine
 
 def catch_all(action, args):
     try:
@@ -95,11 +97,6 @@ def generateReport(args):
         report_file_content = report_file_generator.generate(planningInput, startDate)
         write_to_file(args.file, report_file_content)
 
-    if args.graph:
-        print("Show a graph")
-        # graphData = graph_generator.generate(report, planningRepos)
-        # graph_engine.show(graph_data)
-    
     if (report.warnings):
         print("\nWarnings:\n")
     
@@ -107,6 +104,14 @@ def generateReport(args):
         print(warning)
 
     print("\n")
+
+    if args.graph:
+        print("Show a graph")
+        graph_generator = BurndownGraphGenerator()
+        graph_engine = GraphEngine()
+
+        data = graph_generator.generate(report, planningRepos)
+        graph_engine.plot_burndown_graph(data)
 
 def formatFile(args):
     print(f"Reformat file {args.filePath}:\n")

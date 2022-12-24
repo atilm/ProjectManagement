@@ -11,6 +11,7 @@
     * the future as confidence band
     * at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
     * (longer) holidays
+- [ ] As a devleoper I want to specify the start date from which project duration is predicted
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
 - [ ] What is the correct velocity ? 
         - average(estimate_i / workdays_i) for every completed task i
