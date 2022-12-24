@@ -1,7 +1,7 @@
 import datetime
 from tests.domain.domain_test_case import DomainTestCase
 from src.domain.report_generator import Report, TaskRepository, WorkingDayRepository, RepositoryCollection, TaskReport
-from src.services.domain.report_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
+from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
 from src.domain import weekdays
 
 def get_comp_date(report: Report, index, attr):
@@ -84,5 +84,4 @@ class GraphGeneratorTestCase(DomainTestCase):
             uppper_limit_dates,
             remaining_effort)
 
-        
 
