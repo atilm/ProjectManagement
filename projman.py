@@ -83,7 +83,7 @@ def generateReport(args):
     planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
-    startDate = datetime.date.today()
+    startDate = datetime.date(2023, 1, 21) #datetime.date.today()
     report = reportGenerator.generate(planningRepos, startDate)
 
     print(f"Velocity: {report.velocity} story points / day")

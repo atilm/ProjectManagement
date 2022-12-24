@@ -16,6 +16,10 @@ class GraphEngine:
 
         ax.set_ylabel(("Remaining Effort [Story Points]"))
 
+        for free_range in data.free_date_ranges:
+            x = [free_range.firstFreeDay, free_range.lastFreeDay]
+            ax.fill_between(x, 0, 1, color='blue', alpha=0.3, transform=ax.get_xaxis_transform())
+
         ax.fill_betweenx(data.lower_confidence_band.y, data.lower_confidence_band.x, data.upper_confidence_band.x, color='gray', alpha=0.3)
         ax.plot(data.lower_confidence_band.x, data.lower_confidence_band.y, '-o', color='gray')
         ax.plot(data.upper_confidence_band.x, data.upper_confidence_band.y, '-o', color='gray')
