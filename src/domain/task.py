@@ -1,7 +1,8 @@
 
 class Task:
-    def __init__(self, id : str, description : str) -> None:
+    def __init__(self, id: str, description: str, project_id: str = "") -> None:
         self.id = id
+        self.projectId = project_id
         self.description = description
         self.estimate = None
         self.createdDate = None

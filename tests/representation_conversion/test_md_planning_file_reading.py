@@ -76,6 +76,7 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
         lhs = actualTask
         rhs = task
         self.assertEqual(lhs.id, rhs.id)
+        self.assertEqual(lhs.projectId, rhs.projectId)
         self.assertEqual(lhs.description, rhs.description)
         self.assertTrue(isNumberOrNone(lhs.estimate))
         self.assertEqual(lhs.estimate, rhs.estimate)
@@ -123,8 +124,8 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         todo = self.build_empty_task_table()
         completed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("1", "Project", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
-            .withRow("2", "Project", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
+            .withRow("1", "Project 1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
+            .withRow("2", "Project 2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
             .build()
         removed = self.build_empty_task_table()
 
@@ -132,7 +133,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
         repo = self.when_the_document_is_converted(document)
 
-        expectedTask1 = Task("1", "Description 1")
+        expectedTask1 = Task("1", "Description 1", "Project 1")
         expectedTask1.estimate = 3
         expectedTask1.startedDate = date(2020, 2, 1)
         expectedTask1.completedDate = date(2020, 2, 3)
@@ -140,7 +141,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask1.createdDate = date(2020, 1, 29)
         expectedTask1.removedDate = None
 
-        expectedTask2 = Task("2", "Description 2")
+        expectedTask2 = Task("2", "Description 2", "Project 2")
         expectedTask2.estimate = 5
         expectedTask2.startedDate = date(2021, 2, 1)
         expectedTask2.completedDate = date(2021, 2, 4)
@@ -163,7 +164,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
         repo = self.when_the_document_is_converted(document)
 
-        expectedTask = Task("1", "Description")
+        expectedTask = Task("1", "Description", "Project")
         expectedTask.estimate = 5
         expectedTask.startedDate = None
         expectedTask.completedDate = None
@@ -185,7 +186,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
 
         repo = self.when_the_document_is_converted(document)
 
-        expectedTask = Task("3", "Description")
+        expectedTask = Task("3", "Description", "Project")
         expectedTask.estimate = 5
         expectedTask.startedDate = date(2022, 5, 4)
         expectedTask.completedDate = None

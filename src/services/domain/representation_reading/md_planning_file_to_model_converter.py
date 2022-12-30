@@ -96,6 +96,7 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         try:
             return TaskToStringConverter()\
                 .withId(row.get(0))\
+                .withProjectId(row.get(1))\
                 .withDescription(row.get(2))\
                 .withEstimate(row.get(3))\
                 .withStartedDate(row.get(4))\

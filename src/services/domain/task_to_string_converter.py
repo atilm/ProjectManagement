@@ -11,10 +11,14 @@ class ConversionException(Exception):
 
 class TaskToStringConverter:
     def __init__(self) -> None:
-        self.task = Task("", "")
+        self.task = Task("", "", "")
 
     def withId(self, id: str):
         self.task.id = id
+        return self
+
+    def withProjectId(self, projectId: str):
+        self.task.projectId = projectId
         return self
 
     def withDescription(self, desc: str):
@@ -51,6 +55,7 @@ class TaskToStringConverter:
     def toStrings(self, task: Task) -> dict:
         s = {}
         s["id"] = self._toStr(task.id, lambda s: s)
+        s["project"] = self._toStr(task.projectId, lambda s: s)
         s["description"] = self._toStr(task.description, lambda s: s)
         s["estimate"] = self._toStr(task.estimate, lambda f: f"{f:g}")
         s["createdDate"] = self._toStr(task.createdDate, string_utilities.to_date_str)

@@ -66,7 +66,7 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
 
         for task in tasks:
             fields = converter.toStrings(task) 
-            tableBuilder.withRow(fields["id"], fields["description"], fields["estimate"], fields["startedDate"], \
+            tableBuilder.withRow(fields["id"], fields["project"], fields["description"], fields["estimate"], fields["startedDate"], \
                 fields["completedDate"], fields["actualWorkDays"], fields["createdDate"], fields["removedDate"])
 
         return tableBuilder.build()
