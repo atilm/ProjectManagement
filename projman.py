@@ -75,6 +75,12 @@ def applyEstimationFile(args):
     planningOutput = planningWriter.write(planningRepos)
     write_to_file(args.planningPath, planningOutput)
 
+def parseDate(date_string: str) -> datetime.date:
+    try:
+        return string_utilities.parse_to_date(date_string)
+    except:
+        raise ValueConversionException(date_string, 0)
+
 def generateReport(args):
     print(f"Report on {args.planningPath}:\n")
 
@@ -83,7 +89,7 @@ def generateReport(args):
     planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
-    startDate = datetime.date(2023, 1, 21) #datetime.date.today()
+    startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
     report = reportGenerator.generate(planningRepos, startDate)
 
     print(f"Velocity: {report.velocity} story points / day")
@@ -145,6 +151,7 @@ applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFi
 reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
 reportParser.add_argument("-f", "--file", help="Path to report file.")
+reportParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
 reportParser.add_argument("-g", "--graph", action='store_true', help="Show a burn down chart of all past and future stories")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
 

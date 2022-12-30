@@ -6,12 +6,15 @@
 - [x] As a developer I want a list of completed dates per item (in the given orders)
 - [x] As a developer I want to know a (kind of) confidence interval for the remaining workdays.
 - [x] As a developer I want to know a confidence interval for the completed date of my project. (official and personal holidays, days spend on other activities)
-- [ ] As a developer I want to see a burn-down chart of the project history showing:
-    * the past as a line
-    * the future as confidence band
-    * at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
-    * (longer) holidays
-- [ ] As a devleoper I want to specify the start date from which project duration is predicted
+- [x] As a developer I want to see a burn-down chart of the project history showing: [x] the past as a line [x] the future as confidence band [x] (longer) holidays
+- [x] As a devleoper I want to specify the start date from which project duration is predicted
+- [ ] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
+    [ ] Table with Project Ids and Names in Planning.md
+    [ ] Project column in planning and estimation task tables
+    [ ] Init should introduce these tables and columns
+    [ ] Report file should contain project column
+    [ ] Report graph should color-code projects
+    [ ] Report overview should output results per project: sections? table?
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
 - [ ] What is the correct velocity ? 
         - average(estimate_i / workdays_i) for every completed task i
@@ -20,7 +23,7 @@
 - [ ] Only copy the 30 most recently completed reference stories into the estimation file
 - [ ] Do not copy strongly mis-estimated stories as reference stories int to the estimation file
 - [ ] TaskIdConflictException should contain the conflicting task id and show it to the user
-- [ ] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
 - [ ] As a developer I want to see a chart of the time evolution of the confidence band for the predicted completion date.
+    - [ ] show at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
 - [ ] monte carlo simulation -> measurement of the probability distribution estimation error?
 - [ ] Epic: make it work for a team
