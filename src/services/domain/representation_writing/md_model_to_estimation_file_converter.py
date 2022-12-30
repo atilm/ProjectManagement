@@ -31,7 +31,7 @@ class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter
 
         for t in tasks:
             task: Task = t
-            builder.withRow(task.id, task.description)
+            builder.withRow(task.id, task.projectId, task.description)
 
         return builder.build()
 

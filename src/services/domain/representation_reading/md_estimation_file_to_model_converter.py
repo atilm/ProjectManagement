@@ -52,10 +52,10 @@ class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):
 
         for r in table.rows:
             row: MarkdownTableRow = r
-            if row.getColumnCount() != 2:
+            if row.getColumnCount() != 3:
                 raise ColumnNumberException(row.lineNumber)
             
-            task = Task(row.get(0), row.get(1))
+            task = Task(id=row.get(0), description=row.get(2), project_id=row.get(1))
             task.estimate = estimate
             yield task
 

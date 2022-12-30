@@ -53,10 +53,10 @@ class MarkdownEstimationFileTest(unittest.TestCase):
             "\n"\
             "## Unestimated\n"\
             "\n"\
-            "| Id  | Desc |\n"\
-            "| - | -  |\n"\
-            "| ID-1| Desc 1     |\n"\
-            "| ID-2    | Desc 2 |\n"\
+            "| Id  | Project | Desc |\n"\
+            "| - | - | -  |\n"\
+            "| ID-1| Project X | Desc 1     |\n"\
+            "| ID-2    | Project Y | Desc 2 |\n"\
             "\n"
 
         resultContent = self.when_the_file_is_read_and_written_again(givenAnEstimationFileContent)
@@ -66,10 +66,10 @@ class MarkdownEstimationFileTest(unittest.TestCase):
             "\n"\
             "## Unestimated\n"\
             "\n"\
-            "| Id   | Desc   |\n"\
-            "| ---- | ------ |\n"\
-            "| ID-1 | Desc 1 |\n"\
-            "| ID-2 | Desc 2 |\n"\
+            "| Id   | Project   | Desc   |\n"\
+            "| ---- | --------- | ------ |\n"\
+            "| ID-1 | Project X | Desc 1 |\n"\
+            "| ID-2 | Project Y | Desc 2 |\n"\
             "\n"
 
         self.assertEqual(resultContent, expectedContent)
@@ -80,23 +80,23 @@ class MarkdownEstimationFileTest(unittest.TestCase):
             "\n"\
             "## 13\n"\
             "\n"\
-            "| Id   | Desc   |\n"\
-            "| ---- | ------ |\n"\
-            "| ID-1 | Desc 1 |\n"\
+            "| Id   | Project | Desc   |\n"\
+            "| ---- | ------- | ------ |\n"\
+            "| ID-1 | Proj 1  | Desc 1 |\n"\
             "\n"\
             "## 3\n"\
             "\n"\
-            "| Id   | Desc   |\n"\
-            "| ---- | ------ |\n"\
-            "| ID-2 | Desc 2 |\n"\
-            "| ID-3 | Desc 3 |\n"\
+            "| Id   | Project | Desc   |\n"\
+            "| ---- | ------- | ------ |\n"\
+            "| ID-2 | Proj 2  | Desc 2 |\n"\
+            "| ID-3 | Proj 1  | Desc 3 |\n"\
             "\n"\
             "## Unestimated\n"\
             "\n"\
-            "| Id   | Desc   |\n"\
-            "| ---- | ------ |\n"\
-            "| ID-4 | Desc 4 |\n"\
-            "| ID-5 | Desc 5 |\n"\
+            "| Id   | Project | Desc   |\n"\
+            "| ---- | ------- | ------ |\n"\
+            "| ID-4 | Proj 2  | Desc 4 |\n"\
+            "| ID-5 | Proj 1  | Desc 5 |\n"\
             "\n"
 
         resultContent = self.when_the_file_is_read_and_written_again(givenFileContent)
@@ -133,9 +133,9 @@ class MarkdownEstimationFileTest(unittest.TestCase):
             "\n"\
             "## 13\n"\
             "\n"\
-            "| Id   | Desc   |\n"\
-            "| ---- | ------ |\n"\
-            "| ID-1 | Desc 1 |\n"\
+            "| Id   | Project | Desc   |\n"\
+            "| ---- | ------- | ------ |\n"\
+            "| ID-1 | Proj 1  | Desc 1 |\n"\
             "| ID-2 |\n"
 
         error = self.expect_parse_exception(givenContent)

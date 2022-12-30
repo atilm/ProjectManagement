@@ -1,4 +1,4 @@
-estimation_task_header = ["Id", "Desc"]
+estimation_task_header = ["Id", "Project", "Desc"]
 
 planning_working_days_header = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 planning_holidays_header = ["Dates", "Description"]
