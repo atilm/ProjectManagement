@@ -19,21 +19,21 @@ planningFileContent = """
 
 # Stories To Do
 
-| Id | Description | Estimate | Started | Completed | Workdays | Created    | Removed |
-| -- | ----------- | -------- | ------- | --------- | -------- | ---------- | ------- |
-| 1  | Task 1      | 1        |         |           |          | 04-12-2022 |         |
-| 2  | Task 2      | 2        |         |           |          | 04-12-2022 |         |
+| Id | Project | Description | Estimate | Started | Completed | Workdays | Created    | Removed |
+| -- | ------- | ----------- | -------- | ------- | --------- | -------- | ---------- | ------- |
+| 1  |         | Task 1      | 1        |         |           |          | 04-12-2022 |         |
+| 2  |         | Task 2      | 2        |         |           |          | 04-12-2022 |         |
 
 # Completed Stories
 
-| Id | Description | Estimate | Started | Completed  | Workdays | Created    | Removed |
-| -- | ----------- | -------- | ------- | ---------- | -------- | ---------- | ------- |
-| 4  | Task 4      | 5        |         | 01-03-2022 | 10.0     | 04-12-2022 |         |
+| Id | Project | Description | Estimate | Started | Completed  | Workdays | Created    | Removed |
+| -- | ------- | ----------- | -------- | ------- | ---------- | -------- | ---------- | ------- |
+| 4  |         | Task 4      | 5        |         | 01-03-2022 | 10.0     | 04-12-2022 |         |
 
 # Removed Stories
 
-| Id | Description | Estimate | Started | Completed | Workdays | Created | Removed |
-| -- | ----------- | -------- | ------- | --------- | -------- | ------- | ------- |
+| Id | Project | Description | Estimate | Started | Completed | Workdays | Created | Removed |
+| -- | ------- | ----------- | -------- | ------- | --------- | -------- | ------- | ------- |
 """
 
 expectedReport = """# Planning Report

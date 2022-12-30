@@ -90,19 +90,19 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         return result
 
     def _toTask(self, row: MarkdownTableRow) -> Task:
-        if row.getColumnCount() != 8:
+        if row.getColumnCount() != 9:
             raise ColumnNumberException(row.lineNumber)
 
         try:
             return TaskToStringConverter()\
                 .withId(row.get(0))\
-                .withDescription(row.get(1))\
-                .withEstimate(row.get(2))\
-                .withStartedDate(row.get(3))\
-                .withCompletedDate(row.get(4))\
-                .withActualWorkDays(row.get(5))\
-                .withCreatedDate(row.get(6))\
-                .withRemovedDate(row.get(7))\
+                .withDescription(row.get(2))\
+                .withEstimate(row.get(3))\
+                .withStartedDate(row.get(4))\
+                .withCompletedDate(row.get(5))\
+                .withActualWorkDays(row.get(6))\
+                .withCreatedDate(row.get(7))\
+                .withRemovedDate(row.get(8))\
                 .toTask()
         except ConversionException as e:
             raise ValueConversionException(e.inputString, row.lineNumber)

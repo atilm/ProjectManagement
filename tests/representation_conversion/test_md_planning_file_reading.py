@@ -123,8 +123,8 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         todo = self.build_empty_task_table()
         completed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
-            .withRow("2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
+            .withRow("1", "Project", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
+            .withRow("2", "Project", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
             .build()
         removed = self.build_empty_task_table()
 
@@ -154,7 +154,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
     def test_can_read_a_task_from_to_do_table(self):
         todo = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("1", "Description", "5", "", "", "", "29-01-2021", "")\
+            .withRow("1", "Project", "Description", "5", "", "", "", "29-01-2021", "")\
             .build()
         completed = self.build_empty_task_table()
         removed = self.build_empty_task_table()
@@ -178,7 +178,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("3", "Description", "5", "04-05-2022", "", "", "01-05-2022", "05-05-2022")\
+            .withRow("3", "Project", "Description", "5", "04-05-2022", "", "", "01-05-2022", "05-05-2022")\
             .build()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
@@ -230,7 +230,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("3", "Description", "5", "12-31-2022", "", "", "01-05-2022", "05-05-2022")\
+            .withRow("3", "Project", "Description", "5", "12-31-2022", "", "", "01-05-2022", "05-05-2022")\
             .build()
         
         removed.rows[0].lineNumber = 5

@@ -13,7 +13,7 @@ todoTableIndex = 6
 completedTableIndex = 8
 removedTableIndex = 10
 
-task_table_col_count = 8
+task_table_col_count = 9
 
 
 class ConverterTestCase(unittest.TestCase):
@@ -105,7 +105,7 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         document = self.when_the_repo_is_converted(repo)
 
-        table = self._assertTable(todoTableIndex, 8, 2, document)
+        table = self._assertTable(todoTableIndex, task_table_col_count, 2, document)
         self.assertEqual(table.rows[0]._cells, ["1", "Todo task 1", "3", "", "", "", "01-03-2022", ""])
         self.assertEqual(table.rows[1]._cells, ["2", "Todo task 2", "3", "", "", "", "01-03-2022", ""])
 
@@ -117,9 +117,9 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         document = self.when_the_repo_is_converted(repo)
 
-        todoTable = self._assertTable(todoTableIndex, 8, 1, document)
-        completedTable = self._assertTable(completedTableIndex, 8, 1, document)
-        removedTable = self._assertTable(removedTableIndex, 8, 1, document)
+        todoTable = self._assertTable(todoTableIndex, task_table_col_count, 1, document)
+        completedTable = self._assertTable(completedTableIndex, task_table_col_count, 1, document)
+        removedTable = self._assertTable(removedTableIndex, task_table_col_count, 1, document)
 
         self.assertEqual(todoTable.rows[0]._cells, ["1", "Todo task", "3", "", "", "", "01-03-2022", ""])
         self.assertEqual(completedTable.rows[0]._cells, ["2", "Completed task", "4", "", "04-03-2022", "2", "01-03-2022", ""])
