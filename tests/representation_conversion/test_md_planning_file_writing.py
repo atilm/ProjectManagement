@@ -13,6 +13,9 @@ todoTableIndex = 6
 completedTableIndex = 8
 removedTableIndex = 10
 
+task_table_col_count = 8
+
+
 class ConverterTestCase(unittest.TestCase):
     def given_a_task_repository(self) -> TaskRepository:
         return TaskRepository()
@@ -60,11 +63,11 @@ class ConverterTestCase(unittest.TestCase):
         self._assertSection(3, "Holidays", 1, doc)
         self._assertTableColumns(holidaysTableIndex, 2, doc)
         self._assertSection(5, "Stories To Do", 1, doc)
-        self._assertTableColumns(todoTableIndex, 8, doc)
+        self._assertTableColumns(todoTableIndex, task_table_col_count, doc)
         self._assertSection(7, "Completed Stories", 1, doc)
-        self._assertTableColumns(completedTableIndex, 8, doc)
+        self._assertTableColumns(completedTableIndex, task_table_col_count, doc)
         self._assertSection(9, "Removed Stories", 1, doc)
-        self._assertTableColumns(removedTableIndex, 8, doc)
+        self._assertTableColumns(removedTableIndex, task_table_col_count, doc)
 
     def _assertSection(self, entryIndex : int, title: str, level: int, document : MarkdownDocument):
         entry = document.getContent()[entryIndex]

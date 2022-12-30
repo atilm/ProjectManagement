@@ -9,12 +9,13 @@
 - [x] As a developer I want to see a burn-down chart of the project history showing: [x] the past as a line [x] the future as confidence band [x] (longer) holidays
 - [x] As a devleoper I want to specify the start date from which project duration is predicted
 - [ ] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
-    [ ] Table with Project Ids and Names in Planning.md
+    [ ] Table with Project Ids and Names in Planning.md -> Is this necessary?
     [ ] Project column in planning and estimation task tables
     [ ] Init should introduce these tables and columns
     [ ] Report file should contain project column
     [ ] Report graph should color-code projects
     [ ] Report overview should output results per project: sections? table?
+- [ ] Have some kind of commenting mechanism for files (ignored by the markdown reader while displayed sensibly by markdown interpreters)
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
 - [ ] What is the correct velocity ? 
         - average(estimate_i / workdays_i) for every completed task i
