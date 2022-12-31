@@ -8,15 +8,15 @@ class adding_and_retrieving_tasks(DomainTestCase):
         self.assertRaises(TaskIdNotFoundException, lambda: self.when_the_user_retrieves_a_task_id("1", repo))
 
     def test_add_and_retrieve_one_task(self):
-        task = Task("1", "")
+        task = Task("1", "", "")
         
         repo = self.given_a_repository_with_tasks([task])
 
         self.then_the_repo_returns_the_task(task.id, repo)
 
     def test_cannot_add_two_tasks_with_same_id(self):
-        task1 = Task("id", "")
-        task2 = Task("id", "")
+        task1 = Task("id", "", "")
+        task2 = Task("id", "", "")
 
         repo = self.given_a_repository_with_tasks([task1])
         
@@ -25,13 +25,13 @@ class adding_and_retrieving_tasks(DomainTestCase):
 
 class updating_estimates(DomainTestCase):
     def test_several_estimates_can_be_updated(self):
-        task1 = Task("1", "")
-        task2 = Task("2", "")
-        task3 = Task("3", "")
+        task1 = Task("1", "", "")
+        task2 = Task("2", "", "")
+        task3 = Task("3", "", "")
 
-        estimatedTask1 = Task("1", "")
+        estimatedTask1 = Task("1", "", "")
         estimatedTask1.estimate = 1
-        estimatedTask2 = Task("2", "")
+        estimatedTask2 = Task("2", "", "")
         estimatedTask2.estimate = 3
 
         repo = self.given_a_repository_with_tasks([task1, task2, task3])

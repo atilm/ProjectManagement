@@ -25,8 +25,8 @@ class DomainTestCase(unittest.TestCase):
         repo.add_free_ranges(holidays)
         return repo
 
-    def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float) -> Task:
-        task = Task(self._id_generator.next(), "")
+    def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float, projectId: str = "") -> Task:
+        task = Task(self._id_generator.next(), "", projectId)
         task.estimate = estimate
         task.actualWorkDays = actualWorkDays
         task.completedDate = completedDate
@@ -34,8 +34,8 @@ class DomainTestCase(unittest.TestCase):
         task.createdDate = task.startedDate
         return task
 
-    def todo_task(self, estimate: float) -> Task:
-        task = Task(self._id_generator.next(), "")
+    def todo_task(self, estimate: float, projectId: str = "") -> Task:
+        task = Task(self._id_generator.next(), "", projectId)
         task.estimate = estimate
         task.createdDate = datetime.date(2000, 1, 1)
         return task

@@ -14,7 +14,7 @@
     - [x] Project column in estimation task tables
     - [x] Init should introduce these tables and columns
     - [x] Report file should contain project column
-    - [ ] Report graph should color-code projects
+    - [x] Report graph should color-code projects
     - [ ] Report overview should output results per project: sections? table?
 - [ ] Have some kind of commenting mechanism for files (ignored by the markdown reader while displayed sensibly by markdown interpreters)
 - [ ] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
@@ -22,8 +22,8 @@
         - average(estimate_i / workdays_i) for every completed task i
         - sum(estimate_i) / sum(workdays_i) for every completed task i
 
-- [ ] Only copy the 30 most recently completed reference stories into the estimation file
-- [ ] Do not copy strongly mis-estimated stories as reference stories int to the estimation file
+- [ ] Only copy the N (=30) most recently completed reference stories into the estimation file
+- [ ] Do not copy strongly mis-estimated stories as reference stories into the estimation file
 - [ ] TaskIdConflictException should contain the conflicting task id and show it to the user
 - [ ] As a developer I want to see a chart of the time evolution of the confidence band for the predicted completion date.
     - [ ] show at which points tasks have been added, removed (or changed -- difficult to record) in the project plan

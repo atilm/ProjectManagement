@@ -23,6 +23,7 @@ class GraphEngine:
         ax.fill_betweenx(data.lower_confidence_band.y, data.lower_confidence_band.x, data.upper_confidence_band.x, color='gray', alpha=0.3)
         ax.plot(data.lower_confidence_band.x, data.lower_confidence_band.y, '-o', color='gray')
         ax.plot(data.upper_confidence_band.x, data.upper_confidence_band.y, '-o', color='gray')
-        ax.plot(data.expected_values.x, data.expected_values.y, '-o')
+        ax.plot(data.expected_values.x, data.expected_values.y, '-')
+        ax.scatter(data.expected_values.x, data.expected_values.y, c=data.expected_values.color, zorder=2)
         
         plt.show()

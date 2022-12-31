@@ -3,6 +3,7 @@ from tests.domain.domain_test_case import DomainTestCase
 from src.domain.report_generator import Report, TaskRepository, WorkingDayRepository, RepositoryCollection, TaskReport
 from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
 from src.domain import weekdays
+from src.services.domain.graph_generation.graph_colors import GraphColorCycle
 
 def get_completion_date(report: Report, index, attr):
     completion_date = report.task_reports[index].completion_date
@@ -83,4 +84,23 @@ class GraphGeneratorTestCase(DomainTestCase):
             uppper_limit_dates,
             remaining_effort)
 
+    def test_expected_values_have_colors_per_project(self):
+        projectA = "Project A"
+        projectB = "Project B"
 
+        task_repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 4), 2, 4, projectA),
+            self.completed_task(datetime.date(2022, 12, 8), 5, 10, projectB),
+            self.todo_task(1, projectA),
+            self.todo_task(1, projectB)
+        ])
+
+        holidays_repo = WorkingDayRepository()
+
+        report = self.when_a_report_is_generated(task_repo, datetime.date(2022, 12, 8), holidays_repo)
+        graph_data = self.when_graph_data_are_generated(report, task_repo, holidays_repo)
+
+        expectedColors = [GraphColorCycle.Blue, GraphColorCycle.Red, GraphColorCycle.Blue, GraphColorCycle.Red]
+
+        self.assertEqual(graph_data.expected_values.color, expectedColors, msg=f"{expectedColors}")
+        
