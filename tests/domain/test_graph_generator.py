@@ -4,7 +4,7 @@ from src.domain.report_generator import Report, TaskRepository, WorkingDayReposi
 from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
 from src.domain import weekdays
 
-def get_comp_date(report: Report, index, attr):
+def get_completion_date(report: Report, index, attr):
     completion_date = report.task_reports[index].completion_date
     return getattr(completion_date, attr)
 
@@ -12,7 +12,6 @@ class GraphGeneratorTestCase(DomainTestCase):
     def assert_xy_data(self, xy_data: XyData, expected_x: list, expected_y: list):
         self.assertEqual(xy_data.x, expected_x)
         self.assertEqual(xy_data.y, expected_y)
-
 
     def given_a_report(self, taskReports: list = []):
         report = Report()
@@ -63,13 +62,13 @@ class GraphGeneratorTestCase(DomainTestCase):
 
         remaining_effort = [7, 5, 3, 0]
         expected_completion_dates = [
-            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_comp_date(report, 0, "expected_value"), get_comp_date(report, 1, "expected_value")
+            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_completion_date(report, 0, "expected_value"), get_completion_date(report, 1, "expected_value")
         ]
         lower_limit_dates = [
-            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_comp_date(report, 0, "lower_limit"), get_comp_date(report, 1, "lower_limit")
+            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_completion_date(report, 0, "lower_limit"), get_completion_date(report, 1, "lower_limit")
         ]
         uppper_limit_dates = [
-            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_comp_date(report, 0, "upper_limit"), get_comp_date(report, 1, "upper_limit")
+            datetime.date(2022, 12, 4), datetime.date(2022, 12, 8), get_completion_date(report, 0, "upper_limit"), get_completion_date(report, 1, "upper_limit")
         ]
 
         self.assert_xy_data(graph_data.expected_values,
