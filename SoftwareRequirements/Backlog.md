@@ -13,7 +13,7 @@
     - [x] Project column in planning task tables
     - [x] Project column in estimation task tables
     - [x] Init should introduce these tables and columns
-    - [ ] Report file should contain project column
+    - [x] Report file should contain project column
     - [ ] Report graph should color-code projects
     - [ ] Report overview should output results per project: sections? table?
 - [ ] Have some kind of commenting mechanism for files (ignored by the markdown reader while displayed sensibly by markdown interpreters)

@@ -21,14 +21,14 @@ planningFileContent = """
 
 | Id | Project | Description | Estimate | Started | Completed | Workdays | Created    | Removed |
 | -- | ------- | ----------- | -------- | ------- | --------- | -------- | ---------- | ------- |
-| 1  |         | Task 1      | 1        |         |           |          | 04-12-2022 |         |
-| 2  |         | Task 2      | 2        |         |           |          | 04-12-2022 |         |
+| 1  | Proj 1  | Task 1      | 1        |         |           |          | 04-12-2022 |         |
+| 2  | Proj 2  | Task 2      | 2        |         |           |          | 04-12-2022 |         |
 
 # Completed Stories
 
 | Id | Project | Description | Estimate | Started | Completed  | Workdays | Created    | Removed |
 | -- | ------- | ----------- | -------- | ------- | ---------- | -------- | ---------- | ------- |
-| 4  |         | Task 4      | 5        |         | 01-03-2022 | 10.0     | 04-12-2022 |         |
+| 4  | Proje 1 | Task 4      | 5        |         | 01-03-2022 | 10.0     | 04-12-2022 |         |
 
 # Removed Stories
 
@@ -38,10 +38,10 @@ planningFileContent = """
 
 expectedReport = """# Planning Report
 
-| Id | Description | Days | Completion date                      |
-| -- | ----------- | ---- | ------------------------------------ |
-| 1  | Task 1      | 2.0  | (20-12-2022, 22-12-2022, 24-12-2022) |
-| 2  | Task 2      | 4.0  | (23-12-2022, 28-12-2022, 30-12-2022) |
+| Id | Project | Description | Days | Completion date                      |
+| -- | ------- | ----------- | ---- | ------------------------------------ |
+| 1  | Proj 1  | Task 1      | 2.0  | (20-12-2022, 22-12-2022, 24-12-2022) |
+| 2  | Proj 2  | Task 2      | 4.0  | (23-12-2022, 28-12-2022, 30-12-2022) |
 
 """
 

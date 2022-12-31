@@ -48,6 +48,7 @@ class ConfidenceInterval:
 class TaskReport:
     def __init__(self, sourceTask: task.Task, estimated_days: ConfidenceInterval, completion_date: ConfidenceInterval) -> None:
         self.taskId: str = sourceTask.id
+        self.projectId: str = sourceTask.projectId
         self.description: str = sourceTask.description
         self.completion_date: ConfidenceInterval = completion_date
         self.estimated_days: ConfidenceInterval = estimated_days

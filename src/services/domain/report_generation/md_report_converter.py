@@ -15,12 +15,13 @@ class ReportToMarkdownConverter:
 
     def _build_task_report_table(self, taskReports: list) -> MarkdownTable:
         tableBuilder = MarkdownTableBuilder()\
-            .withHeader("Id", "Description", "Days", "Completion date")
+            .withHeader("Id", "Project", "Description", "Days", "Completion date")
 
         for tr in taskReports:
             taskReport: TaskReport = tr
             tableBuilder.withRow(
                 taskReport.taskId,
+                taskReport.projectId,
                 taskReport.description,
                 string_utilities.to_days_str(taskReport.estimated_days.expected_value),
                 taskReport.completion_date.to_string(string_utilities.to_date_str))
