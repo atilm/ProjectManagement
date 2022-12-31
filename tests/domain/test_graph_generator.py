@@ -102,5 +102,8 @@ class GraphGeneratorTestCase(DomainTestCase):
 
         expectedColors = [GraphColorCycle.Blue, GraphColorCycle.Red, GraphColorCycle.Blue, GraphColorCycle.Red]
 
-        self.assertEqual(graph_data.expected_values.color, expectedColors, msg=f"{expectedColors}")
-        
+        colors = graph_data.expected_values.color
+
+        # then data points belonging to the same projects have the same colors
+        self.assertEqual(colors[0], colors[2])
+        self.assertEqual(colors[1], colors[3])
