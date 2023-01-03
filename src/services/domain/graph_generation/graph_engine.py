@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphData
+import datetime
 
 class GraphEngine:
 
@@ -17,7 +18,7 @@ class GraphEngine:
         ax.set_ylabel(("Remaining Effort [Story Points]"))
 
         for free_range in data.free_date_ranges:
-            x = [free_range.firstFreeDay, free_range.lastFreeDay]
+            x = [free_range.firstFreeDay, free_range.lastFreeDay + datetime.timedelta(1)]
             ax.fill_between(x, 0, 1, color='blue', alpha=0.3, transform=ax.get_xaxis_transform())
 
         ax.fill_betweenx(data.lower_confidence_band.y, data.lower_confidence_band.x, data.upper_confidence_band.x, color='gray', alpha=0.3)
