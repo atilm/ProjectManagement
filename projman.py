@@ -25,7 +25,7 @@ def catch_all(action, args):
     except MarkdownConverterException as e:
         print(f"Markdown parsing error in line {e.lineNumber}.")
     except TaskIdConflictException as e:
-        print("Found duplicate task id.")
+        print(f"Found duplicate task id '{e.taskId}'")
     except VelocityCalculationException as e:
         print(f"Could not calculate velocity for story {e.task_id}.")
 

@@ -4,7 +4,9 @@ class TaskIdNotFoundException(Exception):
     pass
 
 class TaskIdConflictException(Exception):
-    pass
+    def __init__(self, taskId: str, *args: object) -> None:
+        super().__init__(*args)
+        self.taskId = taskId
 
 class TaskRepository:
     def __init__(self) -> None:
@@ -12,7 +14,7 @@ class TaskRepository:
 
     def add(self, task : Task) -> None:
         if task.id in self.tasks:
-            raise TaskIdConflictException
+            raise TaskIdConflictException(task.id)
 
         self.tasks[task.id] = task
 

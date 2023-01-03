@@ -2,6 +2,13 @@ from .domain_test_case import DomainTestCase
 from src.domain.tasks_repository import *
 
 class adding_and_retrieving_tasks(DomainTestCase):
+    def expect_exception(self, action) -> Exception:
+        try:
+            action()
+            self.fail("Expected an exception")
+        except Exception as e:
+            return e
+
     def test_exception_on_get_nonexisting_id(self):
         repo = self.given_an_empty_repository()
 
@@ -15,13 +22,15 @@ class adding_and_retrieving_tasks(DomainTestCase):
         self.then_the_repo_returns_the_task(task.id, repo)
 
     def test_cannot_add_two_tasks_with_same_id(self):
-        task1 = Task("id", "", "")
-        task2 = Task("id", "", "")
+        task1 = Task("id7", "", "")
+        task2 = Task("id7", "", "")
 
         repo = self.given_a_repository_with_tasks([task1])
         
         action = lambda: self.when_a_task_is_added(task2, repo)
-        self.assertRaises(TaskIdConflictException, action)
+        error = self.expect_exception(action)
+        self.assertIsInstance(error, TaskIdConflictException)
+        self.assertEqual(error.taskId, "id7")
 
 class updating_estimates(DomainTestCase):
     def test_several_estimates_can_be_updated(self):
