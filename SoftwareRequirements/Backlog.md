@@ -8,6 +8,7 @@
 - [x] As a developer I want to know a confidence interval for the completed date of my project. (official and personal holidays, days spend on other activities)
 - [x] As a developer I want to see a burn-down chart of the project history showing: [x] the past as a line [x] the future as confidence band [x] (longer) holidays
 - [x] As a devleoper I want to specify the start date from which project duration is predicted
+- [ ] TaskIdConflictException should contain the conflicting task id and show it to the user
 - [ ] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
     - [-] Table with Project Ids and Names in Planning.md -> Is this necessary?
     - [x] Project column in planning task tables
@@ -24,7 +25,6 @@
 
 - [ ] Only copy the N (=30) most recently completed reference stories into the estimation file
 - [ ] Do not copy strongly mis-estimated stories as reference stories into the estimation file
-- [ ] TaskIdConflictException should contain the conflicting task id and show it to the user
 - [ ] As a developer I want to see a chart of the time evolution of the confidence band for the predicted completion date.
     - [ ] show at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
 - [ ] monte carlo simulation -> measurement of the probability distribution estimation error?

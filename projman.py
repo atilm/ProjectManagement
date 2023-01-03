@@ -97,12 +97,6 @@ def generateReport(args):
     print(f"Remaining work days range: {work_days_range}")
     print(f"Predicted completion date range: {report.predicted_completion_date.to_string(string_utilities.to_date_str)}")
 
-    if args.file:
-        print(f"Write to report file: {args.file}")
-        report_file_generator = ReportFileGenerator()
-        report_file_content = report_file_generator.generate(planningInput, startDate)
-        write_to_file(args.file, report_file_content)
-
     if (report.warnings):
         print("\nWarnings:\n")
     
@@ -110,6 +104,12 @@ def generateReport(args):
         print(warning)
 
     print("\n")
+
+    if args.file:
+        print(f"Write to report file: {args.file}")
+        report_file_generator = ReportFileGenerator()
+        report_file_content = report_file_generator.generate(planningInput, startDate)
+        write_to_file(args.file, report_file_content)
 
     if args.graph:
         print("Show a graph")
