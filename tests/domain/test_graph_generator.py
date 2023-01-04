@@ -43,9 +43,13 @@ class GraphGeneratorTestCase(DomainTestCase):
         holidays_repo = self.given_a_working_days_repository(
             [weekdays.SATURDAY, weekdays.SUNDAY],
             expected_free_ranges)
-        report = self.given_a_report()
+        
+        task_repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 10, 1), 1, 1),
+            self.todo_task(1)
+        ])
 
-        graph_data = self.when_graph_data_are_generated(report, TaskRepository(), holidays_repo)
+        graph_data = self.when_report_and_graphdata_are_generated(task_repo, holidays_repo, datetime.date(2023, 1, 1))
 
         self.assertEqual(graph_data.free_date_ranges, expected_free_ranges)
 
@@ -119,3 +123,23 @@ class GraphGeneratorTestCase(DomainTestCase):
         graph_data = self.when_report_and_graphdata_are_generated(task_repo, WorkingDayRepository(), historicStartDate)
 
         self.assertEqual(len(graph_data.expected_values.x), GlobalSettings.velocity_count + 1)
+
+    def test_only_holidays_within_the_plotted_completion_dates_are_plotted(self):
+        startDate = datetime.date(2022, 1, 1)
+
+        task_repo = self.given_a_repository_with_tasks([
+            self.completed_task(startDate, 1, 1),
+            self.todo_task(3)
+        ])
+
+        input_holidays = [
+            FreeRange(datetime.date(2021, 1, 3), datetime.date(2021, 1, 4), ""),
+            FreeRange(datetime.date(2022, 1, 3), datetime.date(2022, 1, 4), ""),
+            FreeRange(datetime.date(2022, 1, 10), datetime.date(2022, 1, 11), "")
+        ]
+
+        holidays_repo = self.given_a_working_days_repository([], input_holidays)
+
+        graph_data = self.when_report_and_graphdata_are_generated(task_repo, holidays_repo, startDate)
+
+        self.assertEqual(graph_data.free_date_ranges, input_holidays[1:-1])

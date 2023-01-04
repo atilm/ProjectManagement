@@ -4,6 +4,7 @@ from src.domain.repository_collection import RepositoryCollection, TaskRepositor
 from src.domain.working_day_repository import FreeRange
 from src.domain import task
 from src.services.domain.graph_generation.graph_colors import GraphColorCycle
+import datetime
 import copy
 
 class XyData:
@@ -24,6 +25,9 @@ class BurndownGraphData:
         self.upper_confidence_band = XyData()
         self.free_date_ranges: FreeRange = []
 
+    def isEmpty(self) -> bool:
+        return not self.expected_values.x
+
 class BurndownGraphGenerator:
     def generate(self, report: Report, repositories: RepositoryCollection) -> BurndownGraphData:
         graph_data = BurndownGraphData()
@@ -37,12 +41,13 @@ class BurndownGraphGenerator:
         for index, project in enumerate(uniqueProjectIds):
             projectIndices[project] = index
 
+        # filter only the most recent completed tasks
         completed_tasks = filter(task.is_completed_task, task_repo.tasks.values())
         completed_tasks = sorted(completed_tasks, key = lambda t: t.completedDate)
-        # show only as many historic tasks as relevant for velocity:
         completed_tasks = completed_tasks[-GlobalSettings.velocity_count:]
         remaining_effort = self._total_effort(completed_tasks, report.task_reports, task_repo)
         
+        # generate graph data
         for t in completed_tasks:
             comp_task: task.Task = t
             remaining_effort -= comp_task.estimate
@@ -57,9 +62,19 @@ class BurndownGraphGenerator:
             graph_data.expected_values.append(task_report.completion_date.expected_value, remaining_effort, GraphColorCycle.get(projectIndices[task_report.projectId]))
             graph_data.upper_confidence_band.append(task_report.completion_date.upper_limit, remaining_effort, GraphColorCycle.Gray)
 
-        graph_data.free_date_ranges = copy.deepcopy(repositories.working_days_repository.free_ranges)
+        # filter the holidays within the plotted data point range
+        if not graph_data.isEmpty():
+            firstCompletionDate = graph_data.lower_confidence_band.x[0]
+            lastCompletionDate = graph_data.upper_confidence_band.x[-1]
+
+            graph_data.free_date_ranges = list(filter(
+                lambda h: self._is_within_dates(h, firstCompletionDate, lastCompletionDate),
+                repositories.working_days_repository.free_ranges))
 
         return graph_data
+
+    def _is_within_dates(self, holidays: FreeRange, start_date: datetime.date, end_date: datetime.date) -> bool:
+        return holidays.lastFreeDay > start_date and holidays.firstFreeDay < end_date
 
     def _total_effort(self, completed_tasks: list, task_reports: list, task_repo: TaskRepository) -> float:
         completed_efforts = [t.estimate for t in completed_tasks]
