@@ -58,7 +58,7 @@ class Report:
     def __init__(self) -> None:
         self.velocity: float = None
         self.remaining_work_days: ConfidenceInterval = None
-        self.predicted_completion_date: ConfidenceInterval = None
+        self.predicted_completion_dates = {} # keys: projectIds, values: completionDate: ConfidenceInterval
         self.warnings = set()
         self.task_reports = []
 
@@ -82,7 +82,8 @@ class ReportGenerator:
         report.add_warning(warning)
         report.remaining_work_days = workdays
         if report.task_reports:
-            report.predicted_completion_date = report.task_reports[-1].completion_date
+            lastReport: TaskReport = report.task_reports[-1]
+            report.predicted_completion_dates[lastReport.projectId] = lastReport.completion_date
 
         return report
 

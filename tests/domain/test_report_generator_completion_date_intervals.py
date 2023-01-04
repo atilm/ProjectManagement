@@ -17,7 +17,7 @@ class the_report_generator_calculates_completion_date_ranges(DomainTestCase):
         self.assertEqual(taskReport.estimated_days, ConfidenceInterval(2, 4, 6))
         self.assertEqual(taskReport.completion_date, expected_completion_date_interval)
         self.assertEqual(report.remaining_work_days, ConfidenceInterval(2, 4, 6))
-        self.assertEqual(report.predicted_completion_date, expected_completion_date_interval)
+        self.assertEqual(report.predicted_completion_dates[""], expected_completion_date_interval)
 
 
     def test_estimation_errors_are_combined_as_sums_of_squares(self):
@@ -41,8 +41,6 @@ class the_report_generator_calculates_completion_date_ranges(DomainTestCase):
 
         actual_intervals = [tr.completion_date for tr in report.task_reports]
         self.assertEqual(actual_intervals, [first_expected_interval, second_expected_interval])
-
-    
 
     def test_exception_when_estimate_is_not_a_fibonacci_number(self):
         self._assert_exception_on_estimate(4)
