@@ -10,7 +10,6 @@
 - [x] As a devleoper I want to specify the start date from which project duration is predicted
 - [x] TaskIdConflictException should contain the conflicting task id and show it to the user
 - [ ] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
-    - [-] Table with Project Ids and Names in Planning.md -> Is this necessary?
     - [x] Project column in planning task tables
     - [x] Project column in estimation task tables
     - [x] Init should introduce these tables and columns

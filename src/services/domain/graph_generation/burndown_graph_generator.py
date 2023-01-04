@@ -1,3 +1,4 @@
+from src.global_settings import GlobalSettings
 from src.domain.report_generator import Report, TaskReport
 from src.domain.repository_collection import RepositoryCollection, TaskRepository
 from src.domain.working_day_repository import FreeRange
@@ -38,6 +39,8 @@ class BurndownGraphGenerator:
 
         completed_tasks = filter(task.is_completed_task, task_repo.tasks.values())
         completed_tasks = sorted(completed_tasks, key = lambda t: t.completedDate)
+        # show only as many historic tasks as relevant for velocity:
+        completed_tasks = completed_tasks[-GlobalSettings.velocity_count:]
         remaining_effort = self._total_effort(completed_tasks, report.task_reports, task_repo)
         
         for t in completed_tasks:

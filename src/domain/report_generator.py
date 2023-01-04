@@ -6,6 +6,7 @@ from src.services.utilities import calculations
 from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
+from src.global_settings import GlobalSettings
 
 class NotAFibonacciEstimateException(Exception):
     def __init__(self, task_id: str, *args: object) -> None:
@@ -88,7 +89,7 @@ class ReportGenerator:
     def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, str]:
         tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
-        velocity =  calculations.calc_average(sorted_tasks[-30:], task.calc_velocity)
+        velocity =  calculations.calc_average(sorted_tasks[-GlobalSettings.velocity_count:], task.calc_velocity)
 
         warning = None if velocity else "No velocity could be calculated."
 

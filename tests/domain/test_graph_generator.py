@@ -4,6 +4,7 @@ from src.domain.report_generator import Report, TaskRepository, WorkingDayReposi
 from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
 from src.domain import weekdays
 from src.services.domain.graph_generation.graph_colors import GraphColorCycle
+from src.global_settings import GlobalSettings
 
 def get_completion_date(report: Report, index, attr):
     completion_date = report.task_reports[index].completion_date
@@ -23,6 +24,10 @@ class GraphGeneratorTestCase(DomainTestCase):
         graph_generator = BurndownGraphGenerator()
         repositories = RepositoryCollection(task_repo, holidays_repo)
         return graph_generator.generate(report, repositories)
+
+    def when_report_and_graphdata_are_generated(self, task_repo: TaskRepository, holidays_repo: WorkingDayRepository, start_date: datetime.date) -> BurndownGraphData:
+        report = self.when_a_report_is_generated(task_repo, start_date, holidays_repo)
+        return self.when_graph_data_are_generated(report, task_repo, holidays_repo)
 
     def test_empty_input_data(self):
         graph_data = self.when_graph_data_are_generated(Report(), TaskRepository(), WorkingDayRepository())
@@ -95,15 +100,22 @@ class GraphGeneratorTestCase(DomainTestCase):
             self.todo_task(1, projectB)
         ])
 
-        holidays_repo = WorkingDayRepository()
-
-        report = self.when_a_report_is_generated(task_repo, datetime.date(2022, 12, 8), holidays_repo)
-        graph_data = self.when_graph_data_are_generated(report, task_repo, holidays_repo)
-
-        expectedColors = [GraphColorCycle.Blue, GraphColorCycle.Red, GraphColorCycle.Blue, GraphColorCycle.Red]
+        graph_data = self.when_report_and_graphdata_are_generated(task_repo, WorkingDayRepository(), datetime.date(2022, 12, 8))
 
         colors = graph_data.expected_values.color
 
         # then data points belonging to the same projects have the same colors
         self.assertEqual(colors[0], colors[2])
         self.assertEqual(colors[1], colors[3])
+
+    def test_only_the_historic_points_relevant_for_velocity_are_plotted(self):
+        historicStartDate = datetime.date(2023, 1, 1)
+
+        tasks = [self.completed_task(historicStartDate + datetime.timedelta(days), 1, 1) for days in range(GlobalSettings.velocity_count + 2)]
+        tasks.append(self.todo_task(1))
+
+        task_repo = self.given_a_repository_with_tasks(tasks)
+
+        graph_data = self.when_report_and_graphdata_are_generated(task_repo, WorkingDayRepository(), historicStartDate)
+
+        self.assertEqual(len(graph_data.expected_values.x), GlobalSettings.velocity_count + 1)
