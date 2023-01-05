@@ -93,9 +93,11 @@ def generateReport(args):
     report = reportGenerator.generate(planningRepos, startDate)
 
     print(f"Velocity: {report.velocity} story points / day")
-    work_days_range = report.remaining_work_days.to_string(lambda value: f"{value:.0f}")
-    print(f"Remaining work days range: {work_days_range}")
-    print(f"Predicted completion date range: {report.predicted_completion_date.to_string(string_utilities.to_date_str)}")
+    print("\nCompletion date ranges:")
+    projectColumnWidth = max([len(projectId) for projectId in report.predicted_completion_dates.keys()])
+    formatStr = f"{{0:>{projectColumnWidth}s}}: {{1}}"
+    for projectId, completionDateInterval in report.predicted_completion_dates.items():
+        print(formatStr.format(projectId, completionDateInterval.to_string(string_utilities.to_date_str)))
 
     if (report.warnings):
         print("\nWarnings:\n")

@@ -2,8 +2,12 @@ from .domain_test_case import DomainTestCase
 import datetime
 from src.domain import weekdays
 from src.domain.working_day_repository import WorkingDayRepository
+from src.domain.report_generator import Report
 
 class the_report_predicts_the_completion_date(DomainTestCase):
+    def then_the_expected_completion_date_is(self, expectedDate: datetime.date , report: Report, projectId: str = ""):
+        self.assertEqual(report.predicted_completion_dates[projectId].expected_value, expectedDate)
+
     def test_when_an_empty_repository_is_given(self):
         repo = self.given_an_empty_repository()
 
@@ -21,8 +25,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
         report = self.when_a_report_is_generated(repo, datetime.date(2022, 12, 6))
 
-        # then the predicted completion date is calculated
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, datetime.date(2022, 12, 10))
+        self.then_the_expected_completion_date_is(datetime.date(2022, 12, 10), report)
 
     def test_skipping_weekends(self):
         repo = self.given_a_repository_with_tasks([
@@ -37,7 +40,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         report = self.when_a_report_is_generated(repo, thursday, workdays)
 
         # then the completion date is 4 days + 2 weekend days in the future
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, datetime.date(2022, 12, 14))
+        self.then_the_expected_completion_date_is(datetime.date(2022, 12, 14), report)
 
     def test_skipping_free_ranges(self):
         repo = self.given_a_repository_with_tasks([
@@ -55,7 +58,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         report = self.when_a_report_is_generated(repo, thursday, workdays)
 
         # then the completion date is after weekend and holidays
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, datetime.date(2022, 12, 28))
+        self.then_the_expected_completion_date_is(datetime.date(2022, 12, 28), report)
 
     def test_start_date_is_not_a_working_day(self):
         repo = self.given_a_repository_with_tasks([
@@ -69,7 +72,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
         report = self.when_a_report_is_generated(repo, freeDay, workdays)
 
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, datetime.date(2022, 12, 29))
+        self.then_the_expected_completion_date_is(datetime.date(2022, 12, 29), report)
     
     def test_work_amounts_to_a_fraction_of_a_day(self):
         repo = self.given_a_repository_with_tasks([
@@ -81,7 +84,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         report = self.when_a_report_is_generated(repo, startDate, WorkingDayRepository())
 
         # then the work is completed on the same day
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, startDate)
+        self.then_the_expected_completion_date_is(startDate, report)
 
     def test_fraction_of_day_must_be_completed_after_weekend(self):
         repo = self.given_a_repository_with_tasks([
@@ -95,5 +98,22 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         startDate = datetime.date(2023, 1, 13) # friday
         report = self.when_a_report_is_generated(repo, startDate, freeWeekendsRepo)
 
-        # then the work is completed on the same day
-        self.assertEqual(report.predicted_completion_dates[""].expected_value, datetime.date(2023, 1, 16))
+        self.then_the_expected_completion_date_is(datetime.date(2023, 1, 16), report)
+
+    def test_completion_dates_are_reported_per_project(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 1, 1, "1"), #velocity of 1
+            self.todo_task(1, "1"),
+            self.todo_task(1, "1"),
+            self.todo_task(1, "2"),
+            self.todo_task(1, "2"),
+            self.todo_task(1, "3"),
+            self.todo_task(1, "3"),
+        ])
+
+        startDate = datetime.date(2023, 1, 1)
+        report = self.when_a_report_is_generated(repo, startDate)
+
+        self.then_the_expected_completion_date_is(startDate + datetime.timedelta(2), report, "1")
+        self.then_the_expected_completion_date_is(startDate + datetime.timedelta(4), report, "2")
+        self.then_the_expected_completion_date_is(startDate + datetime.timedelta(6), report, "3")

@@ -81,9 +81,11 @@ class ReportGenerator:
         workdays, report.task_reports, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository)
         report.add_warning(warning)
         report.remaining_work_days = workdays
-        if report.task_reports:
-            lastReport: TaskReport = report.task_reports[-1]
-            report.predicted_completion_dates[lastReport.projectId] = lastReport.completion_date
+
+        for taskReport in report.task_reports:
+            # each entry might be set several times
+            # the last time will set the projects completion date, because the task reports are sorted by date
+            report.predicted_completion_dates[taskReport.projectId] = taskReport.completion_date
 
         return report
 
