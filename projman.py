@@ -11,7 +11,10 @@ from src.domain.task import VelocityCalculationException
 from src.services.utilities import string_utilities
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
+from src.services.domain.graph_generation.estimation_error_graph_generator import EstimationErrorGraphGenerator
 from src.services.domain.graph_generation.graph_engine import GraphEngine
+
+# HELPERS ---------------------------------------------------------------------------------------
 
 def catch_all(action, args):
     try:
@@ -39,6 +42,19 @@ def write_to_file(filePath: str, content: str) -> str:
     file = open(filePath, mode='w', encoding="utf-8")
     file.write(content)
     file.close()
+
+def parse_planning_file(planningPath: str) -> RepositoryCollection:
+    planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+    planningInput = read_from_file(planningPath)
+    return planningReader.read(planningInput)
+
+def parseDate(date_string: str) -> datetime.date:
+    try:
+        return string_utilities.parse_to_date(date_string)
+    except:
+        raise ValueConversionException(date_string, 0)
+
+# Commands ------------------------------------------------------------------------------------
 
 def initPlanningFile(args):
     print(f"initialize planning file: {args.planningPath}")
@@ -75,15 +91,10 @@ def applyEstimationFile(args):
     planningOutput = planningWriter.write(planningRepos)
     write_to_file(args.planningPath, planningOutput)
 
-def parseDate(date_string: str) -> datetime.date:
-    try:
-        return string_utilities.parse_to_date(date_string)
-    except:
-        raise ValueConversionException(date_string, 0)
-
 def generateReport(args):
     print(f"Report on {args.planningPath}:\n")
 
+    # Todo: replace with parse_planning_file() when ReportFileGenerator takes a report
     planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
     planningInput = read_from_file(args.planningPath)
     planningRepos = planningReader.read(planningInput)
@@ -131,6 +142,17 @@ def formatFile(args):
     output = writer.write(document)
     write_to_file(args.filePath, output)
 
+def plotEstimationErrors(args):
+    print(f"Plot estimation errors of all completed stories in {args.planningPath}")
+
+    repos = parse_planning_file(args.planningPath)
+
+    graph_generator = EstimationErrorGraphGenerator()
+    graph_engine = GraphEngine()
+
+    errorGraphData = graph_generator.generate(repos.task_repository)
+    graph_engine.plot_estimation_error_graph(errorGraphData)
+
 
 argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 
@@ -139,6 +161,10 @@ subparsers = argumentParser.add_subparsers(help="The action to perform")
 initParser = subparsers.add_parser("init", help="Generate a planning file with the initial structure.")
 initParser.add_argument("planningPath", help="Path to the planning file.")
 initParser.set_defaults(func=lambda args: catch_all(initPlanningFile, args))
+
+formatParser = subparsers.add_parser("format", help="Clean up the format of a markdown file (e.g. alignment in tables).")
+formatParser.add_argument("filePath", help="The file to reformat.")
+formatParser.set_defaults(func=lambda args: catch_all(formatFile, args))
 
 createEstimationFileParser = subparsers.add_parser("estimate", help="Generate an estimation file from the planning file.")
 createEstimationFileParser.add_argument("planningPath", help="Path to the planning file.")
@@ -157,9 +183,9 @@ reportParser.add_argument("-d", "--startDate", help="Date from when to start the
 reportParser.add_argument("-g", "--graph", action='store_true', help="Show a burn down chart of all past and future stories")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
 
-formatParser = subparsers.add_parser("format", help="Clean up the format of a markdown file (e.g. alignment in tables).")
-formatParser.add_argument("filePath", help="The file to reformat.")
-formatParser.set_defaults(func=lambda args: catch_all(formatFile, args))
+reportParser = subparsers.add_parser("ploterrors", help="Show a plot of estimation errors over all completed stories.")
+reportParser.add_argument("planningPath", help="Path to the planning file.")
+reportParser.set_defaults(func=lambda args: catch_all(plotEstimationErrors, args))
 
 args = argumentParser.parse_args()
 args.func(args)

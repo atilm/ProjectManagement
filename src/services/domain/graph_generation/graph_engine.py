@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphData
+from src.services.domain.graph_generation.estimation_error_graph_generator import EstimationErrorGraphData
 import datetime
 
 class GraphEngine:
@@ -28,3 +29,6 @@ class GraphEngine:
         ax.scatter(data.expected_values.x, data.expected_values.y, c=data.expected_values.color, zorder=2)
         
         plt.show()
+
+    def plot_estimation_error_graph(self, data: EstimationErrorGraphData):
+        pass
