@@ -5,7 +5,6 @@ from src.domain.fibonacci_sequence import FibonacciSequence
 from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
-from src.global_settings import GlobalSettings
 
 class NotAFibonacciEstimateException(Exception):
     def __init__(self, task_id: str, *args: object) -> None:
@@ -61,6 +60,10 @@ class Report:
         self.warnings = set()
         self.task_reports = []
 
+    def add_warnings(self, warnings):
+        for w in warnings:
+            self.add_warning(w)
+
     def add_warning(self, warning: str):
         if warning is not None:
             self.warnings.add(warning)
@@ -71,8 +74,8 @@ class ReportGenerator:
 
         task_repo = repos.task_repository
 
-        velocity, warning = self._calculate_recent_velocity(task_repo)
-        report.add_warning(warning)
+        velocity, warnings = self._calculate_recent_velocity(task_repo)
+        report.add_warnings(warnings)
         report.velocity = velocity
 
         todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
@@ -88,14 +91,15 @@ class ReportGenerator:
 
         return report
 
-    def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, str]:
+    def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, list]:
         tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
         warnings, velocity = task.calculate_velocity(sorted_tasks)
 
-        warning = None if velocity else "No velocity could be calculated."
+        if not velocity:
+            warnings.add("No velocity could be calculated.")
 
-        return (velocity, warning)
+        return (velocity, warnings)
 
     def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepo: WorkingDayRepository) -> tuple[float, list, str]:
         result = []

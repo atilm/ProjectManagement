@@ -7,6 +7,6 @@
 [x] first story has no velocity
 [x] plot the errors
 [x] extract FreeRange into own module as it is used by WorkingDaysRepository and GraphData
-[ ] use velocity warnings in report generator
+[x] use velocity warnings in report generator
 [ ] refactor build of unique project dictionary
 [ ] do not generate report twice when an output file is requested
