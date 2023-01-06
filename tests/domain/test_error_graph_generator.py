@@ -26,13 +26,17 @@ class EstimationErrorGraphGeneratorTestCase(DomainTestCase):
         self.then_the_relative_errors_are([], [], data)
 
     def test_errors_are_calculated(self):
-        # taskWithoutEstimateAtBeginning = self.completed_task(datetime.date(2023, 1, 1), None, 1)
+        taskWithoutEstimateAtBeginning = self.completed_task(datetime.date(2023, 1, 1), None, 1)
+        taskWithoutDurationAtBeginning = self.completed_task(datetime.date(2023, 1, 2), 1, None)
+        taskWithoutDurationInTheMiddle = self.completed_task(datetime.date(2023, 1, 8), 1, None)
         taskWithoutDurationAtEnd = self.completed_task(datetime.date(2023, 1, 14), 1, None)
         taskWithoutEstimateAtEnd = self.completed_task(datetime.date(2023, 1, 15), None, 1)
 
         repo = self.given_a_repository_with_tasks([
-            # taskWithoutEstimateAtBeginning,
+            taskWithoutEstimateAtBeginning,
+            taskWithoutDurationAtBeginning,
             self.completed_task(datetime.date(2023, 1, 6), 2, 1),
+            taskWithoutDurationInTheMiddle,
             self.completed_task(datetime.date(2023, 1, 12), 5, 1.2), # input not sorted by completion date!
             self.completed_task(datetime.date(2023, 1, 7), 8, 1),
             taskWithoutDurationAtEnd,
@@ -43,7 +47,9 @@ class EstimationErrorGraphGeneratorTestCase(DomainTestCase):
 
         self.then_the_relative_errors_are([8, 5], [-0.75, 0.2], data)
         self.then_warnings_are_pressent({
-            # f"Story {taskWithoutEstimateAtBeginning.id} has no estimate or workdays and was ignored.",
+            f"Story {taskWithoutEstimateAtBeginning.id} has no estimate or workdays and was ignored.",
+            f"Story {taskWithoutDurationAtBeginning.id} has no estimate or workdays and was ignored.",
+            f"Story {taskWithoutDurationInTheMiddle.id} has no estimate or workdays and was ignored.",
             f"Story {taskWithoutDurationAtEnd.id} has no estimate or workdays and was ignored.",
             f"Story {taskWithoutEstimateAtEnd.id} has no estimate or workdays and was ignored.",
         }, data)

@@ -1,8 +1,8 @@
 from src.domain.tasks_repository import TaskRepository
 from src.services.domain.graph_generation.xy_data import XyData
 from src.domain.task import Task, is_completed_task, calculate_velocity, has_velocity
-from src.services.utilities import calculations
 from src.services.domain.graph_generation.graph_colors import *
+from src.global_settings import GlobalSettings
 
 class EstimationErrorGraphData:
     def __init__(self) -> None:
@@ -19,10 +19,15 @@ class EstimationErrorGraphGenerator:
             task: Task = t
 
             if not task.actualWorkDays or not task.estimate:
-                data.warnings.add(f"Story {task.id} has no estimate or workdays and was ignored.")
+                data.warnings.add(GlobalSettings.no_velocity_ignored_warning.format(task.id))
                 continue
 
-            velocity = calculate_velocity(completed_tasks[:i])
+            warnings, velocity = calculate_velocity(completed_tasks[:i])
+
+            data.warnings = data.warnings.union(warnings)
+
+            if not velocity:
+                continue
 
             expectedWorkDays = task.estimate / velocity
             relative_error = (task.actualWorkDays - expectedWorkDays) / expectedWorkDays

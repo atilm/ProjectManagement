@@ -25,11 +25,22 @@ def calc_velocity(task: Task) -> float:
 
     return task.estimate / task.actualWorkDays
 
-def calculate_velocity(sorted_task_list: list) -> float:
+def calculate_velocity(sorted_task_list: list) -> tuple[set,float]:
     """Calculate velocity from given list of tasks.
     Only take into account the global specified number of tasks.
     Therefore the INPUT MUST BE SORTED by completion date."""
-    return calculations.calc_average(sorted_task_list[-GlobalSettings.velocity_count:], calc_velocity)
+    tasks_with_velocity = []
+    warnings = set()
+
+    for task in sorted_task_list:
+        if has_velocity(task):
+            tasks_with_velocity.append(task)
+        else:
+            warnings.add(GlobalSettings.no_velocity_ignored_warning.format(task.id))
+
+    averageVelocity = calculations.calc_average(tasks_with_velocity[-GlobalSettings.velocity_count:], calc_velocity)
+
+    return (warnings, averageVelocity)
 
 def has_velocity(task: Task) -> float:
     return task.estimate is not None and\

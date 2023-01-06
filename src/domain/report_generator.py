@@ -91,7 +91,7 @@ class ReportGenerator:
     def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, str]:
         tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
-        velocity = task.calculate_velocity(sorted_tasks)
+        warnings, velocity = task.calculate_velocity(sorted_tasks)
 
         warning = None if velocity else "No velocity could be calculated."
 
