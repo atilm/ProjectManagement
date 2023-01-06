@@ -5,7 +5,7 @@
 [x] no error calculation possible for < 2 completed tasks
 [x] completed task without velocity (no estimate, no duration) at beginning, middle, end
 [x] first story has no velocity
-[ ] plot the errors
+[x] plot the errors
 [ ] use velocity warnings in report generator
 
 [ ] refactor build of unique project dictionary
