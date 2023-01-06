@@ -1,9 +1,9 @@
 import datetime
 from tests.domain.domain_test_case import DomainTestCase
 from src.domain.report_generator import Report, TaskRepository, WorkingDayRepository, RepositoryCollection
-from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData, FreeRange
+from src.domain.free_range import FreeRange
+from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData
 from src.domain import weekdays
-from src.services.domain.graph_generation.graph_colors import GraphColorCycle
 from src.global_settings import GlobalSettings
 
 def get_completion_date(report: Report, index, attr):

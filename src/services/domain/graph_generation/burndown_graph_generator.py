@@ -1,7 +1,7 @@
 from src.global_settings import GlobalSettings
 from src.domain.report_generator import Report, TaskReport
 from src.domain.repository_collection import RepositoryCollection, TaskRepository
-from src.domain.working_day_repository import FreeRange
+from src.domain.free_range import FreeRange
 from src.domain import task
 from src.services.domain.graph_generation.graph_colors import GraphColorCycle
 from src.services.domain.graph_generation.xy_data import XyData
