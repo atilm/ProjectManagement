@@ -8,5 +8,4 @@
 [x] plot the errors
 [x] extract FreeRange into own module as it is used by WorkingDaysRepository and GraphData
 [x] use velocity warnings in report generator
-[ ] refactor build of unique project dictionary
-[ ] do not generate report twice when an output file is requested
+[x] do not generate report twice when an output file is requested

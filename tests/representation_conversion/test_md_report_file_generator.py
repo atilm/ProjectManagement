@@ -1,6 +1,9 @@
 import unittest
 import datetime
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
+from src.services.markdown.markdown_parser import MarkdownParser
+from src.services.domain.representation_reading.md_planning_file_to_model_converter import MarkdownPlanningDocumentToModelConverter
+from src.domain.report_generator import *
 
 planningFileContent = """
 # Planning
@@ -46,11 +49,20 @@ expectedReport = """# Planning Report
 """
 
 class ReportFileGeneratorTest(unittest.TestCase):
-    def test_generate_report_from_planning_file_content(self):
-        generator = ReportFileGenerator()
+    def given_a_report(self, planningFileContent: str) -> Report:
+        parser = MarkdownParser()
+        planningFileConverter = MarkdownPlanningDocumentToModelConverter()
+        reportGenerator = ReportGenerator()
 
         startDate = datetime.date(2022,12,20)
+        planningDocument = parser.parse(planningFileContent)
+        repos = planningFileConverter.convert(planningDocument)
+        return reportGenerator.generate(repos, startDate)
 
-        actualreport = generator.generate(planningFileContent, startDate)
+    def test_generate_report_from_planning_file_content(self):
+        report = self.given_a_report(planningFileContent)
+
+        generator = ReportFileGenerator()
+        actualreport = generator.generate(report)
 
         self.assertEqual(actualreport, expectedReport)

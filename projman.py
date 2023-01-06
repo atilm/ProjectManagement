@@ -95,14 +95,16 @@ def generateReport(args):
     print(f"Report on {args.planningPath}:\n")
 
     # Todo: replace with parse_planning_file() when ReportFileGenerator takes a report
-    planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
-    planningInput = read_from_file(args.planningPath)
-    planningRepos = planningReader.read(planningInput)
+    planningRepos = parse_planning_file(args.planningPath)
+    # planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+    # planningInput = read_from_file(args.planningPath)
+    # planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
     startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
     report = reportGenerator.generate(planningRepos, startDate)
 
+    # print summary to console
     print(f"Velocity: {report.velocity} story points / day")
     print("\nCompletion date ranges:")
     projectColumnWidth = max([len(projectId) for projectId in report.predicted_completion_dates.keys()])
@@ -121,7 +123,7 @@ def generateReport(args):
     if args.file:
         print(f"Write to report file: {args.file}")
         report_file_generator = ReportFileGenerator()
-        report_file_content = report_file_generator.generate(planningInput, startDate)
+        report_file_content = report_file_generator.generate(report)
         write_to_file(args.file, report_file_content)
 
     if args.graph:
