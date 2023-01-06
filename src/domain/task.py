@@ -1,4 +1,7 @@
 
+from src.services.utilities import calculations
+from src.global_settings import GlobalSettings
+
 class Task:
     def __init__(self, id: str, description: str, project_id: str) -> None:
         self.id = id
@@ -21,6 +24,12 @@ def calc_velocity(task: Task) -> float:
         raise VelocityCalculationException(task.id)
 
     return task.estimate / task.actualWorkDays
+
+def calculate_velocity(sorted_task_list: list) -> float:
+    """Calculate velocity from given list of tasks.
+    Only take into account the global specified number of tasks.
+    Therefore the INPUT MUST BE SORTED by completion date."""
+    return calculations.calc_average(sorted_task_list[-GlobalSettings.velocity_count:], calc_velocity)
 
 def has_velocity(task: Task) -> float:
     return task.estimate is not None and\

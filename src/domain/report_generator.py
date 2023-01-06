@@ -2,7 +2,6 @@ import math
 import datetime
 from src.domain import task
 from src.domain.fibonacci_sequence import FibonacciSequence
-from src.services.utilities import calculations
 from src.domain.tasks_repository import TaskRepository
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.repository_collection import RepositoryCollection
@@ -92,7 +91,7 @@ class ReportGenerator:
     def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, str]:
         tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
-        velocity =  calculations.calc_average(sorted_tasks[-GlobalSettings.velocity_count:], task.calc_velocity)
+        velocity = task.calculate_velocity(sorted_tasks)
 
         warning = None if velocity else "No velocity could be calculated."
 

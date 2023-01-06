@@ -4,19 +4,8 @@ from src.domain.repository_collection import RepositoryCollection, TaskRepositor
 from src.domain.working_day_repository import FreeRange
 from src.domain import task
 from src.services.domain.graph_generation.graph_colors import GraphColorCycle
+from src.services.domain.graph_generation.xy_data import XyData
 import datetime
-import copy
-
-class XyData:
-    def __init__(self) -> None:
-        self.x = []
-        self.y = []
-        self.color = []
-
-    def append(self, x, y, color) -> None:
-        self.x.append(x)
-        self.y.append(y)
-        self.color.append(color)
 
 class BurndownGraphData:
     def __init__(self) -> None:
