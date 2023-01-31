@@ -33,8 +33,8 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
         report = self.when_a_report_is_generated(repo)
 
-        # then the velocity is the arithmetic mean of the two single velocities
-        self.assertAlmostEqual(report.velocity, 0.59, places=2)
+        # then the velocity is (3 + 5) / (5.5 + 8.0)
+        self.assertAlmostEqual(report.velocity, 0.5926, places=4)
 
     def test_duration_of_zero(self):
         task = self.completed_task(datetime.date(2022, 12, 4), 3, 0.0)
@@ -87,8 +87,8 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
 
         report = self.when_a_report_is_generated(repo)
 
-        # then the velocity is (29 * 1 + 100) / 30
-        self.assertAlmostEqual(report.velocity, 4.3, places=2)
+        # then the velocity is sum of estimates / sum of workdays = 30 / 29.01 = 1.0341
+        self.assertAlmostEqual(report.velocity, 1.0341, places=4)
 
 class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTestCase):
     def test_when_no_tasks_are_given_0_is_returned(self):

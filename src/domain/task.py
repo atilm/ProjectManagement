@@ -19,15 +19,9 @@ class VelocityCalculationException(Exception):
         super().__init__(*args)
         self.task_id = task_id
 
-def calc_velocity(task: Task) -> float:
-    if task.actualWorkDays <= 0:
-        raise VelocityCalculationException(task.id)
-
-    return task.estimate / task.actualWorkDays
-
 def calculate_velocity(sorted_task_list: list) -> tuple[set,float]:
     """Calculate velocity from given list of tasks.
-    Only take into account the global specified number of tasks.
+    Only take into account the globally specified number of tasks.
     Therefore the INPUT MUST BE SORTED by completion date."""
     tasks_with_velocity = []
     warnings = set()
@@ -38,9 +32,18 @@ def calculate_velocity(sorted_task_list: list) -> tuple[set,float]:
         else:
             warnings.add(GlobalSettings.no_velocity_ignored_warning.format(task.id))
 
-    averageVelocity = calculations.calc_average(tasks_with_velocity[-GlobalSettings.velocity_count:], calc_velocity)
+    summedEstimates = 0
+    summedWorkdays = 0
+    for t in tasks_with_velocity[-GlobalSettings.velocity_count:]:
+        task: Task = t
+        if task.actualWorkDays <= 0:
+            raise VelocityCalculationException(task.id)
+        summedEstimates += task.estimate
+        summedWorkdays += task.actualWorkDays
+    
+    meanVelocity = summedEstimates / summedWorkdays if summedWorkdays > 0 else None
 
-    return (warnings, averageVelocity)
+    return (warnings, meanVelocity)
 
 def has_velocity(task: Task) -> float:
     return task.estimate is not None and\

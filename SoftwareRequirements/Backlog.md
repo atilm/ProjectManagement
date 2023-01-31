@@ -12,12 +12,12 @@
 - [x] As a developer I want to predict completed dates and confidence intervals for various projects separately while organizing my tasks together.
 - [x] Project column in planning task tables
 - [x] As a developer I want to know the distribution of my relative estimation errors (-> to use in a monte carlo simulation ?)
-- [ ] Only copy the N (=30) most recently completed reference stories into the estimation file
-- [ ] Do not copy strongly mis-estimated stories as reference stories into the estimation file
-
-- [ ] What is the correct velocity ? 
+- [x] What is the correct velocity ? 
         - average(estimate_i / workdays_i) for every completed task i
         - sum(estimate_i) / sum(workdays_i) for every completed task i
+        - Answer: sum(estimate_i) / sum(workdays_i), because in the first version estimation-errors of small tasks have too much weight!
+- [ ] Only copy the N (=30) most recently completed reference stories into the estimation file
+- [ ] Do not copy strongly mis-estimated stories as reference stories into the estimation file
 
 - [ ] As a developer I want to see a chart of the time evolution of the confidence band for the predicted completion date per project
     - [ ] show at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
