@@ -1,17 +1,19 @@
-import unittest
+from tests.domain.domain_test_case import DomainTestCase
 from src.services.markdown.markdown_parser import *
 from src.services.markdown.markdown_writer import *
 from src.services.domain.representation_reading.md_estimation_file_to_model_converter import *
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
 
-class MarkdownEstimationFileTest(unittest.TestCase):
+class MarkdownEstimationFileTest(DomainTestCase):
     
     def when_the_file_is_read_and_written_again(self, input: str) -> str:
         repos = self._parse_to_repo(input)
 
-        backConverter = ModelToMarkdownEstimationDocumentConverter()
-        outputDocument = backConverter.convert(repos)
+        return self.when_an_estimation_file_is_generated(repos)
 
+    def when_an_estimation_file_is_generated(self, repos: RepositoryCollection) -> str:
+        converter = ModelToMarkdownEstimationDocumentConverter()
+        outputDocument = converter.convert(repos)
         writer = MarkdownWriter()
         output = writer.write(outputDocument)
 
@@ -102,6 +104,31 @@ class MarkdownEstimationFileTest(unittest.TestCase):
         resultContent = self.when_the_file_is_read_and_written_again(givenFileContent)
 
         self.assertEqual(resultContent, givenFileContent)
+
+    def test_only_the_three_newest_tasks_of_each_estimation_level_are_used_as_reference_stories(self):
+        tasks = [
+            self.completed_task(datetime.date(2023, 1, 1), 1, 1, "Proj 1"),
+            self.completed_task(datetime.date(2023, 1, 2), 1, 1, "Proj 2"),
+            self.completed_task(datetime.date(2023, 1, 3), 1, 1, "Proj 3"),
+            self.completed_task(datetime.date(2023, 1, 4), 1, 1, "Proj 4"),
+        ]
+        repo = self.given_a_repository_with_tasks(tasks)
+
+        resultContent = self.when_an_estimation_file_is_generated(RepositoryCollection(repo, WorkingDayRepository()))
+
+        expectedFilecontent = ""\
+            "# Estimation\n"\
+            "\n"\
+            "## 1\n"\
+            "\n"\
+            "| Id | Project | Desc |\n"\
+            "| -- | ------- | ---- |\n"\
+            f"| {tasks[1].id}  | Proj 2  |      |\n"\
+            f"| {tasks[2].id}  | Proj 3  |      |\n"\
+            f"| {tasks[3].id}  | Proj 4  |      |\n"\
+            "\n"\
+
+        self.assertEqual(expectedFilecontent, resultContent)
 
     def test_an_unexpected_section_raises_an_exception(self):
         givenContent = ""\

@@ -12,8 +12,8 @@ class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter
             .withSection("Estimation", 0)
 
         tasksGroupedByEstimate = self._group_by_estimate((repos.task_repository.tasks.values()))
-        keyGenerator = lambda f: -1 if f is None else f
-        sortedEstimates = sorted(list(tasksGroupedByEstimate.keys()), reverse = True, key = keyGenerator)
+        sortingKey = lambda f: -1 if f is None else f
+        sortedEstimates = sorted(list(tasksGroupedByEstimate.keys()), reverse = True, key = sortingKey)
 
         for estimate in sortedEstimates:
             if estimate is None:
@@ -21,7 +21,9 @@ class ModelToMarkdownEstimationDocumentConverter(IModelToRepresentationConverter
                 builder.withTable(self._tasks_to_table(tasksGroupedByEstimate[estimate]))
             else:
                 builder.withSection(f"{estimate:g}", 1)
-                builder.withTable(self._tasks_to_table(tasksGroupedByEstimate[estimate]))
+                sortingKey = lambda task: task.completedDate if task.completedDate else datetime.date(1900, 1, 1)
+                theThreeNewestTasks = sorted(tasksGroupedByEstimate[estimate], key = sortingKey)[-3:]
+                builder.withTable(self._tasks_to_table(theThreeNewestTasks))
 
         return builder.build()
 
