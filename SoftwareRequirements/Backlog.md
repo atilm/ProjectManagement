@@ -1,4 +1,17 @@
 
+- [ ] Epic: make it work for a team
+  - [ ] Extract working days and holidays to file
+  - [ ] Each developer must have her own file of working days and holidays
+  - [ ] velocity for prediction should be scaled down to v * (N-k) / N when k developers are absent
+  - [ ] velocity must be determined as v = Sum(Points) / Sum(person-working-days while issues in progress)
+
+- [ ] Get Information from Jira
+  - [ ] Get new Issues from Jira and automatically add them with creation date
+  - [ ] Get closed (i.e. removed) issues from Jira and move them to removed with removed date
+  - [ ] Get Started and Fixed data from Jira
+  - [ ] (Upload estimation to Jira?)
+  - [ ] 
+
 - [x] As a developer I want to use relative comparison of my tasks to estimate them on a floating point scale.
 - [x] As a developer I want to know how many workdays I need for the remaining tasks based on my recent velocity.
 - [x] As a developer I want to know a predicted completed date of my project. (official and personal holidays, days spend on other activities, free weekdays)
@@ -23,4 +36,3 @@
     - [ ] show at which points tasks have been added, removed (or changed -- difficult to record) in the project plan
 
 - [ ] monte carlo simulation -> measurement of the probability distribution estimation error?
-- [ ] Epic: make it work for a team

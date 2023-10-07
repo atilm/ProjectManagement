@@ -3,7 +3,7 @@ import datetime
 from src.domain.tasks_repository import *
 from src.domain.report_generator import *
 from tests.domain.domain_utilities.id_generator import IdGenerator
-from src.domain.working_day_repository import WorkingDayRepository
+from src.domain.working_day_repository_collection import *
 
 class DomainTestCase(unittest.TestCase):
     def __init__(self, methodName: str = ...) -> None:
@@ -24,6 +24,12 @@ class DomainTestCase(unittest.TestCase):
         repo.set_free_weekdays(*free_weekdays)
         repo.add_free_ranges(holidays)
         return repo
+    
+    def given_a_working_days_repository_collection(self, repositories: list[WorkingDayRepository]) -> WorkingDayRepositoryCollection:
+        collection = WorkingDayRepositoryCollection()
+        for repo in repositories:
+            collection.add(repo)
+        return collection
 
     def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float, projectId: str = "") -> Task:
         task = Task(self._id_generator.next(), "", projectId)

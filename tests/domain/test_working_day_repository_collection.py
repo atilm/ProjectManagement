@@ -1,0 +1,37 @@
+
+from .domain_test_case import DomainTestCase
+from src.domain.working_day_repository_collection import *
+from src.domain.free_range import FreeRange
+from src.domain import weekdays
+
+class calculate_capacity_from_zero_to_several_repositories(DomainTestCase):
+    def test_an_empty_repository_collection_always_returns_zero(self):
+        repos = WorkingDayRepositoryCollection()
+
+        self.assertEqual(0.0, repos.get_working_day_capacity(datetime.date(2023, 10, 7)))
+
+    def test_adding_one_repository(self):
+        holidays = FreeRange(datetime.date(2023, 10, 9), datetime.date(2023, 10, 10), "")
+
+        holidays_repo = self.given_a_working_days_repository(
+            [weekdays.SATURDAY, weekdays.SUNDAY],
+            [holidays])
+        
+        repo_collection = self.given_a_working_days_repository_collection([holidays_repo])
+        
+        self.then_the_given_day_has_the_capacity(holidays.lastFreeDay + datetime.timedelta(days=1), 1.0, repo_collection)
+
+    def test_calculate_capacity_from_three_repositories(self):
+        working_days_A = self.given_a_working_days_repository([], [FreeRange(datetime.date(2023, 10, 10), datetime.date(2023, 10, 10), "")])
+        working_days_B = self.given_a_working_days_repository([], [FreeRange(datetime.date(2023, 10, 10), datetime.date(2023, 10, 11), "")])
+        working_days_C = self.given_a_working_days_repository([], [FreeRange(datetime.date(2023, 10, 10), datetime.date(2023, 10, 12), "")])
+
+        collection = self.given_a_working_days_repository_collection([working_days_A, working_days_B, working_days_C])
+        
+        self.then_the_given_day_has_the_capacity(datetime.date(2023, 10, 10), 0.0, collection)
+        self.then_the_given_day_has_the_capacity(datetime.date(2023, 10, 11), 1.0/3.0, collection)
+        self.then_the_given_day_has_the_capacity(datetime.date(2023, 10, 12), 2.0/3.0, collection)
+        self.then_the_given_day_has_the_capacity(datetime.date(2023, 10, 13), 1.0, collection)
+
+    def then_the_given_day_has_the_capacity(self, day: datetime.date, expected_capacity: float, repos: WorkingDayRepositoryCollection):
+        self.assertAlmostEqual(expected_capacity, repos.get_working_day_capacity(day))
