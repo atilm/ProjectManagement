@@ -65,7 +65,7 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
     def when_the_document_is_converted_to_a_working_days_repo(self, document: MarkdownDocument) -> WorkingDayRepository:
         converter = MarkdownPlanningDocumentToModelConverter()
         repoCollection = converter.convert(document)
-        return repoCollection.working_days_repository
+        return repoCollection.working_days_repository_collection.repositories[0]
 
     def then_the_repo_contains_id(self, taskId: str, repo: TaskRepository):
         task = repo.get(taskId)

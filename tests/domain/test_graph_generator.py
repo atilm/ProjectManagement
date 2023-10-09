@@ -1,6 +1,7 @@
 import datetime
 from tests.domain.domain_test_case import DomainTestCase
-from src.domain.report_generator import Report, TaskRepository, WorkingDayRepository, RepositoryCollection
+from src.domain.report_generator import Report, TaskRepository, RepositoryCollection
+from src.domain.working_day_repository_collection import *
 from src.domain.free_range import FreeRange
 from src.services.domain.graph_generation.burndown_graph_generator import XyData, BurndownGraphGenerator, BurndownGraphData
 from src.domain import weekdays
@@ -20,9 +21,11 @@ class GraphGeneratorTestCase(DomainTestCase):
         report.task_reports = taskReports
         return report
         
-    def when_graph_data_are_generated(self, report: Report, task_repo, holidays_repo) -> BurndownGraphData:
+    def when_graph_data_are_generated(self, report: Report, task_repo, holidays_repo: WorkingDayRepository) -> BurndownGraphData:
         graph_generator = BurndownGraphGenerator()
-        repositories = RepositoryCollection(task_repo, holidays_repo)
+        working_days_repo_collection = WorkingDayRepositoryCollection()
+        working_days_repo_collection.add(holidays_repo)
+        repositories = RepositoryCollection(task_repo, working_days_repo_collection)
         return graph_generator.generate(report, repositories)
 
     def when_report_and_graphdata_are_generated(self, task_repo: TaskRepository, holidays_repo: WorkingDayRepository, start_date: datetime.date) -> BurndownGraphData:

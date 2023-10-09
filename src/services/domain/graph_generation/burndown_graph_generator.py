@@ -58,7 +58,7 @@ class BurndownGraphGenerator:
 
             graph_data.free_date_ranges = list(filter(
                 lambda h: self._is_within_dates(h, firstCompletionDate, lastCompletionDate),
-                repositories.working_days_repository.free_ranges))
+                repositories.working_days_repository_collection.get_free_ranges()))
 
         return graph_data
 

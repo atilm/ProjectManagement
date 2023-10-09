@@ -12,9 +12,9 @@ class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
         document = MarkdownDocumentBuilder()\
             .withSection("Planning", 0)\
             .withSection("Working Days", 1)\
-            .withTable(self._build_working_days_table(repos.working_days_repository))\
+            .withTable(self._build_working_days_table(repos.working_days_repository_collection.repositories[0]))\
             .withSection("Holidays", 1)\
-            .withTable(self._build_holidays_table(repos.working_days_repository))\
+            .withTable(self._build_holidays_table(repos.working_days_repository_collection.repositories[0]))\
             .withSection("Stories To Do", 1)\
             .withTable(self._build_todo_table(repos.task_repository))\
             .withSection("Completed Stories", 1)\

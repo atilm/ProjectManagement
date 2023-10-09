@@ -54,7 +54,9 @@ class DomainTestCase(unittest.TestCase):
 
     def when_a_report_is_generated(self, task_repo: TaskRepository, startDate = datetime.date(2022, 1, 1), workdays_repo = WorkingDayRepository()) -> Report:
         generator = ReportGenerator()
-        repos = RepositoryCollection(task_repo, workdays_repo)
+        workingDaysRepoCollection = WorkingDayRepositoryCollection()
+        workingDaysRepoCollection.add(workdays_repo)
+        repos = RepositoryCollection(task_repo, workingDaysRepoCollection)
         return generator.generate(repos, startDate)
 
     def then_report_generation_raises(self, repo: TaskRepository) -> Exception:

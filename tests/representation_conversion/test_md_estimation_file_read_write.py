@@ -3,6 +3,7 @@ from src.services.markdown.markdown_parser import *
 from src.services.markdown.markdown_writer import *
 from src.services.domain.representation_reading.md_estimation_file_to_model_converter import *
 from src.services.domain.representation_writing.md_model_to_estimation_file_converter import *
+from src.domain.working_day_repository_collection import *
 
 class MarkdownEstimationFileTest(DomainTestCase):
     
@@ -114,7 +115,9 @@ class MarkdownEstimationFileTest(DomainTestCase):
         ]
         repo = self.given_a_repository_with_tasks(tasks)
 
-        resultContent = self.when_an_estimation_file_is_generated(RepositoryCollection(repo, WorkingDayRepository()))
+        workingDaysRepoCollection = WorkingDayRepositoryCollection()
+        workingDaysRepoCollection.add(WorkingDayRepository())
+        resultContent = self.when_an_estimation_file_is_generated(RepositoryCollection(repo, workingDaysRepoCollection))
 
         expectedFilecontent = ""\
             "# Estimation\n"\

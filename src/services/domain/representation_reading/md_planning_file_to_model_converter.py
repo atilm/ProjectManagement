@@ -1,5 +1,5 @@
 from .representation_to_model_converter import *
-from src.domain.working_day_repository import *
+from src.domain.working_day_repository_collection import *
 from src.domain.tasks_repository import *
 from src.domain.weekdays import *
 from .md_converter_exceptions import *
@@ -34,6 +34,7 @@ def parse_to_free_range(tableRow: MarkdownTableRow) -> FreeRange:
 class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
     def convert(self, document : MarkdownDocument) -> RepositoryCollection:
         repo = TaskRepository()
+        workingDaysRepoCollection = WorkingDayRepositoryCollection()
         workingDaysRepo = WorkingDayRepository()
 
         for item in document.getContent():
@@ -49,7 +50,9 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
                 else:
                     raise HeaderFormatException(item._headerRow.lineNumber)
 
-        return RepositoryCollection(repo, workingDaysRepo)
+        workingDaysRepoCollection.add(workingDaysRepo)
+
+        return RepositoryCollection(repo, workingDaysRepoCollection)
 
     def _has_working_days_header(self, table: MarkdownTable):
         return self._has_header(table, markdown_configuration.planning_working_days_header)

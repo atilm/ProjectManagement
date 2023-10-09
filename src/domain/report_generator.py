@@ -3,7 +3,7 @@ import datetime
 from src.domain import task
 from src.domain.fibonacci_sequence import FibonacciSequence
 from src.domain.tasks_repository import TaskRepository
-from src.domain.working_day_repository import WorkingDayRepository
+from src.domain.working_day_repository_collection import *
 from src.domain.repository_collection import RepositoryCollection
 
 class NotAFibonacciEstimateException(Exception):
@@ -80,7 +80,7 @@ class ReportGenerator:
 
         todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
 
-        workdays, report.task_reports, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository)
+        workdays, report.task_reports, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository_collection)
         report.add_warning(warning)
         report.remaining_work_days = workdays
 
@@ -101,7 +101,7 @@ class ReportGenerator:
 
         return (velocity, warnings)
 
-    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepo: WorkingDayRepository) -> tuple[float, list, str]:
+    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepoCollection: WorkingDayRepositoryCollection) -> tuple[float, list, str]:
         result = []
 
         warning = None
@@ -128,7 +128,7 @@ class ReportGenerator:
                 workdaysSumInterval = ConfidenceInterval(lower_limit, expected_value, upper_limit)
 
                 # could this algorithm be optimized to use only one loop? 
-                completionDateInterval = workdaysSumInterval.convert(lambda days: self._calculate_completion_date(workingDaysRepo, days, startDate))
+                completionDateInterval = workdaysSumInterval.convert(lambda days: self._calculate_completion_date(workingDaysRepoCollection, days, startDate))
 
                 result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
             else:
@@ -136,13 +136,13 @@ class ReportGenerator:
 
         return (workdaysSumInterval, result, warning)
 
-    def _calculate_completion_date(self, working_day_repo: WorkingDayRepository, days_of_work: float, start_date: datetime.date) -> datetime.date:
+    def _calculate_completion_date(self, working_day_repo_collection: WorkingDayRepositoryCollection, days_of_work: float, start_date: datetime.date) -> datetime.date:
         if days_of_work is None:
             return None
         
         currentDate = start_date
         while days_of_work > 0:
-            if not working_day_repo.is_working_day(currentDate):
+            if not working_day_repo_collection.get_working_day_capacity(currentDate) > 0.5:
                 currentDate += datetime.timedelta(1)
             else:
                 if days_of_work >= 1:

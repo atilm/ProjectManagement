@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from src.domain.tasks_repository import *
-from src.domain.working_day_repository import *
+from src.domain.working_day_repository_collection import *
 from src.domain import weekdays
 from src.services.markdown.markdown_document import *
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
@@ -49,12 +49,16 @@ class ConverterTestCase(unittest.TestCase):
 
     def when_the_repo_is_converted(self, taskRepo: TaskRepository) -> MarkdownDocument:
         converter = ModelToMarkdownPlanningDocumentConverter()
-        repos = RepositoryCollection(taskRepo, WorkingDayRepository())
+        workingDaysRepoCollection = WorkingDayRepositoryCollection()
+        workingDaysRepoCollection.add(WorkingDayRepository())
+        repos = RepositoryCollection(taskRepo, workingDaysRepoCollection)
         return converter.convert(repos)
 
     def when_the_repos_are_converted(self, taskRepo: TaskRepository, daysRepo: WorkingDayRepository) -> MarkdownDocument:
         converter = ModelToMarkdownPlanningDocumentConverter()
-        return converter.convert(RepositoryCollection(taskRepo, daysRepo))
+        workingDaysRepoCollection = WorkingDayRepositoryCollection()
+        workingDaysRepoCollection.add(daysRepo)
+        return converter.convert(RepositoryCollection(taskRepo, workingDaysRepoCollection))
 
     def then_the_document_has_the_expected_structure(self, doc: MarkdownDocument):
         self.assertEqual(len(doc.getContent()), 11, doc)
