@@ -3,6 +3,7 @@ import datetime
 from src.domain import weekdays
 from src.domain.working_day_repository import WorkingDayRepository
 from src.domain.report_generator import Report
+from src.domain.free_range import FreeRange
 
 class the_report_predicts_the_completion_date(DomainTestCase):
     def then_the_expected_completion_date_is(self, expectedDate: datetime.date , report: Report, projectId: str = ""):
@@ -117,3 +118,20 @@ class the_report_predicts_the_completion_date(DomainTestCase):
         self.then_the_expected_completion_date_is(startDate + datetime.timedelta(2), report, "1")
         self.then_the_expected_completion_date_is(startDate + datetime.timedelta(4), report, "2")
         self.then_the_expected_completion_date_is(startDate + datetime.timedelta(6), report, "3")
+
+    def test_completion_date_is_calculated_correctly_with_two_working_day_repos(self):
+        repo = self.given_a_repository_with_tasks([
+            self.completed_task(datetime.date(2022, 12, 5), 8, 4), #velocity of 2
+            self.todo_task(3),
+            self.todo_task(5), # total effort: 4 days
+        ])
+
+        startDate = datetime.date(2023, 10, 16) # monday
+
+        # Two developers with 3 holidays each and 1 day holiday overlap
+        working_days_A = self.given_a_working_days_repository([weekdays.SATURDAY, weekdays.SUNDAY], [FreeRange(datetime.date(2023, 10, 17), datetime.date(2023, 10, 18), "holiday a")])
+        working_days_B = self.given_a_working_days_repository([weekdays.SATURDAY, weekdays.SUNDAY], [FreeRange(datetime.date(2023, 10, 18), datetime.date(2023, 10, 19), "holiday b")])
+
+        report = self.when_a_report_is_generated(repo, startDate, working_days_A, working_days_B)
+
+        self.then_the_expected_completion_date_is(startDate + datetime.timedelta(8), report)

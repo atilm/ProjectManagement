@@ -52,10 +52,16 @@ class DomainTestCase(unittest.TestCase):
     def when_a_task_is_added(self, task : Task, repo : TaskRepository) -> Task:
         repo.add(task)
 
-    def when_a_report_is_generated(self, task_repo: TaskRepository, startDate = datetime.date(2022, 1, 1), workdays_repo = WorkingDayRepository()) -> Report:
+    def when_a_report_is_generated(self, task_repo: TaskRepository, startDate = datetime.date(2022, 1, 1), *workdays_repos: WorkingDayRepository) -> Report:
         generator = ReportGenerator()
         workingDaysRepoCollection = WorkingDayRepositoryCollection()
-        workingDaysRepoCollection.add(workdays_repo)
+        
+        if len(workdays_repos) == 0:
+            workingDaysRepoCollection.add(WorkingDayRepository())
+        else:
+            for repo in workdays_repos:
+                workingDaysRepoCollection.add(repo)
+        
         repos = RepositoryCollection(task_repo, workingDaysRepoCollection)
         return generator.generate(repos, startDate)
 

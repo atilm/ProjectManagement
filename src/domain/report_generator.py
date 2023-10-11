@@ -136,19 +136,17 @@ class ReportGenerator:
 
         return (workdaysSumInterval, result, warning)
 
-    def _calculate_completion_date(self, working_day_repo_collection: WorkingDayRepositoryCollection, days_of_work: float, start_date: datetime.date) -> datetime.date:
-        if days_of_work is None:
+    def _calculate_completion_date(self, working_day_repo_collection: WorkingDayRepositoryCollection, remaining_days_of_work: float, start_date: datetime.date) -> datetime.date:
+        if remaining_days_of_work is None:
             return None
         
         currentDate = start_date
-        while days_of_work > 0:
-            if not working_day_repo_collection.get_working_day_capacity(currentDate) > 0.5:
+        while remaining_days_of_work > 0:
+            todays_capacity = working_day_repo_collection.get_working_day_capacity(currentDate)
+            if remaining_days_of_work >= todays_capacity:
+                remaining_days_of_work -= todays_capacity
                 currentDate += datetime.timedelta(1)
             else:
-                if days_of_work >= 1:
-                    days_of_work -= 1
-                    currentDate += datetime.timedelta(1)
-                else:
-                    days_of_work = 0
+                remaining_days_of_work = 0
 
         return currentDate
