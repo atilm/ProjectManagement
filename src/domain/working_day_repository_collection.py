@@ -17,5 +17,10 @@ class WorkingDayRepositoryCollection:
         return sum(1 for repo in self.repositories if repo.is_working_day(day)) / len(self.repositories)
     
     def get_free_ranges(self) -> list[FreeRange]:
-        return self.repositories[0].free_ranges
+        all_free_ranges = []
+
+        for repo in self.repositories:
+            all_free_ranges += repo.free_ranges
+
+        return all_free_ranges
     
