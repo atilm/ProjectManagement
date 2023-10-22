@@ -74,7 +74,7 @@ class ReportGenerator:
 
         task_repo = repos.task_repository
 
-        velocity, warnings = self._calculate_recent_velocity(task_repo)
+        velocity, warnings = self._calculate_recent_velocity(repos)
         report.add_warnings(warnings)
         report.velocity = velocity
 
@@ -91,8 +91,9 @@ class ReportGenerator:
 
         return report
 
-    def _calculate_recent_velocity(self, repo: TaskRepository) -> tuple[float, list]:
-        tasks_for_velocity = filter(task.has_velocity, repo.tasks.values())
+    def _calculate_recent_velocity(self, repos: RepositoryCollection) -> tuple[float, list]:
+        tasksRepo = repos.task_repository
+        tasks_for_velocity = filter(task.has_velocity, tasksRepo.tasks.values())
         sorted_tasks = sorted(tasks_for_velocity, key=lambda t: t.completedDate)
         warnings, velocity = task.calculate_velocity(sorted_tasks)
 
