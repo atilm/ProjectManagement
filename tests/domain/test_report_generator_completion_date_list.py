@@ -96,7 +96,7 @@ class the_report_predicts_completion_dates_per_story(DomainTestCase):
 
     def test_date_calculations_between_weekends_and_holidays(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(date(2022,12,18), 2, 1), # velocity = 2
+            self.completed_task(date(2022,12,16), 2, 1), # velocity = 2
             self.todo_task(3), # 1.5 days duration
             self.todo_task(3),
             self.todo_task(3),

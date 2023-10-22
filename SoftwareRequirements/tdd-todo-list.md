@@ -1,8 +1,7 @@
-- [x] introduce a collection of working day repositories instead of a single one
-  - [ ] report_generator.py use actual working day capacity to calculate velocity
-  - [ ] report_generator.py use actual working day capacity to calculate completion date
-  - [x] implement WorkingDaysRepositoryCollection.get_free_ranges
+- [ ] task.calculate_velocity -> only take Repository-Collection as parameter
 
-- [ ] sort task list in task.calculate_velocity instead of requiring a sorted input list
+- [ ] parse calendar files of several coworkers from directory
 
-- [x] parse the working day collections from separate files
+- [ ] fix (or remove) estimation error graph 
+- [ ] EstimationErrorGraphGenerator: remove double repository parameters
+

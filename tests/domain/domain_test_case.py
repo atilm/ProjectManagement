@@ -36,7 +36,8 @@ class DomainTestCase(unittest.TestCase):
         task.estimate = estimate
         task.actualWorkDays = actualWorkDays
         task.completedDate = completedDate
-        task.startedDate = completedDate - datetime.timedelta(actualWorkDays) if actualWorkDays is not None else completedDate
+        # subtract (actualWorkDays - 1), because when start date and completed date are equal, this should count as a workday:
+        task.startedDate = completedDate - datetime.timedelta(actualWorkDays - 1) if actualWorkDays is not None else completedDate
         task.createdDate = task.startedDate
         return task
 

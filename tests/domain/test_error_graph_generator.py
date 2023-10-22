@@ -1,12 +1,15 @@
 from tests.domain.domain_test_case import DomainTestCase
+from src.domain.working_day_repository_collection import WorkingDayRepositoryCollection
 from src.services.domain.graph_generation.estimation_error_graph_generator import *
+
 import datetime
 from src.global_settings import GlobalSettings
 
 class EstimationErrorGraphGeneratorTestCase(DomainTestCase):
-    def when_graph_data_are_generated(self, repo: TaskRepository) -> EstimationErrorGraphData:
+    def when_graph_data_are_generated(self, task_repo: TaskRepository) -> EstimationErrorGraphData:
         generator = EstimationErrorGraphGenerator()
-        return generator.generate(repo)
+        repos = RepositoryCollection(task_repo, WorkingDayRepositoryCollection())
+        return generator.generate(task_repo, repos)
 
     def then_the_relative_errors_are(self, estimates: list, relative_errors: list, data: EstimationErrorGraphData):
         for actual, expected in zip(relative_errors, data.relative_errors.x):

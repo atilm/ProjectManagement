@@ -1,4 +1,5 @@
 from src.domain.tasks_repository import TaskRepository
+from src.domain.repository_collection import RepositoryCollection
 from src.services.domain.graph_generation.xy_data import XyData
 from src.domain.task import Task, is_completed_task, calculate_velocity, has_velocity
 from src.services.domain.graph_generation.graph_colors import *
@@ -10,7 +11,7 @@ class EstimationErrorGraphData:
         self.warnings = set()
 
 class EstimationErrorGraphGenerator:
-    def generate(self, task_repo: TaskRepository) -> EstimationErrorGraphData:
+    def generate(self, task_repo: TaskRepository, repos: RepositoryCollection) -> EstimationErrorGraphData:
         completed_tasks = list(filter(is_completed_task, task_repo.tasks.values()))
         completed_tasks = sorted(completed_tasks, key=lambda t: t.completedDate)
         data = EstimationErrorGraphData()
@@ -22,7 +23,7 @@ class EstimationErrorGraphGenerator:
                 data.warnings.add(GlobalSettings.no_velocity_ignored_warning.format(task.id))
                 continue
 
-            warnings, velocity = calculate_velocity(completed_tasks[:i])
+            warnings, velocity = calculate_velocity(completed_tasks[:i], repos)
 
             data.warnings = data.warnings.union(warnings)
 

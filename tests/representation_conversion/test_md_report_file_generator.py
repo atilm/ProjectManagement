@@ -31,7 +31,7 @@ planningFileContent = """
 
 | Id | Project | Description | Estimate | Started    | Completed  | Workdays | Created    | Removed |
 | -- | ------- | ----------- | -------- | ---------- | ---------- | -------- | ---------- | ------- |
-| 4  | Proj  1 | Task 4      | 5        | 15-02-2022 | 01-03-2022 | 10.0     | 04-12-2022 |         |
+| 4  | Proj  1 | Task 4      | 5        | 15-02-2022 | 28-02-2022 | 10.0     | 04-12-2022 |         |
 
 # Removed Stories
 

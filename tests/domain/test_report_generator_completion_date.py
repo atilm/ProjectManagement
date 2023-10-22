@@ -30,7 +30,8 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
     def test_skipping_weekends(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 5), 3, 6), #velocity of 0.5
+            #velocity of 0.5, because there are 6 workdays in the specified date range:
+            self.completed_task(datetime.date(2022, 11, 30), 3, 8), 
             self.todo_task(2)
         ])
 
@@ -45,7 +46,8 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
     def test_skipping_free_ranges(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 5), 3, 6), #velocity of 0.5
+            #velocity of 0.5, because there are 6 workdays in the specified date range:
+            self.completed_task(datetime.date(2022, 11, 30), 3, 8), 
             self.todo_task(2),
             self.todo_task(2)
         ])
@@ -89,7 +91,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
     def test_fraction_of_day_must_be_completed_after_weekend(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 5), 8, 4), #velocity of 2
+            self.completed_task(datetime.date(2022, 12, 2), 8, 4), #velocity of 2
             self.todo_task(3) # effort = 1.5 days
         ])
 
@@ -121,7 +123,7 @@ class the_report_predicts_the_completion_date(DomainTestCase):
 
     def test_completion_date_is_calculated_correctly_with_two_working_day_repos(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 5), 8, 4), #velocity of 2
+            self.completed_task(datetime.date(2022, 12, 2), 8, 4), #velocity of 2
             self.todo_task(3),
             self.todo_task(5), # total effort: 4 days
         ])

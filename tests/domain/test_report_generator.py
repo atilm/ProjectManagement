@@ -17,24 +17,25 @@ class the_user_can_generate_a_report_from_a_task_repository(DomainTestCase):
 
 class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestCase):
     def test_calculate_velocity_from_a_single_task(self):
-        task = self.completed_task(datetime.date(2022, 12, 4), 3, 5.5)
+        task = self.completed_task(datetime.date(2022, 12, 4), 3, 5)
         repo = self.given_a_repository_with_tasks([task])
 
         report = self.when_a_report_is_generated(repo)
 
         # then the velocity is calculated from this task
-        self.assertAlmostEqual(report.velocity, 0.55, places=2)
+        self.assertAlmostEqual(report.velocity, 0.6, places=2)
 
     def test_calculate_velocity_from_two_tasks(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 4), 3, 5.5),
+            self.completed_task(datetime.date(2022, 12, 5), 3, 5.0),
             self.completed_task(datetime.date(2022, 12, 4), 5, 8.0)
         ])
 
         report = self.when_a_report_is_generated(repo)
 
-        # then the velocity is (3 + 5) / (5.5 + 8.0)
-        self.assertAlmostEqual(report.velocity, 0.5926, places=4)
+        # then the velocity is (3 + 5) / 9
+        # beause global start-date is 2022-12-4 - 8 days and global completed date is 2022-12-5
+        self.assertAlmostEqual(report.velocity, 0.88888, places=4)
 
     def test_duration_of_zero(self):
         task = self.completed_task(datetime.date(2022, 12, 4), 3, 0.0)
@@ -78,17 +79,20 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         self.assertIsNone(report.velocity)
 
     def test_only_the_30_most_recent_tasks_are_used(self):
-        startDate = datetime.date(2022, 2, 1)
+        startDate = datetime.date(2022, 2, 2)
         tasks = [self.completed_task(startDate + datetime.timedelta(i), 1, 1) for i in range(29)]
-        tasks.append(self.completed_task(startDate + datetime.timedelta(30), 1, 0.01))
-        tasks.append(self.completed_task(startDate - datetime.timedelta(1), 1, 0.001))
+        tasks.append(self.completed_task(startDate + datetime.timedelta(30), 5, 1))
+        
+        tasks.append(self.completed_task(startDate - datetime.timedelta(1), 21, 1))
 
         repo = self.given_a_repository_with_tasks(tasks)
 
         report = self.when_a_report_is_generated(repo)
 
-        # then the velocity is sum of estimates / sum of workdays = 30 / 29.01 = 1.0341
-        self.assertAlmostEqual(report.velocity, 1.0341, places=4)
+        # global start date: 2022-2-2 - 1 day, because one earlier date is ignored
+        # global completed date: 2022-2-2 + 30 days
+        # velocity: (29 + 5) story points / 31 days
+        self.assertAlmostEqual(report.velocity, 1.09677, places=4)
 
 class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTestCase):
     def test_when_no_tasks_are_given_0_is_returned(self):

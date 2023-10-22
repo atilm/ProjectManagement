@@ -48,7 +48,7 @@ class GraphGeneratorTestCase(DomainTestCase):
             expected_free_ranges)
         
         task_repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 10, 1), 1, 1),
+            self.completed_task(datetime.date(2022, 9, 30), 1, 1),
             self.todo_task(1)
         ])
 
