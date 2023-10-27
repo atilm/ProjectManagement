@@ -42,22 +42,25 @@ def calculate_velocity(tasks: list[Task], repos) -> tuple[set,float]:
     recent_tasks: list[Task] = sorted_tasks_with_velocity[-GlobalSettings.velocity_count:]
     start_date = recent_tasks[0].startedDate
     end_date = recent_tasks[-1].completedDate
-    day_count = (end_date - start_date).days + 1
 
-    if day_count < 1:
-        raise VelocityCalculationException(recent_tasks[-1].id)
-
-    summed_capacity = 0
-    working_days = repos.working_days_repository_collection
-
-    for current_date in (start_date + datetime.timedelta(n) for n in range(day_count)):
-        summed_capacity += working_days.get_working_day_capacity(current_date)
+    summed_capacity = capacity_in_date_range(start_date, end_date, repos.working_days_repository_collection)
 
     summedEstimates = sum(t.estimate for t in recent_tasks)
     
     meanVelocity = summedEstimates / summed_capacity if summed_capacity > 0 else None
 
     return (warnings, meanVelocity)
+
+def capacity_in_date_range(start_date: datetime.date, end_date: datetime.date, working_days):
+    day_count = (end_date - start_date).days + 1
+    if day_count < 1:
+        raise VelocityCalculationException(-1)
+    summed_capacity = 0
+
+    for current_date in (start_date + datetime.timedelta(n) for n in range(day_count)):
+        summed_capacity += working_days.get_working_day_capacity(current_date)
+    
+    return summed_capacity
 
 def has_velocity(task: Task) -> float:
     return task.estimate is not None and\

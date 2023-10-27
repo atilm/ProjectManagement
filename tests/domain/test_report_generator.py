@@ -44,7 +44,7 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         exception = self.then_report_generation_raises(repo)
 
         self.assertIsInstance(exception, VelocityCalculationException)
-        self.assertEqual(exception.task_id, task.id)
+        self.assertEqual(exception.task_id, -1) # because in general several tasks could be involved
 
     def test_tasks_without_estimate_are_ignored(self):
         repo = self.given_a_repository_with_tasks([
