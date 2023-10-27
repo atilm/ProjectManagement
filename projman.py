@@ -11,7 +11,6 @@ from src.domain.task import VelocityCalculationException
 from src.services.utilities import string_utilities
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
-from src.services.domain.graph_generation.estimation_error_graph_generator import EstimationErrorGraphGenerator
 from src.services.domain.graph_generation.graph_engine import GraphEngine
 
 # HELPERS ---------------------------------------------------------------------------------------
@@ -144,17 +143,6 @@ def formatFile(args):
     output = writer.write(document)
     write_to_file(args.filePath, output)
 
-def plotEstimationErrors(args):
-    print(f"Plot estimation errors of all completed stories in {args.planningPath}")
-
-    repos = parse_planning_file(args.planningPath)
-
-    graph_generator = EstimationErrorGraphGenerator()
-    graph_engine = GraphEngine()
-
-    errorGraphData = graph_generator.generate(repos.task_repository)
-    graph_engine.plot_estimation_error_graph(errorGraphData)
-
 
 argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 
@@ -184,10 +172,6 @@ reportParser.add_argument("-f", "--file", help="Path to report file.")
 reportParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
 reportParser.add_argument("-g", "--graph", action='store_true', help="Show a burn down chart of all past and future stories")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
-
-reportParser = subparsers.add_parser("ploterrors", help="Show a plot of estimation errors over all completed stories.")
-reportParser.add_argument("planningPath", help="Path to the planning file.")
-reportParser.set_defaults(func=lambda args: catch_all(plotEstimationErrors, args))
 
 args = argumentParser.parse_args()
 args.func(args)
