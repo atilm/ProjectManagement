@@ -151,8 +151,4 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
 
         # then the report contains a warning about unestimated tasks
         # self.assertEqual(report.warnings, {"Unestimated stories have been ignored."})
-        self.assertEqual(report.warnings, {
-            "Unestimated stories have been ignored.",
-            "Story 4 has no estimate or workdays and was ignored.",
-            "Story 3 has no estimate or workdays and was ignored.",
-            "Story 2 has no estimate or workdays and was ignored."})
+        self.assertEqual(report.warnings, {"Unestimated stories have been ignored."})

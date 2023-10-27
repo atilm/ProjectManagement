@@ -93,7 +93,8 @@ class ReportGenerator:
 
     def _calculate_recent_velocity(self, repos: RepositoryCollection) -> tuple[float, list]:
         tasksRepo = repos.task_repository
-        warnings, velocity = task.calculate_velocity(tasksRepo.tasks.values(), repos)
+        completedTasks = filter(task.is_completed_task, tasksRepo.tasks.values())
+        warnings, velocity = task.calculate_velocity(completedTasks, repos)
 
         if not velocity:
             warnings.add("No velocity could be calculated.")
