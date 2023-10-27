@@ -36,13 +36,16 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         repo = TaskRepository()
         workingDaysRepoCollection = WorkingDayRepositoryCollection()
         workingDaysRepo = WorkingDayRepository()
+        hasWorkingDaysSection = False
 
         for item in document.getContent():
             if isinstance(item, MarkdownTable):
                 if self._has_holidays_header(item):
+                    hasWorkingDaysSection = True
                     free_ranges = [parse_to_free_range(r) for r in item.rows]
                     workingDaysRepo.add_free_ranges(free_ranges)
                 elif self._has_working_days_header(item):
+                    hasWorkingDaysSection = True
                     workingDaysRepo.set_free_weekdays(*self._to_free_days(item))
                 elif self._has_tasks_header(item):
                     for row in item.rows:
@@ -50,7 +53,8 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
                 else:
                     raise HeaderFormatException(item._headerRow.lineNumber)
 
-        workingDaysRepoCollection.add(workingDaysRepo)
+        if hasWorkingDaysSection:
+            workingDaysRepoCollection.add(workingDaysRepo)
 
         return RepositoryCollection(repo, workingDaysRepoCollection)
 

@@ -1,6 +1,8 @@
 import argparse
+import os
 
 from src.services.domain.representation_reading.md_representation_reader import *
+from src.services.domain.representation_reading.md_multi_representation_reader import *
 from src.services.domain.representation_reading.md_planning_file_to_model_converter import *
 from src.services.domain.representation_reading.md_estimation_file_to_model_converter import *
 from src.services.domain.representation_writing.md_representation_writer import *
@@ -42,10 +44,22 @@ def write_to_file(filePath: str, content: str) -> str:
     file.write(content)
     file.close()
 
-def parse_planning_file(planningPath: str) -> RepositoryCollection:
-    planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
+def parse_planning_files(planningPath: str) -> RepositoryCollection:
+    planningReader = MarkdownMultiRepresentationReader(MarkdownPlanningDocumentToModelConverter())
     planningInput = read_from_file(planningPath)
-    return planningReader.read(planningInput)
+
+    input_strings = [planningInput]
+
+    absoluteFilePath = os.path.abspath(planningPath)
+    directoryPath = os.path.dirname(absoluteFilePath)
+    calendarPath = os.path.join(directoryPath, "Calendars")
+
+    if os.path.exists(calendarPath):
+        calendarFiles = os.listdir(calendarPath)
+        for calendarFile in calendarFiles:
+            input_strings.append(read_from_file(os.path.join(calendarPath, calendarFile)))
+
+    return planningReader.read(input_strings)
 
 def parseDate(date_string: str) -> datetime.date:
     try:
@@ -93,7 +107,7 @@ def applyEstimationFile(args):
 def generateReport(args):
     print(f"Report on {args.planningPath}:\n")
 
-    planningRepos = parse_planning_file(args.planningPath)
+    planningRepos = parse_planning_files(args.planningPath)
 
     reportGenerator = ReportGenerator()
     startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
@@ -162,7 +176,7 @@ applyEstimationParser.add_argument("planningPath", help="Path to the planning fi
 applyEstimationParser.add_argument("estimationPath", help="Path to the estimation file.")
 applyEstimationParser.set_defaults(func=lambda args: catch_all(applyEstimationFile, args))
 
-reportParser = subparsers.add_parser("report", help="Ouput a report about the specified palnning file.")
+reportParser = subparsers.add_parser("report", help="Output a report about the specified planning file.")
 reportParser.add_argument("planningPath", help="Path to the planning file.")
 reportParser.add_argument("-f", "--file", help="Path to report file.")
 reportParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
