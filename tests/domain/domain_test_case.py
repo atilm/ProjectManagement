@@ -4,6 +4,7 @@ from src.domain.tasks_repository import *
 from src.domain.report_generator import *
 from tests.domain.domain_utilities.id_generator import IdGenerator
 from src.domain.working_day_repository_collection import *
+from typing import List
 
 class DomainTestCase(unittest.TestCase):
     def __init__(self, methodName: str = ...) -> None:
@@ -13,7 +14,7 @@ class DomainTestCase(unittest.TestCase):
     def given_an_empty_repository(self) -> TaskRepository:
         return TaskRepository()
 
-    def given_a_repository_with_tasks(self, taskList : list) -> TaskRepository:
+    def given_a_repository_with_tasks(self, taskList : List[Task]) -> TaskRepository:
         repo = TaskRepository()
         for t in taskList:
             repo.add(t)
@@ -30,6 +31,9 @@ class DomainTestCase(unittest.TestCase):
         for repo in repositories:
             collection.add(repo)
         return collection
+    
+    def given_a_repository_collection(self, tasks: List[Task], working_days_repos: List[WorkingDayRepository]) -> RepositoryCollection:
+        return RepositoryCollection(self.given_a_repository_with_tasks(tasks), self.given_a_working_days_repository_collection(working_days_repos))
 
     def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float, projectId: str = "") -> Task:
         task = Task(self._id_generator.next(), "", projectId)

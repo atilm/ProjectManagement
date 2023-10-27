@@ -1,4 +1,5 @@
 from .task import Task
+from typing import List
 
 class TaskIdNotFoundException(Exception):
     pass
@@ -17,6 +18,10 @@ class TaskRepository:
             raise TaskIdConflictException(task.id)
 
         self.tasks[task.id] = task
+
+    def addRange(self, tasks: List[Task]) -> None:
+        for t in tasks:
+            self.add(t)
 
     def get(self, taskId : str) -> Task:
         if taskId in self.tasks:

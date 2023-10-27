@@ -3,6 +3,7 @@ from src.services.utilities import calculations
 from src.global_settings import GlobalSettings
 #from src.domain.repository_collection import RepositoryCollection
 import datetime
+from src.services.utilities.date_utilities import dateRange
 
 class Task:
     def __init__(self, id: str, description: str, project_id: str) -> None:
@@ -57,7 +58,7 @@ def capacity_in_date_range(start_date: datetime.date, end_date: datetime.date, w
         raise VelocityCalculationException(-1)
     summed_capacity = 0
 
-    for current_date in (start_date + datetime.timedelta(n) for n in range(day_count)):
+    for current_date in dateRange(start_date, end_date):
         summed_capacity += working_days.get_working_day_capacity(current_date)
     
     return summed_capacity

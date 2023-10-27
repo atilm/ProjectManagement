@@ -1,5 +1,6 @@
 from .working_day_repository import WorkingDayRepository
 from .free_range import FreeRange
+from typing import List
 import datetime
 
 class WorkingDayRepositoryCollection:
@@ -8,6 +9,9 @@ class WorkingDayRepositoryCollection:
 
     def add(self, repository: WorkingDayRepository) -> None:
         self.repositories.append(repository)
+
+    def addRange(self, repositories: List[WorkingDayRepository]) -> None:
+        self.repositories += repositories
 
     def get_working_day_capacity(self, day: datetime.date) -> float:
         """Return (N - k) / N where N is the number of workers and k the number of absent workers"""

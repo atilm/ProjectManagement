@@ -93,11 +93,7 @@ def applyEstimationFile(args):
 def generateReport(args):
     print(f"Report on {args.planningPath}:\n")
 
-    # Todo: replace with parse_planning_file() when ReportFileGenerator takes a report
     planningRepos = parse_planning_file(args.planningPath)
-    # planningReader = MarkdownRepresentationReader(MarkdownPlanningDocumentToModelConverter())
-    # planningInput = read_from_file(args.planningPath)
-    # planningRepos = planningReader.read(planningInput)
 
     reportGenerator = ReportGenerator()
     startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
