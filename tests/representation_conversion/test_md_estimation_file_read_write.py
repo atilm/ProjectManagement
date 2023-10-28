@@ -157,7 +157,7 @@ class MarkdownEstimationFileTest(DomainTestCase):
 
         self.then_the_exception_is(error, HeaderFormatException, 5)
 
-    def test_an_wrong_number_of_table_columns_raises_an_exception(self):
+    def test_a_wrong_number_of_table_columns_raises_an_exception(self):
         givenContent = ""\
             "# Estimation\n"\
             "\n"\

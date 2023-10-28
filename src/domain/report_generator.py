@@ -56,9 +56,9 @@ class Report:
     def __init__(self) -> None:
         self.velocity: float = None
         self.remaining_work_days: ConfidenceInterval = None
-        self.predicted_completion_dates = {} # keys: projectIds, values: completionDate: ConfidenceInterval
-        self.warnings = set()
-        self.task_reports = []
+        self.predicted_completion_dates: dict[str, ConfidenceInterval] = {} # keys: projectIds, values: completionDate: ConfidenceInterval
+        self.warnings: set[str] = set()
+        self.task_reports: list[TaskReport] = []
 
     def add_warnings(self, warnings):
         for w in warnings:

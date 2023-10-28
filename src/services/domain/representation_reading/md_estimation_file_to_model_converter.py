@@ -2,6 +2,7 @@ from .md_converter_exceptions import *
 from .representation_to_model_converter import *
 from src.services.markdown.markdown_document import *
 from src.domain.tasks_repository import *
+from src.domain.repository_collection import RepositoryCollection
 from src.services.domain import markdown_configuration
 
 class MarkdownEstimationFileToModelConverter(IRepresentationToModelConverter):

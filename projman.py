@@ -10,6 +10,7 @@ from src.services.domain.representation_writing.md_model_to_estimation_file_conv
 from src.services.domain.representation_writing.md_model_to_planning_file_converter import *
 from src.domain.report_generator import *
 from src.domain.task import VelocityCalculationException
+from src.domain.completion_date_history import CompletionDateHistory
 from src.services.utilities import string_utilities
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
@@ -60,6 +61,17 @@ def parse_planning_files(planningPath: str) -> RepositoryCollection:
             input_strings.append(read_from_file(os.path.join(calendarPath, calendarFile)))
 
     return planningReader.read(input_strings)
+
+def parse_tracking_file(projectId: str) -> CompletionDateHistory:
+    tracking_file_path = f"{projectId}.md"
+
+    if not(os.path.exists(tracking_file_path)):
+        return CompletionDateHistory(projectId)
+    
+    file_content = read_from_file(tracking_file_path)
+    # history = historyParser.parse(fileContent)
+    history = CompletionDateHistory(projectId)
+    
 
 def parseDate(date_string: str) -> datetime.date:
     try:
@@ -112,6 +124,18 @@ def generateReport(args):
     reportGenerator = ReportGenerator()
     startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
     report = reportGenerator.generate(planningRepos, startDate)
+
+    # for each project, append the currently predicted completion dates to a file to track the development of completion dates
+     # for each entry in report
+    for projectId, completion_dates in report.predicted_completion_dates.items():
+        # construct the file name
+        file_name = f"{projectId}.md"
+        # if the tracking-file exists: read it to a class CompletionDateHistory
+        if os.path.exists(file_name):
+            file_content = read_from_file(file_name)
+        # else: initialize a CompletionDateHistory instance
+        # add the current prediction
+        # write the instance to the tracking-file
 
     # print summary to console
     print(f"Velocity: {report.velocity} story points / day")

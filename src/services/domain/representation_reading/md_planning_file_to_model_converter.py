@@ -7,6 +7,7 @@ from src.services.markdown.markdown_document import *
 from src.services.domain.task_to_string_converter import *
 from src.services.utilities import string_utilities
 from src.services.domain import markdown_configuration
+from src.domain.repository_collection import RepositoryCollection
 
 def parse_date_range(dateString: str, lineNumber: int) -> tuple:
     rangeMatch = GlobalSettings.date_range_regex.match(dateString)

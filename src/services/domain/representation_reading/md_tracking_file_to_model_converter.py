@@ -1,0 +1,4 @@
+from src.services.domain.representation_reading.representation_to_model_converter import IRepresentationToModelConverter
+
+class MarkdownTrackingFileToModelConverter(IRepresentationToModelConverter):
+    pass
