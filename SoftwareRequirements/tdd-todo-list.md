@@ -7,4 +7,10 @@
 - [ ] remove actualWorkDays field
 
 - [ ] add to per project prediction date history
+  - [x] input fehler behandeln
+    - [x] keine projectId gefunden
+    - [x] unerwarteter header
+    - [x] tabellenzeile unerwartete anzahl
+    - [x] tabellenzelle enthält kein datum
+  
 - [ ] plot prediction date history with task additions / removals for the same project

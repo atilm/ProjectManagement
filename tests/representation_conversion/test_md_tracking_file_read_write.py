@@ -47,5 +47,4 @@ class MarkdownTrackingFileTest(DomainTestCase):
 
         history = self.when_a_file_is_read(file_input)
         file_output = self.when_a_history_is_written(history)
-
         self.assertEqual(file_output, file_input)
