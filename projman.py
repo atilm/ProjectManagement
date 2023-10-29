@@ -15,6 +15,8 @@ from src.services.utilities import string_utilities
 from src.services.domain.report_generation.report_file_generator import ReportFileGenerator
 from src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
 from src.services.domain.graph_generation.graph_engine import GraphEngine
+from src.services.domain.representation_reading.md_tracking_file_to_model_converter import MarkdownTrackingFileToModelConverter
+from src.services.domain.representation_writing.md_model_to_tracking_file_converter import ModelToMarkdownTrackingFileConverter
 
 # HELPERS ---------------------------------------------------------------------------------------
 
@@ -69,8 +71,15 @@ def parse_tracking_file(projectId: str) -> CompletionDateHistory:
         return CompletionDateHistory(projectId)
     
     file_content = read_from_file(tracking_file_path)
-    # history = historyParser.parse(fileContent)
-    history = CompletionDateHistory(projectId)
+    tracking_reader = MarkdownRepresentationReader(MarkdownTrackingFileToModelConverter())
+    history: CompletionDateHistory = tracking_reader.read(file_content)
+    return history
+
+def write_tracking_file(history: CompletionDateHistory) -> None:
+    file_path = f"{history.projectId}.md"
+    tracking_writer = MarkdownRepresentationWriter(ModelToMarkdownTrackingFileConverter())
+    file_content = tracking_writer.write(history)
+    write_to_file(file_path, file_content)
     
 
 def parseDate(date_string: str) -> datetime.date:
@@ -126,16 +135,10 @@ def generateReport(args):
     report = reportGenerator.generate(planningRepos, startDate)
 
     # for each project, append the currently predicted completion dates to a file to track the development of completion dates
-     # for each entry in report
     for projectId, completion_dates in report.predicted_completion_dates.items():
-        # construct the file name
-        file_name = f"{projectId}.md"
-        # if the tracking-file exists: read it to a class CompletionDateHistory
-        if os.path.exists(file_name):
-            file_content = read_from_file(file_name)
-        # else: initialize a CompletionDateHistory instance
-        # add the current prediction
-        # write the instance to the tracking-file
+        history = parse_tracking_file(projectId)
+        history.add(datetime.date.today(), completion_dates)
+        write_tracking_file(history)
 
     # print summary to console
     print(f"Velocity: {report.velocity} story points / day")

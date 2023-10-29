@@ -12,3 +12,6 @@ class CompletionDateHistory:
     def __init__(self, projectId: str) -> None:
         self.projectId: str = projectId
         self.records: list[CompletionDateRecord] = []
+
+    def add(self, date: datetime.date, completion_date_interval: ConfidenceInterval) -> None:
+        self.records.append(CompletionDateRecord(date, completion_date_interval, ""))
