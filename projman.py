@@ -17,6 +17,7 @@ from src.services.domain.graph_generation.burndown_graph_generator import Burndo
 from src.services.domain.graph_generation.graph_engine import GraphEngine
 from src.services.domain.representation_reading.md_tracking_file_to_model_converter import MarkdownTrackingFileToModelConverter
 from src.services.domain.representation_writing.md_model_to_tracking_file_converter import ModelToMarkdownTrackingFileConverter
+from src.services.domain.graph_generation.project_tracking_graph_generator import ProjectTrackingGraphGenerator
 
 # HELPERS ---------------------------------------------------------------------------------------
 
@@ -180,6 +181,13 @@ def formatFile(args):
     output = writer.write(document)
     write_to_file(args.filePath, output)
 
+def plotTrackingFile(args):
+    print("not implemented yet...")
+    history = parse_tracking_file(args.filePath)
+    graph_generator = ProjectTrackingGraphGenerator()
+    graph_engine = GraphEngine()
+    data = graph_generator.generate(history)
+    graph_engine.plot_tracking_graph(data)
 
 argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
 
@@ -209,6 +217,10 @@ reportParser.add_argument("-f", "--file", help="Path to report file.")
 reportParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
 reportParser.add_argument("-g", "--graph", action='store_true', help="Show a burn down chart of all past and future stories")
 reportParser.set_defaults(func=lambda args: catch_all(generateReport, args))
+
+plotTrackingFileParser = subparsers.add_parser("track", help="Plot a graph of the historically predicted completion date ranges of the specified project.")
+plotTrackingFileParser.add_argument("filePath", help="Path to the tracking file.")
+plotTrackingFileParser.set_defaults(func=lambda args: catch_all(plotTrackingFile, args))
 
 args = argumentParser.parse_args()
 args.func(args)
