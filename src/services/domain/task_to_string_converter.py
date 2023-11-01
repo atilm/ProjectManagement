@@ -41,10 +41,6 @@ class TaskToStringConverter:
         self.task.completedDate = self._convert(date, self._toDateOrNone)
         return self
 
-    def withActualWorkDays(self, days: str):
-        self.task.actualWorkDays = self._convert(days, self._toFloatOrNone)
-        return self
-
     def withRemovedDate(self, date: str):
         self.task.removedDate = self._convert(date, self._toDateOrNone)
         return self
@@ -61,7 +57,6 @@ class TaskToStringConverter:
         s["createdDate"] = self._toStr(task.createdDate, string_utilities.to_date_str)
         s["startedDate"] = self._toStr(task.startedDate, string_utilities.to_date_str)
         s["completedDate"] = self._toStr(task.completedDate, string_utilities.to_date_str)
-        s["actualWorkDays"] = self._toStr(task.actualWorkDays, str)
         s["removedDate"] = self._toStr(task.removedDate, string_utilities.to_date_str)
         return s
 

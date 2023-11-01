@@ -13,7 +13,7 @@ todoTableIndex = 6
 completedTableIndex = 8
 removedTableIndex = 10
 
-task_table_col_count = 9
+task_table_col_count = 8
 default_project_name = "Project X"
 
 
@@ -33,9 +33,8 @@ class ConverterTestCase(unittest.TestCase):
     def add_completed_task(self, repo: TaskRepository, id: str, description: str):
         task = Task(id, description, default_project_name)
         task.estimate = 4
-        task.startedDate = None
+        task.startedDate = date(2022, 3, 2)
         task.completedDate = date(2022, 3, 4)
-        task.actualWorkDays = 2
         task.createdDate = date(2022, 3, 1)
         repo.add(task)
 
@@ -111,8 +110,8 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
         document = self.when_the_repo_is_converted(repo)
 
         table = self._assertTable(todoTableIndex, task_table_col_count, 2, document)
-        self.assertEqual(table.rows[0]._cells, ["1", default_project_name, "Todo task 1", "3", "", "", "", "01-03-2022", ""])
-        self.assertEqual(table.rows[1]._cells, ["2", default_project_name, "Todo task 2", "3", "", "", "", "01-03-2022", ""])
+        self.assertEqual(table.rows[0]._cells, ["1", default_project_name, "Todo task 1", "3", "", "", "01-03-2022", ""])
+        self.assertEqual(table.rows[1]._cells, ["2", default_project_name, "Todo task 2", "3", "", "", "01-03-2022", ""])
 
     def test_a_repository_with_all_task_kinds(self):
         repo = self.given_a_task_repository()
@@ -126,9 +125,9 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
         completedTable = self._assertTable(completedTableIndex, task_table_col_count, 1, document)
         removedTable = self._assertTable(removedTableIndex, task_table_col_count, 1, document)
 
-        self.assertEqual(todoTable.rows[0]._cells, ["1", default_project_name, "Todo task", "3", "", "", "", "01-03-2022", ""])
-        self.assertEqual(completedTable.rows[0]._cells, ["2", default_project_name, "Completed task", "4", "", "04-03-2022", "2", "01-03-2022", ""])
-        self.assertEqual(removedTable.rows[0]._cells, ["3", default_project_name, "Removed task", "5", "02-03-2022", "", "", "01-03-2022", "03-03-2022"])
+        self.assertEqual(todoTable.rows[0]._cells, ["1", default_project_name, "Todo task", "3", "", "", "01-03-2022", ""])
+        self.assertEqual(completedTable.rows[0]._cells, ["2", default_project_name, "Completed task", "4", "02-03-2022", "04-03-2022", "01-03-2022", ""])
+        self.assertEqual(removedTable.rows[0]._cells, ["3", default_project_name, "Removed task", "5", "02-03-2022", "", "01-03-2022", "03-03-2022"])
 
 
     def test_a_repository_with_all_working_days(self):

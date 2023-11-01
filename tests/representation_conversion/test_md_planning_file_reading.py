@@ -84,8 +84,6 @@ class MarkdownPlanningDocumentToModelConverterTestCase(unittest.TestCase):
         self.assertEqual(lhs.startedDate, rhs.startedDate)
         self.assertTrue(isDateOrNone(lhs.completedDate))
         self.assertEqual(lhs.completedDate, rhs.completedDate)
-        self.assertTrue(isNumberOrNone(lhs.actualWorkDays))
-        self.assertEqual(lhs.actualWorkDays, rhs.actualWorkDays)
         self.assertTrue(isDateOrNone(lhs.createdDate))
         self.assertEqual(lhs.createdDate, rhs.createdDate)
         self.assertTrue(isDateOrNone(lhs.removedDate))
@@ -124,8 +122,8 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         todo = self.build_empty_task_table()
         completed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("1", "Project 1", "Description 1", "3", "01-02-2020", "03-02-2020", "2", "29-01-2020", "")\
-            .withRow("2", "Project 2", "Description 2", "5", "01-02-2021", "04-02-2021", "3.5", "29-01-2021", "")\
+            .withRow("1", "Project 1", "Description 1", "3", "01-02-2020", "03-02-2020", "29-01-2020", "")\
+            .withRow("2", "Project 2", "Description 2", "5", "01-02-2021", "04-02-2021", "29-01-2021", "")\
             .build()
         removed = self.build_empty_task_table()
 
@@ -137,7 +135,6 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask1.estimate = 3
         expectedTask1.startedDate = date(2020, 2, 1)
         expectedTask1.completedDate = date(2020, 2, 3)
-        expectedTask1.actualWorkDays = 2
         expectedTask1.createdDate = date(2020, 1, 29)
         expectedTask1.removedDate = None
 
@@ -145,7 +142,6 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask2.estimate = 5
         expectedTask2.startedDate = date(2021, 2, 1)
         expectedTask2.completedDate = date(2021, 2, 4)
-        expectedTask2.actualWorkDays = 3.5
         expectedTask2.createdDate = date(2021, 1, 29)
         expectedTask2.removedDate = None
 
@@ -155,7 +151,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
     def test_can_read_a_task_from_to_do_table(self):
         todo = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("1", "Project", "Description", "5", "", "", "", "29-01-2021", "")\
+            .withRow("1", "Project", "Description", "5", "", "", "29-01-2021", "")\
             .build()
         completed = self.build_empty_task_table()
         removed = self.build_empty_task_table()
@@ -168,7 +164,6 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask.estimate = 5
         expectedTask.startedDate = None
         expectedTask.completedDate = None
-        expectedTask.actualWorkDays = None
         expectedTask.createdDate = date(2021, 1, 29)
         expectedTask.removedDate = None
 
@@ -179,7 +174,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("3", "Project", "Description", "5", "04-05-2022", "", "", "01-05-2022", "05-05-2022")\
+            .withRow("3", "Project", "Description", "5", "04-05-2022", "", "01-05-2022", "05-05-2022")\
             .build()
 
         document = self.given_a_document_with_tables(todo, completed, removed)
@@ -190,7 +185,6 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         expectedTask.estimate = 5
         expectedTask.startedDate = date(2022, 5, 4)
         expectedTask.completedDate = None
-        expectedTask.actualWorkDays = None
         expectedTask.createdDate = date(2022, 5, 1)
         expectedTask.removedDate = date(2022, 5, 5)
 
@@ -200,7 +194,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         todo = self.build_empty_task_table()
         completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
-            .withHeader("Id", "Description", "Started", "Completed", "Workdays", "Created", "Removed")\
+            .withHeader("Id", "Description", "Started", "Completed", "Created", "Removed")\
             .build()
         removed._headerRow.lineNumber = 13
 
@@ -231,7 +225,7 @@ class reading_tests(MarkdownPlanningDocumentToModelConverterTestCase):
         completed = self.build_empty_task_table()
         removed = MarkdownTableBuilder()\
             .withHeader(*markdown_configuration.planning_task_header)\
-            .withRow("3", "Project", "Description", "5", "12-31-2022", "", "", "01-05-2022", "05-05-2022")\
+            .withRow("3", "Project", "Description", "5", "12-31-2022", "", "01-05-2022", "05-05-2022")\
             .build()
         
         removed.rows[0].lineNumber = 5

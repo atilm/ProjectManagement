@@ -56,9 +56,12 @@ class the_report_contains_the_velocity_from_the_30_most_recent_tasks(DomainTestC
         # then no velocity is calculated
         self.assertIsNone(report.velocity)
 
-    def test_tasks_without_actual_work_days_are_ignored(self):
+    def test_tasks_without_start_date_are_ignored(self):
+        taskWithoutStartDate = self.completed_task(datetime.date(2022, 12, 4), 3, None)
+        taskWithoutStartDate.startedDate = None
+
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 12, 4), 3, None)
+            taskWithoutStartDate
         ])
 
         report = self.when_a_report_is_generated(repo)

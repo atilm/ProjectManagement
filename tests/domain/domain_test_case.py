@@ -38,7 +38,7 @@ class DomainTestCase(unittest.TestCase):
     def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float, projectId: str = "") -> Task:
         task = Task(self._id_generator.next(), "", projectId)
         task.estimate = estimate
-        task.actualWorkDays = actualWorkDays
+        # task.actualWorkDays = actualWorkDays
         task.completedDate = completedDate
         # subtract (actualWorkDays - 1), because when start date and completed date are equal, this should count as a workday:
         task.startedDate = completedDate - datetime.timedelta(actualWorkDays - 1) if actualWorkDays is not None else completedDate

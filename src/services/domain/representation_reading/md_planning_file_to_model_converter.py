@@ -98,7 +98,7 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
         return result
 
     def _toTask(self, row: MarkdownTableRow) -> Task:
-        if row.getColumnCount() != 9:
+        if row.getColumnCount() != 8:
             raise ColumnNumberException(row.lineNumber)
 
         try:
@@ -109,9 +109,8 @@ class MarkdownPlanningDocumentToModelConverter(IRepresentationToModelConverter):
                 .withEstimate(row.get(3))\
                 .withStartedDate(row.get(4))\
                 .withCompletedDate(row.get(5))\
-                .withActualWorkDays(row.get(6))\
-                .withCreatedDate(row.get(7))\
-                .withRemovedDate(row.get(8))\
+                .withCreatedDate(row.get(6))\
+                .withRemovedDate(row.get(7))\
                 .toTask()
         except ConversionException as e:
             raise ValueConversionException(e.inputString, row.lineNumber)

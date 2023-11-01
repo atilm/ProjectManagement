@@ -15,21 +15,21 @@ class ReadingWorkingDaysFromSeveralFiles(unittest.TestCase):
 
 # Stories To Do
 
-| Id | Project | Description | Estimate | Started | Completed | Workdays | Created    | Removed |
-| -- | ------- | ----------- | -------- | ------- | --------- | -------- | ---------- | ------- |
-| 1  | Proj 1  | Task 1      | 1        |         |           |          | 04-12-2022 |         |
-| 2  | Proj 2  | Task 2      | 2        |         |           |          | 04-12-2022 |         |
+| Id | Project | Description | Estimate | Started | Completed | Created    | Removed |
+| -- | ------- | ----------- | -------- | ------- | --------- | ---------- | ------- |
+| 1  | Proj 1  | Task 1      | 1        |         |           | 04-12-2022 |         |
+| 2  | Proj 2  | Task 2      | 2        |         |           | 04-12-2022 |         |
 
 # Completed Stories
 
-| Id | Project | Description | Estimate | Started    | Completed  | Workdays | Created    | Removed |
-| -- | ------- | ----------- | -------- | ---------- | ---------- | -------- | ---------- | ------- |
-| 4  | Proj  1 | Task 4      | 5        | 15-02-2022 | 28-02-2022 | 10.0     | 04-12-2022 |         |
+| Id | Project | Description | Estimate | Started    | Completed  | Created    | Removed |
+| -- | ------- | ----------- | -------- | ---------- | ---------- | ---------- | ------- |
+| 4  | Proj  1 | Task 4      | 5        | 15-02-2022 | 28-02-2022 | 04-12-2022 |         |
 
 # Removed Stories
 
-| Id | Project | Description | Estimate | Started | Completed | Workdays | Created | Removed |
-| -- | ------- | ----------- | -------- | ------- | --------- | -------- | ------- | ------- |
+| Id | Project | Description | Estimate | Started | Completed | Created | Removed |
+| -- | ------- | ----------- | -------- | ------- | --------- | ------- | ------- |
 """
 
     def given_a_first_working_days_file(self):

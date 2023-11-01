@@ -1,5 +1,4 @@
 
-from src.services.utilities import calculations
 from src.global_settings import GlobalSettings
 #from src.domain.repository_collection import RepositoryCollection
 import datetime
@@ -14,7 +13,6 @@ class Task:
         self.createdDate: datetime.date | None = None
         self.startedDate: datetime.date | None = None
         self.completedDate: datetime.date | None = None
-        self.actualWorkDays = None
         self.removedDate = None
 
 class VelocityCalculationException(Exception):
@@ -67,7 +65,6 @@ def has_velocity(task: Task) -> float:
     return task.estimate is not None and\
         task.startedDate is not None and\
         task.completedDate is not None and\
-        task.actualWorkDays is not None and\
         task.removedDate is None
 
 def is_todo_task(task: Task) -> bool:
