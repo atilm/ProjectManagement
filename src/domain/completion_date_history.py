@@ -1,6 +1,7 @@
 import datetime
 
 from src.domain.report_generator import ConfidenceInterval
+from src.services.utilities import list_utilities
 
 class CompletionDateRecord:
     def __init__(self, date: datetime.date, completion_date_interval: ConfidenceInterval, comment: str) -> None:
@@ -14,4 +15,8 @@ class CompletionDateHistory:
         self.records: list[CompletionDateRecord] = []
 
     def add(self, date: datetime.date, completion_date_interval: ConfidenceInterval) -> None:
-        self.records.append(CompletionDateRecord(date, completion_date_interval, ""))
+        newRecord = CompletionDateRecord(date, completion_date_interval, "")
+    
+        if not(list_utilities.replace(self.records, newRecord, lambda lhs, rhs: lhs.date == rhs.date)):
+            self.records.append(newRecord)
+
