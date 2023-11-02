@@ -18,6 +18,7 @@ from src.services.domain.graph_generation.graph_engine import GraphEngine
 from src.services.domain.representation_reading.md_tracking_file_to_model_converter import MarkdownTrackingFileToModelConverter
 from src.services.domain.representation_writing.md_model_to_tracking_file_converter import ModelToMarkdownTrackingFileConverter
 from src.services.domain.graph_generation.project_tracking_graph_generator import ProjectTrackingGraphGenerator
+from src.services.utilities.string_utilities import remove_suffix
 
 # HELPERS ---------------------------------------------------------------------------------------
 
@@ -36,6 +37,8 @@ def catch_all(action, args):
         print(f"Found duplicate task id '{e.taskId}'")
     except VelocityCalculationException as e:
         print(f"Could not calculate velocity for story {e.task_id}.")
+    except FileNotFoundError as e:
+        print(f"File not found: {e.filename}")
 
 def read_from_file(filePath: str) -> str:
     file = open(filePath, mode='r', encoding="utf-8")
@@ -66,10 +69,10 @@ def parse_planning_files(planningPath: str) -> RepositoryCollection:
     return planningReader.read(input_strings)
 
 def parse_tracking_file(projectId: str) -> CompletionDateHistory:
+    # this function works with a project id
+    # handle the case, where a file name is given instead
+    projectId = remove_suffix(projectId, ".md")
     tracking_file_path = f"{projectId}.md"
-
-    if not(os.path.exists(tracking_file_path)):
-        return CompletionDateHistory(projectId)
     
     file_content = read_from_file(tracking_file_path)
     tracking_reader = MarkdownRepresentationReader(MarkdownTrackingFileToModelConverter())
@@ -182,7 +185,6 @@ def formatFile(args):
     write_to_file(args.filePath, output)
 
 def plotTrackingFile(args):
-    print("not implemented yet...")
     history = parse_tracking_file(args.filePath)
     graph_generator = ProjectTrackingGraphGenerator()
     graph_engine = GraphEngine()

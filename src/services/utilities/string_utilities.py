@@ -10,3 +10,8 @@ def parse_to_date(dateStr: str) -> datetime.date:
 
 def to_days_str(days: float) -> str:
     return f"{days:.1f}"
+
+def remove_suffix(s, suffix: str) -> str:
+    if suffix and s.endswith(suffix):
+        return s[:-len(suffix)]
+    return s

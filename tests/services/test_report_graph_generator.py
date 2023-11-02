@@ -1,5 +1,5 @@
 import datetime
-from tests.domain.domain_test_case import DomainTestCase
+from tests.services.test_graph_generator import GraphGeneratorTestCase
 from src.domain.report_generator import Report, TaskRepository, RepositoryCollection
 from src.domain.working_day_repository_collection import *
 from src.domain.free_range import FreeRange
@@ -11,7 +11,7 @@ def get_completion_date(report: Report, index, attr):
     completion_date = report.task_reports[index].completion_date
     return getattr(completion_date, attr)
 
-class GraphGeneratorTestCase(DomainTestCase):
+class ReportGraphGeneratorTestCase(GraphGeneratorTestCase):
     def assert_xy_data(self, xy_data: XyData, expected_x: list, expected_y: list):
         self.assertEqual(xy_data.x, expected_x)
         self.assertEqual(xy_data.y, expected_y)
