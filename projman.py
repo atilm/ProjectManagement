@@ -69,10 +69,7 @@ def parse_planning_files(planningPath: str) -> RepositoryCollection:
     return planningReader.read(input_strings)
 
 def parse_tracking_file(projectId: str) -> CompletionDateHistory:
-    # this function works with a project id
-    # handle the case, where a file name is given instead
-    projectId = remove_suffix(projectId, ".md")
-    tracking_file_path = f"{projectId}.md"
+    tracking_file_path = to_tracking_file_path(projectId)
     
     file_content = read_from_file(tracking_file_path)
     tracking_reader = MarkdownRepresentationReader(MarkdownTrackingFileToModelConverter())
@@ -80,11 +77,17 @@ def parse_tracking_file(projectId: str) -> CompletionDateHistory:
     return history
 
 def write_tracking_file(history: CompletionDateHistory) -> None:
-    file_path = f"{history.projectId}.md"
+    file_path = to_tracking_file_path(history.projectId)
     tracking_writer = MarkdownRepresentationWriter(ModelToMarkdownTrackingFileConverter())
     file_content = tracking_writer.write(history)
     write_to_file(file_path, file_content)
     
+def to_tracking_file_path(projectId: str):
+    # this function works with a project id
+    # handle the case, where a file name is given instead
+    projectId = remove_suffix(projectId, ".md")
+    tracking_file_path = f"Tracking/{projectId}.md"
+    return tracking_file_path
 
 def parseDate(date_string: str) -> datetime.date:
     try:
