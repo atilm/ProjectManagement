@@ -70,8 +70,12 @@ def parse_planning_files(planningPath: str) -> RepositoryCollection:
 
 def parse_tracking_file(projectId: str) -> CompletionDateHistory:
     tracking_file_path = to_tracking_file_path(projectId)
-    
+
+    if not(os.path.exists(tracking_file_path)):
+        return CompletionDateHistory(projectId)
+
     file_content = read_from_file(tracking_file_path)
+
     tracking_reader = MarkdownRepresentationReader(MarkdownTrackingFileToModelConverter())
     history: CompletionDateHistory = tracking_reader.read(file_content)
     return history
