@@ -102,6 +102,13 @@ class a_model_can_be_converted_into_a_planning_markdown_document(ConverterTestCa
 
         self.then_the_document_has_the_expected_structure(document)
 
+    def test_a_repository_can_be_converted_to_a_planning_document_without_a_working_days_repository(self):
+        repo = self.given_a_task_repository()
+
+        document = self.when_the_repos_are_converted(repo, None)
+
+        self._assertSection(1, "Stories To Do", 1, document)
+
     def test_a_repository_with_two_todo_tasks(self):
         repo = self.given_a_task_repository()
         self.add_todo_task(repo, "1", "Todo task 1")

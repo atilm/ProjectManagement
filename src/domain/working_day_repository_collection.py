@@ -13,6 +13,9 @@ class WorkingDayRepositoryCollection:
     def addRange(self, repositories: List[WorkingDayRepository]) -> None:
         self.repositories += repositories
 
+    def isEmpty(self) -> bool:
+        return len(self.repositories) == 0
+
     def get_working_day_capacity(self, day: datetime.date) -> float:
         """Return (N - k) / N where N is the number of workers and k the number of absent workers"""
         if len(self.repositories) == 0:

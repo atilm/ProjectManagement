@@ -9,21 +9,40 @@ from src.services.domain import markdown_configuration
 
 class ModelToMarkdownPlanningDocumentConverter(IModelToRepresentationConverter):
     def convert(self, repos : RepositoryCollection) -> object:
-        document = MarkdownDocumentBuilder()\
-            .withSection("Planning", 0)\
-            .withSection("Working Days", 1)\
-            .withTable(self._build_working_days_table(repos.working_days_repository_collection.repositories[0]))\
-            .withSection("Holidays", 1)\
-            .withTable(self._build_holidays_table(repos.working_days_repository_collection.repositories[0]))\
-            .withSection("Stories To Do", 1)\
+        documentBuilder = MarkdownDocumentBuilder()\
+            .withSection("Planning", 0)
+        
+        if self._has_defined_working_days(repos):
+            documentBuilder.withSection("Working Days", 1)\
+                .withTable(self._build_working_days_table(repos.working_days_repository_collection.repositories[0]))\
+                .withSection("Holidays", 1)\
+                .withTable(self._build_holidays_table(repos.working_days_repository_collection.repositories[0]))
+            
+        documentBuilder.withSection("Stories To Do", 1)\
             .withTable(self._build_todo_table(repos.task_repository))\
             .withSection("Completed Stories", 1)\
             .withTable(self._build_completedTable(repos.task_repository))\
             .withSection("Removed Stories", 1)\
-            .withTable(self._build_removed_table(repos.task_repository))\
-            .build()
+            .withTable(self._build_removed_table(repos.task_repository))
         
-        return document
+        return documentBuilder.build()
+
+    def _has_defined_working_days(self, repos: RepositoryCollection) -> bool:
+        if repos.working_days_repository_collection == None:
+            return False
+        
+        if repos.working_days_repository_collection.isEmpty():
+            return False
+        
+        workingDaysRepo: WorkingDayRepository = repos.working_days_repository_collection.repositories[0]
+        
+        if workingDaysRepo is None:
+            return False
+
+        if workingDaysRepo.free_weekdays is None:
+            return False
+        
+        return True
 
     def _build_working_days_table(self, repo: WorkingDayRepository) -> MarkdownTable:
         theWeekdays = [weekdays.MONDAY, weekdays.TUESDAY, weekdays.WEDNESDAY,\
