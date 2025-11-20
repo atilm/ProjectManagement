@@ -1,6 +1,29 @@
 # Project Management Tools
 
-## Installation
+## Installation in Docker Container
+
+### Build the Container
+
+```
+docker build -t pm-docker:latest .
+```
+
+### Create and start the container (first time)
+
+* `cd` to the working directory of you planning project
+* Then
+  ```
+  docker run -it --name planning -v "$(pwd)":/workspace pm-docker:latest bash
+  ```
+
+### Reuse the container
+
+```
+docker start -ai planning
+```
+
+
+## Editable Installation
 
 In the root directory (containing the file setup.py) run:
 
