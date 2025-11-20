@@ -104,9 +104,9 @@ def parseDate(date_string: str) -> datetime.date:
 def initPlanningFile(args):
     print(f"initialize planning file: {args.planningPath}")
     task_repo = TaskRepository()
-    working_days_repo = WorkingDayRepository()
+    working_days_repos = WorkingDayRepositoryCollection()
     writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
-    planningFileContent = writer.write(RepositoryCollection(task_repo, working_days_repo))
+    planningFileContent = writer.write(RepositoryCollection(task_repo, working_days_repos))
     write_to_file(args.planningPath, planningFileContent)
 
 def generateEstimationFile(args):
@@ -200,8 +200,9 @@ def plotTrackingFile(args):
 
 def main():
     argumentParser = argparse.ArgumentParser(prog="projman", description="Cli project management tools")
-
-    subparsers = argumentParser.add_subparsers(help="The action to perform")
+    # Require a subcommand; without one args won't have 'func' and would raise AttributeError.
+    subparsers = argumentParser.add_subparsers(help="The action to perform", dest="command")
+    subparsers.required = True
 
     initParser = subparsers.add_parser("init", help="Generate a planning file with the initial structure.")
     initParser.add_argument("planningPath", help="Path to the planning file.")
@@ -233,7 +234,12 @@ def main():
     plotTrackingFileParser.set_defaults(func=lambda args: catch_all(plotTrackingFile, args))
 
     args = argumentParser.parse_args()
+    # Defensive: in case required flag is ignored or older Python behavior.
+    if not hasattr(args, 'func'):
+        argumentParser.print_help()
+        return 1
     args.func(args)
+    return 0
 
 if __name__ == "__main__":
     main()

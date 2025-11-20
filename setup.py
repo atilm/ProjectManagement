@@ -7,8 +7,9 @@ setup(
     author="Andreas Thielmann",
     packages=find_packages(),
     install_requires=[
-        # Add your dependencies here, e.g.:
-        # 'Markdown',
+        # Runtime dependencies
+        'matplotlib>=3.7.0',
+        'argparse>=1.4.0',
     ],
     entry_points={
         'console_scripts': [
