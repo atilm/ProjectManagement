@@ -1,5 +1,5 @@
 class FibonacciSequence:
-    sequence = [0, 1, 2, 3, 5, 8, 13, 20, 21, 34, 40, 55, 100]
+    sequence = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100, 200]
 
     def is_in_sequence(value: float):
         return value in FibonacciSequence.sequence[1:-1]
