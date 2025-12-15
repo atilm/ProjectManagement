@@ -129,15 +129,16 @@ class the_report_contains_the_sum_of_remaining_estimated_workdays_todo(DomainTes
 
     def test_when_a_completed_and_two_estimated_tasks_are_given(self):
         repo = self.given_a_repository_with_tasks([
-            self.completed_task(datetime.date(2022, 1, 1), 3, 6),
-            self.todo_task(5),
-            self.todo_task(3)
+            self.completed_task(datetime.date(2022, 1, 1), 3, 6, "project1"),
+            self.todo_task(5,  "project1"),
+            self.todo_task(3,  "project1")
         ])
 
         report = self.when_a_report_is_generated(repo)
 
         # then the sum of the durations is returned
         self.assertAlmostEqual(report.remaining_work_days.expected_value, 16, places=2)
+        self.assertEqual(report.predicted_completion_dates["project1"].expected_value, datetime.date(2022, 1, 17))
 
     def test_when_a_completed_and_some_estimated_and_some_unestimated_tasks_are_given(self):
         repo = self.given_a_repository_with_tasks([

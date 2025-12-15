@@ -13,7 +13,7 @@ RUN addgroup --gid 1000 container && \
 # Set user to 'container'
 USER container
 
-# Ensure /home/tara/.local/bin is in PATH for user tara
+# Ensure /home/container/.local/bin is in PATH for user container
 ENV PATH="/home/container/.local/bin:$PATH"
 
 # Set the working directory

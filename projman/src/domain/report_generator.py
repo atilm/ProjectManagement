@@ -1,5 +1,6 @@
 import math
 import datetime
+import projman.src.domain.project_calculation as pc
 from projman.src.domain import task
 from projman.src.domain.fibonacci_sequence import FibonacciSequence
 from projman.src.domain.tasks_repository import TaskRepository
@@ -72,12 +73,11 @@ class ReportGenerator:
     def generate(self, repos: RepositoryCollection, startDate: datetime.date) -> Report:
         report = Report()
 
-        task_repo = repos.task_repository
-
-        velocity, warnings = self._calculate_recent_velocity(repos)
+        velocity, warnings = pc.calculate_recent_velocity(repos)
         report.add_warnings(warnings)
         report.velocity = velocity
 
+        task_repo = repos.task_repository
         todo_tasks = list(filter(task.is_todo_task, task_repo.tasks.values()))
 
         workdays, report.task_reports, warning = self._calculate_completion_dates(todo_tasks, startDate, velocity, repos.working_days_repository_collection)
@@ -91,17 +91,7 @@ class ReportGenerator:
 
         return report
 
-    def _calculate_recent_velocity(self, repos: RepositoryCollection) -> tuple[float, list]:
-        tasksRepo = repos.task_repository
-        completedTasks = filter(task.is_completed_task, tasksRepo.tasks.values())
-        warnings, velocity = task.calculate_velocity(completedTasks, repos)
-
-        if not velocity:
-            warnings.add("No velocity could be calculated.")
-
-        return (velocity, warnings)
-
-    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepoCollection: WorkingDayRepositoryCollection) -> tuple[float, list, str]:
+    def _calculate_completion_dates(self, todoTasks: list, startDate: datetime.date, velocity: float, workingDaysRepoCollection: WorkingDayRepositoryCollection) -> tuple[ConfidenceInterval, list, str]:
         result = []
 
         warning = None
@@ -128,25 +118,10 @@ class ReportGenerator:
                 workdaysSumInterval = ConfidenceInterval(lower_limit, expected_value, upper_limit)
 
                 # could this algorithm be optimized to use only one loop? 
-                completionDateInterval = workdaysSumInterval.convert(lambda days: self._calculate_completion_date(workingDaysRepoCollection, days, startDate))
+                completionDateInterval = workdaysSumInterval.convert(lambda days: pc.calculate_completion_date(workingDaysRepoCollection, days, startDate))
 
                 result.append(TaskReport(todoTask, taskDurationInterval, completionDateInterval))
             else:
                 warning = "Unestimated stories have been ignored."
 
         return (workdaysSumInterval, result, warning)
-
-    def _calculate_completion_date(self, working_day_repo_collection: WorkingDayRepositoryCollection, remaining_days_of_work: float, start_date: datetime.date) -> datetime.date:
-        if remaining_days_of_work is None:
-            return None
-        
-        currentDate = start_date
-        while remaining_days_of_work > 0:
-            todays_capacity = working_day_repo_collection.get_working_day_capacity(currentDate)
-            if remaining_days_of_work >= todays_capacity:
-                remaining_days_of_work -= todays_capacity
-                currentDate += datetime.timedelta(1)
-            else:
-                remaining_days_of_work = 0
-
-        return currentDate
