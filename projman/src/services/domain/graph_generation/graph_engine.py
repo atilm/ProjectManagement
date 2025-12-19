@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from projman.src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphData
+from projman.src.domain.monte_carlo_simulator import MonteCarloSimulationResult
 from projman.src.services.domain.graph_generation.project_tracking_graph_generator import ProjectTrackingGraphData
 from projman.src.services.domain.graph_generation.graph_colors import GraphColorCycle
 import datetime
@@ -29,6 +30,17 @@ class GraphEngine:
         ax.plot(data.expected_values.x, data.expected_values.y, '-')
         ax.scatter(data.expected_values.x, data.expected_values.y, c=data.expected_values.color, zorder=2)
         
+        plt.show()
+
+    def plot_simulation_historgram(self, data: MonteCarloSimulationResult):
+        # plot a bar chart showing frequencies over bin_edges
+        fig, ax = plt.subplots()
+        ax.bar(data.bin_edges, data.frequencies, align='edge')
+        date_formatter = mdates.DateFormatter("%d-%m")
+        ax.xaxis.set_major_formatter(date_formatter)
+        plt.title("Monte Carlo Simulation Completion Date Histogram")
+        ax.set_xlabel("Completion Date")
+        ax.set_ylabel("Frequency")
         plt.show()
 
     def plot_tracking_graph(self, data: ProjectTrackingGraphData):

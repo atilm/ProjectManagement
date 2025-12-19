@@ -193,6 +193,9 @@ def simulate(args):
 
     for p, date in simulation_result.percentiles.items():
         print(f"{p}th percentile: {string_utilities.to_date_str(date)}")
+    
+    graph_engine = GraphEngine()
+    graph_engine.plot_simulation_historgram(simulation_result)
 
 def formatFile(args):
     print(f"Reformat file {args.filePath}:\n")
