@@ -13,6 +13,7 @@ from projman.src.domain.task import VelocityCalculationException
 from projman.src.domain.completion_date_history import CompletionDateHistory
 from projman.src.services.utilities import string_utilities
 from projman.src.services.domain.report_generation.report_file_generator import ReportFileGenerator
+from projman.src.domain.monte_carlo_simulator import *
 from projman.src.services.domain.graph_generation.burndown_graph_generator import BurndownGraphGenerator
 from projman.src.services.domain.graph_generation.graph_engine import GraphEngine
 from projman.src.services.domain.representation_reading.md_tracking_file_to_model_converter import MarkdownTrackingFileToModelConverter
@@ -181,6 +182,18 @@ def generateReport(args):
         data = graph_generator.generate(report, planningRepos)
         graph_engine.plot_burndown_graph(data)
 
+def simulate(args):
+    print(f"Running Monte Carlo simulation on {args.planningPath} with {args.numSimulations} simulations:\n")
+
+    planningRepos = parse_planning_files(args.planningPath)
+
+    simulator = MonteCarloSimulator(planningRepos, args.numSimulations, UniformRandomSelector())
+    startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
+    simulation_result = simulator.run_simulation(startDate)
+
+    for p, date in simulation_result.percentiles.items():
+        print(f"{p}th percentile: {string_utilities.to_date_str(date)}")
+
 def formatFile(args):
     print(f"Reformat file {args.filePath}:\n")
     parser = MarkdownParser()
@@ -232,6 +245,12 @@ def main():
     plotTrackingFileParser = subparsers.add_parser("track", help="Plot a graph of the historically predicted completion date ranges of the specified project.")
     plotTrackingFileParser.add_argument("filePath", help="Path to the tracking file.")
     plotTrackingFileParser.set_defaults(func=lambda args: catch_all(plotTrackingFile, args))
+
+    monteCarloSimulationParser = subparsers.add_parser("simulate", help="Run a Monte Carlo simulation to predict completion dates.")
+    monteCarloSimulationParser.add_argument("planningPath", help="Path to the planning file.")
+    monteCarloSimulationParser.add_argument("-n", "--numSimulations", type=int, default=10000, help="Number of simulations to run. Default is 10000.")
+    monteCarloSimulationParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
+    monteCarloSimulationParser.set_defaults(func=lambda args: catch_all(simulate, args)
 
     args = argumentParser.parse_args()
     # Defensive: in case required flag is ignored or older Python behavior.
