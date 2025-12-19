@@ -250,7 +250,7 @@ def main():
     monteCarloSimulationParser.add_argument("planningPath", help="Path to the planning file.")
     monteCarloSimulationParser.add_argument("-n", "--numSimulations", type=int, default=10000, help="Number of simulations to run. Default is 10000.")
     monteCarloSimulationParser.add_argument("-d", "--startDate", help="Date from when to start the predicition. If not specified, the current date is used.")
-    monteCarloSimulationParser.set_defaults(func=lambda args: catch_all(simulate, args)
+    monteCarloSimulationParser.set_defaults(func=lambda args: catch_all(simulate, args))
 
     args = argumentParser.parse_args()
     # Defensive: in case required flag is ignored or older Python behavior.

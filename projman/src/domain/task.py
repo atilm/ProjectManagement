@@ -1,6 +1,6 @@
 
 from projman.src.global_settings import GlobalSettings
-#from projman.src.domain.repository_collection import RepositoryCollection
+from projman.src.domain.working_day_repository_collection import WorkingDayRepositoryCollection
 import datetime
 from projman.src.services.utilities.date_utilities import dateRange
 
@@ -50,7 +50,7 @@ def calculate_velocity(tasks: list[Task], repos) -> tuple[set,float]:
 
     return (warnings, meanVelocity)
 
-def capacity_in_date_range(start_date: datetime.date, end_date: datetime.date, working_days):
+def capacity_in_date_range(start_date: datetime.date, end_date: datetime.date, working_days: WorkingDayRepositoryCollection) -> float:
     day_count = (end_date - start_date).days + 1
     if day_count < 1:
         raise VelocityCalculationException(-1)

@@ -1,3 +1,7 @@
+- [ ] Fix Tracking
+  - [ ] Look for it in subfolder next to planning file
+- [ ] Init should create the working days repository
+- [ ] Init should crate a Calendar file
 - [.] Monte Carlo Simulation
   - [ ] Add command which
     - [ ] parses files
