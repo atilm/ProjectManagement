@@ -18,7 +18,9 @@ from projman.src.services.domain.graph_generation.burndown_graph_generator impor
 from projman.src.services.domain.graph_generation.graph_engine import GraphEngine
 from projman.src.services.domain.representation_reading.md_tracking_file_to_model_converter import MarkdownTrackingFileToModelConverter
 from projman.src.services.domain.representation_writing.md_model_to_tracking_file_converter import ModelToMarkdownTrackingFileConverter
+from projman.src.services.domain.representation_writing.md_model_to_calendar_file_converter import ModelToCalendarFilesConverter
 from projman.src.services.domain.graph_generation.project_tracking_graph_generator import ProjectTrackingGraphGenerator
+from projman.src.domain.working_day_repository import WorkingDayRepository
 from projman.src.services.utilities.string_utilities import remove_suffix
 
 # HELPERS ---------------------------------------------------------------------------------------
@@ -105,16 +107,31 @@ def parseDate(date_string: str) -> datetime.date:
 def initPlanningFile(args):
     print(f"initialize planning file: {args.planningPath}")
     task_repo = TaskRepository()
+    working_days_repo = WorkingDayRepository()
+    working_days_repo.set_free_weekdays(SATURDAY, SUNDAY)
     working_days_repos = WorkingDayRepositoryCollection()
-    writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
-    planningFileContent = writer.write(RepositoryCollection(task_repo, working_days_repos))
-
+    working_days_repos.add(working_days_repo)
+    repos = RepositoryCollection(task_repo, working_days_repos)
+    
     # Create directory if it does not exist
     dir_path = os.path.dirname(args.planningPath)
     if dir_path:
         os.makedirs(dir_path, exist_ok=True)
 
+    # Write planning file
+    writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
+    planningFileContent = writer.write(repos)
     write_to_file(args.planningPath, planningFileContent)
+
+    # Write calendar file
+    calendar_dir = os.path.join(dir_path, "Calendars")
+    os.makedirs(calendar_dir, exist_ok=True)
+    calendar_files = ModelToCalendarFilesConverter().convert(repos)
+    calendar_writer = MarkdownWriter()
+    for calendar_file in calendar_files:
+        calendarFileContent = calendar_writer.write(calendar_file.document)
+        calendar_file_path = os.path.join(calendar_dir, calendar_file.filename)
+        write_to_file(calendar_file_path, calendarFileContent)
 
 def generateEstimationFile(args):
     print(f"generating {args.estimationPath} from {args.planningPath}")

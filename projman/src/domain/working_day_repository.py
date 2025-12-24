@@ -2,9 +2,10 @@ import datetime
 from projman.src.domain.free_range import FreeRange
 
 class WorkingDayRepository:
-    def __init__(self) -> None:
+    def __init__(self, name: str = "Developer Name") -> None:
+        self.name = name
         self.free_weekdays = set()
-        self.free_ranges = []
+        self.free_ranges: list[FreeRange] = []
 
     # takes Weekdays as arguments
     def set_free_weekdays(self, *args) -> None:

@@ -20,8 +20,8 @@ class DomainTestCase(unittest.TestCase):
             repo.add(t)
         return repo
 
-    def given_a_working_days_repository(self, free_weekdays: list, holidays: list) -> TaskRepository:
-        repo = WorkingDayRepository()
+    def given_a_working_days_repository(self, free_weekdays: list, holidays: list, name: str = None) -> TaskRepository:
+        repo = WorkingDayRepository(name) if name else WorkingDayRepository()
         repo.set_free_weekdays(*free_weekdays)
         repo.add_free_ranges(holidays)
         return repo
@@ -38,9 +38,7 @@ class DomainTestCase(unittest.TestCase):
     def completed_task(self, completedDate: datetime.date, estimate: float, actualWorkDays: float, projectId: str = "") -> Task:
         task = Task(self._id_generator.next(), "", projectId)
         task.estimate = estimate
-        # task.actualWorkDays = actualWorkDays
         task.completedDate = completedDate
-        # subtract (actualWorkDays - 1), because when start date and completed date are equal, this should count as a workday:
         task.startedDate = completedDate - datetime.timedelta(actualWorkDays - 1) if actualWorkDays is not None else completedDate
         task.createdDate = task.startedDate
         return task
