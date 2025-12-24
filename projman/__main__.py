@@ -108,6 +108,12 @@ def initPlanningFile(args):
     working_days_repos = WorkingDayRepositoryCollection()
     writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
     planningFileContent = writer.write(RepositoryCollection(task_repo, working_days_repos))
+
+    # Create directory if it does not exist
+    dir_path = os.path.dirname(args.planningPath)
+    if dir_path:
+        os.makedirs(dir_path, exist_ok=True)
+
     write_to_file(args.planningPath, planningFileContent)
 
 def generateEstimationFile(args):
