@@ -169,9 +169,10 @@ def generateReport(args):
     startDate = parseDate( args.startDate) if args.startDate else datetime.date.today()
     report = reportGenerator.generate(planningRepos, startDate)
 
-    # for each project, append the currently predicted completion dates to a file to track the development of completion dates
-    for projectId, completion_dates in report.predicted_completion_dates.items():
-        history = parse_tracking_file(projectId)
+    # for each project, append the currently predicted completion dates
+    # to a file to track the development of completion dates
+    for project_id, completion_dates in report.predicted_completion_dates.items():
+        history = parse_tracking_file(project_id)
         history.add(datetime.date.today(), completion_dates)
         write_tracking_file(history)
 
@@ -180,12 +181,12 @@ def generateReport(args):
     print("\nCompletion date ranges:")
     projectColumnWidth = max([len(projectId) for projectId in report.predicted_completion_dates.keys()])
     formatStr = f"{{0:>{projectColumnWidth}s}}: {{1}}"
-    for projectId, completionDateInterval in report.predicted_completion_dates.items():
-        print(formatStr.format(projectId, completionDateInterval.to_string(string_utilities.to_date_str)))
+    for project_id, completionDateInterval in report.predicted_completion_dates.items():
+        print(formatStr.format(project_id, completionDateInterval.to_string(string_utilities.to_date_str)))
 
-    if (report.warnings):
+    if report.warnings:
         print("\nWarnings:\n")
-    
+
     for warning in report.warnings:
         print(warning)
 
