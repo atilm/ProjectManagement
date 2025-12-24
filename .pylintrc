@@ -1,0 +1,2 @@
+[MESSAGES CONTROL]
+disable=missing-function-docstring,missing-method-docstring,invalid-name,line-too-long

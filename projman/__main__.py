@@ -49,6 +49,11 @@ def read_from_file(filePath: str) -> str:
     file.close()
     return content
 
+def create_missing_directories(file_path: str) -> None:
+    dir_path = os.path.dirname(file_path)
+    if dir_path and not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
 def write_to_file(filePath: str, content: str) -> str:
     file = open(filePath, mode='w', encoding="utf-8")
     file.write(content)
@@ -71,29 +76,34 @@ def parse_planning_files(planningPath: str) -> RepositoryCollection:
 
     return planningReader.read(input_strings)
 
-def parse_tracking_file(projectId: str) -> CompletionDateHistory:
-    tracking_file_path = to_tracking_file_path(projectId)
+def parse_tracking_file_from_id(working_dir: str, projectId: str) -> CompletionDateHistory:
+    tracking_file_path = to_tracking_file_path(working_dir, projectId)
 
-    if not(os.path.exists(tracking_file_path)):
+    if not os.path.exists(tracking_file_path):
         return CompletionDateHistory(projectId)
 
+    return parse_tracking_file(tracking_file_path)
+
+def parse_tracking_file(tracking_file_path: str) -> CompletionDateHistory:
     file_content = read_from_file(tracking_file_path)
 
     tracking_reader = MarkdownRepresentationReader(MarkdownTrackingFileToModelConverter())
     history: CompletionDateHistory = tracking_reader.read(file_content)
     return history
 
-def write_tracking_file(history: CompletionDateHistory) -> None:
-    file_path = to_tracking_file_path(history.projectId)
+def write_tracking_file(working_dir: str, history: CompletionDateHistory) -> None:
+    file_path = to_tracking_file_path(working_dir, history.projectId)
     tracking_writer = MarkdownRepresentationWriter(ModelToMarkdownTrackingFileConverter())
     file_content = tracking_writer.write(history)
+
+    create_missing_directories(file_path)
     write_to_file(file_path, file_content)
-    
-def to_tracking_file_path(projectId: str):
+
+def to_tracking_file_path(working_dir: str, projectId: str):
     # this function works with a project id
     # handle the case, where a file name is given instead
     projectId = remove_suffix(projectId, ".md")
-    tracking_file_path = f"Tracking/{projectId}.md"
+    tracking_file_path = os.path.join(working_dir, "Tracking", f"{projectId}.md")
     return tracking_file_path
 
 def parseDate(date_string: str) -> datetime.date:
@@ -115,8 +125,7 @@ def initPlanningFile(args):
     
     # Create directory if it does not exist
     dir_path = os.path.dirname(args.planningPath)
-    if dir_path:
-        os.makedirs(dir_path, exist_ok=True)
+    create_missing_directories(args.planningPath)
 
     # Write planning file
     writer = MarkdownRepresentationWriter(ModelToMarkdownPlanningDocumentConverter())
@@ -171,10 +180,13 @@ def generateReport(args):
 
     # for each project, append the currently predicted completion dates
     # to a file to track the development of completion dates
+
+    working_dir = os.path.dirname(os.path.abspath(args.planningPath))
+
     for project_id, completion_dates in report.predicted_completion_dates.items():
-        history = parse_tracking_file(project_id)
+        history = parse_tracking_file_from_id(working_dir, project_id)
         history.add(datetime.date.today(), completion_dates)
-        write_tracking_file(history)
+        write_tracking_file(working_dir, history)
 
     # print summary to console
     print(f"Velocity: {report.velocity} story points / day")
@@ -217,7 +229,7 @@ def simulate(args):
 
     for p, date in simulation_result.percentiles.items():
         print(f"{p}th percentile: {string_utilities.to_date_str(date)}")
-    
+
     graph_engine = GraphEngine()
     graph_engine.plot_simulation_historgram(simulation_result)
 
@@ -226,8 +238,8 @@ def formatFile(args):
     parser = MarkdownParser()
     writer = MarkdownWriter()
 
-    input = read_from_file(args.filePath)
-    document = parser.parse(input)
+    input_str = read_from_file(args.filePath)
+    document = parser.parse(input_str)
     output = writer.write(document)
     write_to_file(args.filePath, output)
 
