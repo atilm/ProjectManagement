@@ -8,6 +8,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         # Runtime dependencies
+        'numpy>=1.23.0',
         'matplotlib>=3.7.0',
         'argparse>=1.4.0',
     ],
