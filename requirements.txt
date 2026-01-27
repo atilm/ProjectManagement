@@ -1,3 +1,5 @@
 numpy
+scipy
+networkx
 matplotlib>=3.7.0
 argparse>=1.4.0
