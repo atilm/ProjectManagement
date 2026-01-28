@@ -1,4 +1,4 @@
-from dependency_monte_carlo.src.project import Estimation, Project
+from dependency_monte_carlo.src.project import Estimation, Project, WorkPackage
 import dependency_monte_carlo.src.beta_distribution as dist
 import numpy as np
 import networkx as nx
@@ -43,7 +43,7 @@ class BetaSampler(ISampler):
 class SimulationWorkPackage:
     """Data set used during simulation of work packages."""
     def __init__(self, work_package, sampler: ISampler):
-        self.work_package = work_package
+        self.work_package: WorkPackage = work_package
         self.sampler = sampler
         self.simulated_end_times: list[float] = []
 

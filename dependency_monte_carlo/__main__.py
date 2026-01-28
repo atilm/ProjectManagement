@@ -20,9 +20,33 @@ def generate_dependency_diagram(project: Project, directory: str):
 {work_package_descriptions}
         """)
 
+def generate_gantt_diagram(project_simulation_result, project_name: str, start_date: datetime.date, output_directory: str):
+    from dependency_monte_carlo.src.gantt_diagram_generator import MermaidGanttDiagramGenerator
+
+    diagram_content = MermaidGanttDiagramGenerator.generate(
+        project_simulation_result,
+        project_name,
+        start_date,
+        percentile=85
+    )
+    output_file_path = os.path.join(output_directory, "project_gantt_diagram.md")
+    with open(output_file_path, 'w') as output_file:
+        output_file.write(f"""# Project Gantt Diagram
+```mermaid
+{diagram_content}
+```
+        """)
+
 def run_simulation(project: Project, output_directory: str):
     simulation = ProjectSimulation(project, sampler_factory=lambda estimation: BetaSampler(estimation))
     result = simulation.run_simulation(iterations=10000)
+
+    generate_gantt_diagram(
+        result,
+        project.name,
+        datetime.date.today(),
+        output_directory
+    )
 
     project_durations_in_days = result.total_durations
     now = datetime.datetime.now()
