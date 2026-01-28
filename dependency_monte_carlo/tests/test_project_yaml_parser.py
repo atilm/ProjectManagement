@@ -23,14 +23,14 @@ project:
         mode: 5
         max: 10
     - id: WP3
-      name: Work pakackge 3
+      name: Work package 3
       depends_on: [WP1]
       estimation:
         min: 1
         mode: 5
         max: 10
     - id: WP4
-      name: Work pakackge 4
+      name: Work package 4
       depends_on: [WP2, WP3]
       estimation:
         min: 0
