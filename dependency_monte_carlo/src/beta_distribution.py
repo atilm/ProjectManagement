@@ -7,7 +7,7 @@ def beta_pert_parameters(mode: float, min_val: float, max_val: float, scale:floa
     Source: https://prevalence.cbra.be/?main=functions&sub=betaPERT
     """
     if not (min_val < mode < max_val):
-        raise ValueError("mode must be between min and max")
+        raise ValueError(f"mode {mode} must be between min {min_val} and max {max_val}")
     
     m = mode
     a = min_val

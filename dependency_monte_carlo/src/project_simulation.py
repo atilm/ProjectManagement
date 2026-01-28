@@ -1,4 +1,5 @@
 from dependency_monte_carlo.src.project import Estimation, Project
+import dependency_monte_carlo.src.beta_distribution as dist
 import numpy as np
 import networkx as nx
 
@@ -9,6 +10,35 @@ class ISampler:
 
     def sample(self, rng: np.random.Generator) -> float:
         return 0.0
+
+class BetaSampler(ISampler):
+    """Beta distribution sampler for work package estimation."""
+    def __init__(self, estimation: Estimation):
+        self.estimation = estimation
+
+        if estimation.min_val == 0 and estimation.mode == 0 and estimation.max_val == 0:
+            self.alpha = 0.0
+            self.beta = 0.0
+            return
+
+        alpha, beta = dist.beta_pert_parameters(
+            mode=estimation.mode,
+            min_val=estimation.min_val,
+            max_val=estimation.max_val
+        )
+        self.alpha = alpha
+        self.beta = beta
+
+    def sample(self, rng: np.random.Generator) -> float:
+        if self.alpha == 0.0 and self.beta == 0.0:
+            return 0.0
+
+        return dist.beta_pert_sample(
+            alpha=self.alpha,
+            beta=self.beta,
+            min_val=self.estimation.min_val,
+            max_val=self.estimation.max_val,
+            rng=rng)
 
 class SimulationWorkPackage:
     """Data set used during simulation of work packages."""
