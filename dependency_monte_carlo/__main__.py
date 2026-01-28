@@ -1,5 +1,7 @@
 import argparse
 import os
+import datetime
+import matplotlib.pyplot as plt
 from dependency_monte_carlo.src.project_yaml_parser import ProjectYamlParser
 from dependency_monte_carlo.src.flow_diagram_generator import MermaidFlowDiagramGenerator
 from dependency_monte_carlo.src.project import Project
@@ -22,6 +24,19 @@ def run_simulation(project: Project, output_directory: str):
     simulation = ProjectSimulation(project, sampler_factory=lambda estimation: BetaSampler(estimation))
     result = simulation.run_simulation(iterations=10000)
 
+    project_durations_in_days = result.total_durations
+    now = datetime.datetime.now()
+    project_end_dates_from_today = [now + datetime.timedelta(days=duration) for duration in project_durations_in_days]
+    ordinals = [date.toordinal() for date in project_end_dates_from_today]
+    plt.hist(ordinals, bins=30, edgecolor='black')
+    plt.xlabel('Completion Date')
+    plt.ylabel('Frequency')
+    plt.title(f'Forecasted Completion Dates for the project')
+    locs, labels = plt.xticks()
+    plt.xticks(locs, [datetime.datetime.fromordinal(int(l)).strftime('%Y-%m-%d') for l in locs], rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_directory, 'project_completion_forecast.png'))
+    plt.close()
 
 
 if __name__ == "__main__":

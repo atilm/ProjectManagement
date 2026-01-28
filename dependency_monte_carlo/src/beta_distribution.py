@@ -26,6 +26,7 @@ def beta_pert_sample(alpha, beta, min_val, max_val, rng: np.random.Generator) ->
     Sample from a Beta-PERT distribution defined by min, max, alpha and beta.
     """
     sample = rng.beta(alpha, beta, size=1)
+    sample = sample[0]
     # Scale sample back to [min_val, max_val]
     scaled_sample = sample * (max_val - min_val) + min_val
     return scaled_sample
