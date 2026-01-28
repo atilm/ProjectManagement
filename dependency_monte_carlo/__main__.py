@@ -17,11 +17,14 @@ if __name__ == "__main__":
     project = ProjectYamlParser.parse(open(project_file_path, 'r'))
 
     diagram_content = MermaidFlowDiagramGenerator.generate(project)
+    work_package_descriptions = MermaidFlowDiagramGenerator.generate_markdown_descriptions(project)
     output_file_path = os.path.join(directory, "project_dependencies.md")
     with open(output_file_path, 'w') as output_file:
         output_file.write(f"""# Project Dependencies Diagram
 ```mermaid
 {diagram_content}
 ```
+
+{work_package_descriptions}
         """)
     

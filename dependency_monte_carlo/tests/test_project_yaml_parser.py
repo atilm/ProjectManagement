@@ -24,6 +24,9 @@ project:
         max: 10
     - id: WP3
       name: Work package 3
+      description: |
+        This is another
+        work package 3.
       depends_on: [WP1]
       estimation:
         min: 1
@@ -65,6 +68,8 @@ class ParserTestCase(unittest.TestCase):
 
       wp3 = project.work_packages[2]
       self.assertEqual(wp3.id, "WP3")
+      self.assertEqual(wp3.name, "Work package 3")
+      self.assertEqual(wp3.description.strip(), "This is another\nwork package 3.")
       self.assertEqual(wp3.dependencies, ["WP1"])
       self.assertEqual(wp3.estimation.min_val, 1)
       self.assertEqual(wp3.estimation.mode, 5)

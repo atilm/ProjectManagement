@@ -26,6 +26,9 @@ project:
         max: 10
     - id: WP3
       name: Work package 3
+      description: |
+        This is another
+        work package 3.
       depends_on: [WP1]
       estimation:
         min: 1
@@ -63,3 +66,22 @@ class FlowDiagramGeneratorTestCase(unittest.TestCase):
     WP3 --> WP4"""
 
         self.assertEqual(diagram.strip(), expected_diagram.strip())
+
+    def test_generate_markdown_descriptions(self):
+        import io
+        file_obj = io.StringIO(YAML_CONTENT)
+        project = ProjectYamlParser.parse(file_obj)
+
+        descriptions = MermaidFlowDiagramGenerator.generate_markdown_descriptions(project)
+
+        expected_text = """## WP1: Work package 1
+This is
+work package 1.
+
+## WP3: Work package 3
+This is another
+work package 3.
+"""
+
+        # Check that descriptions are included in the node labels
+        self.assertIn(expected_text, descriptions)
