@@ -13,6 +13,7 @@ class ProjectYamlParser:
             wp.id = wp_data.get('id', '')
             wp.name = wp_data.get('name', '')
             wp.description = wp_data.get('description', '')
+            wp.subgraph = wp_data.get('subgraph', '')
             wp.dependencies = wp_data.get('depends_on', [])
             est_data = wp_data.get('estimation', {})
             wp.estimation = Estimation(

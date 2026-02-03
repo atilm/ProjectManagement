@@ -19,6 +19,7 @@ project:
         max: 30
     - id: WP2
       name: Work package 2
+      subgraph: Midphase
       depends_on: [WP1]
       estimation:
         min: 1
@@ -29,6 +30,7 @@ project:
       description: |
         This is another
         work package 3.
+      subgraph: Endphase
       depends_on: [WP1]
       estimation:
         min: 1
@@ -36,6 +38,7 @@ project:
         max: 10
     - id: WP4
       name: Work package 4
+      subgraph: Endphase
       depends_on: [WP2, WP3]
       estimation:
         min: 0
@@ -63,7 +66,17 @@ class FlowDiagramGeneratorTestCase(unittest.TestCase):
     WP1 --> WP2
     WP1 --> WP3
     WP2 --> WP4
-    WP3 --> WP4"""
+    WP3 --> WP4
+
+    subgraph Midphase
+        WP2
+    end
+
+    subgraph Endphase
+        WP3
+        WP4
+    end
+"""
 
         self.assertEqual(diagram.strip(), expected_diagram.strip())
 

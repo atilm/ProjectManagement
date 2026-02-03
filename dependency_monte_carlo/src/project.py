@@ -11,6 +11,7 @@ class WorkPackage:
         self.description: str = ""
         self.estimation: Estimation = Estimation()
         self.dependencies: list[str] = []
+        self.subgraph: str = ""
 
 class Project:
     def __init__(self):
