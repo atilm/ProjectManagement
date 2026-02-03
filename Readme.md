@@ -8,28 +8,14 @@
 docker build -t pm-docker:latest .
 ```
 
-### Create and start the container (first time)
-
-* `cd` to the working directory of you planning project
-* Then
-```
-docker run -it \
-  --name planning \
-  -e DISPLAY=$DISPLAY \
-  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
-  -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY \
-  -v "$(pwd)":/workspace \
-  pm-docker:latest bash
-```
-
-### Reuse the container
+### Use the script to run a self-removing interactive container
 
 ```
-docker start -ai planning
+./run_planning.sh
 ```
 
+This will run the image `pm-docker:latest` and mount the current working directory.
+When you exit the container, the container will be removed automatically.
 
 ## Editable Installation
 

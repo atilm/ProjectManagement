@@ -41,6 +41,12 @@ def run_simulation(project: Project, output_directory: str):
     simulation = ProjectSimulation(project, sampler_factory=lambda estimation: BetaSampler(estimation))
     result = simulation.run_simulation(iterations=10000)
 
+    # Output 0, 50, 85 and 100 percent percentiles
+    percentiles = [0, 50, 85, 100]
+    for p in percentiles:
+        duration = result.get_percentile(p)
+        print(f"Project duration at {p} percentile: {duration} days")
+
     generate_gantt_diagram(
         result,
         project.name,
@@ -62,11 +68,10 @@ def run_simulation(project: Project, output_directory: str):
     plt.savefig(os.path.join(output_directory, 'project_completion_forecast.png'))
     plt.close()
 
-
-if __name__ == "__main__":
+def main():
     argumentParser = argparse.ArgumentParser(prog="monte-carlo-dependencies", description="Cli project management tools")
     argumentParser.add_argument("project_file_path", help="Path to the project YAML file")
-    
+
     args = argumentParser.parse_args()
     project_file_path = args.project_file_path
 
@@ -74,8 +79,13 @@ if __name__ == "__main__":
 
     print(f"Project file path: {project_file_path}")
 
-    project = ProjectYamlParser.parse(open(project_file_path, 'r'))
+    with open(project_file_path, 'r') as f:
+        project = ProjectYamlParser.parse(f)
 
     generate_dependency_diagram(project, directory)
     run_simulation(project, directory)
-    
+
+
+if __name__ == "__main__":
+    main()
+
